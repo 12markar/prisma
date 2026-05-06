@@ -57,11 +57,11 @@ public enum CatalogueRegistry {
     }
 
     public static func search(_ query: String) -> [CatalogueEntry] {
-        let q = query.trimmingCharacters(in: .whitespaces).lowercased()
-        guard !q.isEmpty else { return entries }
+        let needle = query.trimmingCharacters(in: .whitespaces).lowercased()
+        guard !needle.isEmpty else { return entries }
         return entries.filter { entry in
-            entry.title.lowercased().contains(q) ||
-                entry.tags.contains { $0.lowercased().contains(q) }
+            entry.title.lowercased().contains(needle) ||
+                entry.tags.contains { $0.lowercased().contains(needle) }
         }
     }
 

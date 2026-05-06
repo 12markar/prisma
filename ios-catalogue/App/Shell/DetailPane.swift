@@ -36,19 +36,27 @@ struct DetailPane: View {
                     .font(PrismaTypography.headlineLg.font)
                     .foregroundStyle(PrismaSemanticColors.textPrimary.themed(scheme))
 
-                // Phase 0 placeholder. Phase 1+ replaces this with real
-                // foundation showcases and component detail layouts (live demo,
-                // variants, states, tokens used, a11y notes, code snippet,
-                // interactive playground).
-                Text("Phase 0 placeholder — implementation lands per-phase per docs/TODO.md.")
-                    .font(PrismaTypography.bodyMd.font)
-                    .foregroundStyle(PrismaSemanticColors.textSecondary.themed(scheme))
-                    .padding(.top, PrismaSpacing.sp2)
+                showcase(for: entry)
+                    .padding(.top, PrismaSpacing.sp4)
 
                 Spacer(minLength: PrismaSpacing.sp7)
             }
             .padding(PrismaSpacing.sp7)
             .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
+    @ViewBuilder
+    private func showcase(for entry: CatalogueEntry) -> some View {
+        switch entry.key {
+        case "foundation.typography": TypographyShowcase()
+        case "foundation.colors":     ColorShowcase()
+        case "foundation.spacing":    SpacingShowcase()
+        case "foundation.radius":     RadiusShowcase()
+        default:
+            Text("Phase 0 placeholder — implementation lands per-phase per docs/TODO.md.")
+                .font(PrismaTypography.bodyMd.font)
+                .foregroundStyle(PrismaSemanticColors.textSecondary.themed(scheme))
         }
     }
 }
