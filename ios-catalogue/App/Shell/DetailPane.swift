@@ -53,6 +53,8 @@ struct DetailPane: View {
         case "foundation.colors":     ColorShowcase()
         case "foundation.spacing":    SpacingShowcase()
         case "foundation.radius":     RadiusShowcase()
+        case "foundation.elevation":  ElevationShowcase()
+        case "foundation.motion":     MotionShowcase()
         default:
             Text("Phase 0 placeholder — implementation lands per-phase per docs/TODO.md.")
                 .font(PrismaTypography.bodyMd.font)
