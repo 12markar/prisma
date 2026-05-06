@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Prisma — Icon Set</title>
+<link rel="stylesheet" href="../../site/tokens.css"/>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--surface-base);color:var(--text-primary);font-family:var(--font-sans);padding:64px 40px;min-height:100vh}
+  .head{max-width:1200px;margin:0 auto 48px;display:flex;align-items:end;justify-content:space-between;gap:24px;flex-wrap:wrap}
+  h1{font-size:48px;line-height:1;letter-spacing:-0.025em;font-weight:600}
+  h1 em{font-style:italic;color:var(--accent-default);font-weight:500}
+  .lede{color:var(--text-secondary);max-width:48ch;margin-top:12px;font-size:16px;line-height:1.55}
+  .controls{display:flex;gap:12px;align-items:center}
+  input[type=search]{font-family:inherit;background:var(--surface-raised);border:1px solid var(--border-subtle);color:var(--text-primary);padding:10px 14px;border-radius:8px;font-size:14px;width:220px}
+  input[type=search]:focus{outline:none;border-color:var(--accent-default)}
+  .size-row{display:inline-flex;background:var(--surface-sunken);border:1px solid var(--border-subtle);border-radius:8px;padding:3px}
+  .size-row button{background:transparent;border:0;font-family:var(--font-mono);font-size:11px;color:var(--text-tertiary);padding:6px 10px;border-radius:6px;cursor:pointer}
+  .size-row button[aria-pressed=true]{background:var(--surface-raised);color:var(--text-primary)}
+  .grid{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+  .cell{aspect-ratio:1;border:1px solid var(--border-subtle);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:var(--surface-raised);transition:all 200ms;cursor:pointer;position:relative}
+  .cell:hover{border-color:var(--accent-default);background:color-mix(in oklab,var(--accent-default) 6%,var(--surface-raised));transform:translateY(-2px)}
+  .cell svg{color:var(--text-primary)}
+  .cell .name{font-family:var(--font-mono);font-size:10px;color:var(--text-tertiary);letter-spacing:0.04em}
+  .cell.copied::after{content:"copied";position:absolute;top:8px;right:8px;font-family:var(--font-mono);font-size:9px;color:var(--accent-default);letter-spacing:0.06em;text-transform:uppercase}
+  .cat{max-width:1200px;margin:0 auto 16px;font-family:var(--font-mono);font-size:11px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:0.08em;padding-top:32px;border-top:1px solid var(--border-subtle)}
+  .meta{max-width:1200px;margin:64px auto 0;padding-top:32px;border-top:1px solid var(--border-subtle);font-family:var(--font-mono);font-size:12px;color:var(--text-tertiary);display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px}
+</style>
+</head>
+<body>
+
+<div class="head">
+  <div>
+    <h1>Icon Set <em>/ 64</em></h1>
+    <p class="lede">Outline-only · 24×24 grid · 1.75px stroke · rounded caps & joins. Click any icon to copy its <code style="font-family:var(--font-mono);font-size:13px;color:var(--accent-default)">&lt;use&gt;</code> reference.</p>
+  </div>
+  <div class="controls">
+    <input type="search" id="q" placeholder="Search icons…"/>
+    <div class="size-row" role="radiogroup">
+      <button data-size="16" aria-pressed="false">16</button>
+      <button data-size="20" aria-pressed="false">20</button>
+      <button data-size="24" aria-pressed="true">24</button>
+      <button data-size="32" aria-pressed="false">32</button>
+    </div>
+  </div>
+</div>
+
+<div id="container"></div>
+
+<div class="meta">
+  <span>prisma-icons · v0.1.0</span>
+  <span>64 icons · 7 categories</span>
+  <span>MIT licensed</span>
+</div>
+
+<script>
+const cats = {
+  "Navigation":["arrow-up","arrow-down","arrow-left","arrow-right","chevron-up","chevron-down","chevron-left","chevron-right"],
+  "Actions":["plus","minus","edit","trash","copy","share","download","upload","save","refresh","more","close"],
+  "Status":["check","x","info","warning","error","success","help","alert"],
+  "Objects":["folder","file","image","video","doc","archive","link","tag","bookmark","calendar","clock","bell"],
+  "Catalogue":["grid","list","sort","filter","search","scan","qr","barcode","label","layers"],
+  "Social":["user","users","heart","star","message","mail","phone","location"],
+  "System":["settings","lock","unlock","eye","eye-off","sync"]
+};
+
+const SPRITE = "prisma-icons.svg";
+let size = 24;
+const container = document.getElementById('container');
+
+function render(filter=""){
+  container.innerHTML = "";
+  Object.entries(cats).forEach(([cat, icons]) => {
+    const matched = icons.filter(n => n.includes(filter.toLowerCase()));
+    if (!matched.length) return;
+    const h = document.createElement('div');
+    h.className = 'cat'; h.textContent = cat + ' · ' + matched.length;
+    container.appendChild(h);
+    const g = document.createElement('div'); g.className = 'grid';
+    matched.forEach(name => {
+      const c = document.createElement('div'); c.className = 'cell'; c.dataset.name = name;
+      c.innerHTML = `<svg width="${size}" height="${size}" viewBox="0 0 24 24"><use href="${SPRITE}#${name}"/></svg><span class="name">${name}</span>`;
+      c.onclick = () => {
+        navigator.clipboard.writeText(`<svg><use href="${SPRITE}#${name}"/></svg>`);
+        c.classList.add('copied'); setTimeout(()=>c.classList.remove('copied'), 1200);
+      };
+      g.appendChild(c);
+    });
+    container.appendChild(g);
+  });
+}
+render();
+
+document.getElementById('q').oninput = e => render(e.target.value);
+document.querySelectorAll('.size-row button').forEach(b => {
+  b.onclick = () => {
+    document.querySelectorAll('.size-row button').forEach(x => x.setAttribute('aria-pressed','false'));
+    b.setAttribute('aria-pressed','true');
+    size = +b.dataset.size;
+    render(document.getElementById('q').value);
+  };
+});
+</script>
+</body>
+</html>

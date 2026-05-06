@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Light-mode window background — Prisma surface.base.light (#FAF8F5).
+         Used during cold-start splash and behind any safe-area bleeds before
+         Compose paints the same colour via PrismaSemanticColors.SurfaceBase. -->
+    <color name="window_background_prisma">#FAF8F5</color>
+</resources>

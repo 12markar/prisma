@@ -50,25 +50,36 @@ public object CatalogueRegistry {
         entry("foundation.radius",     "Radius",     CatalogueSection.Foundations, listOf("corner", "radius"))     { RadiusShowcase() },
 
         // Inputs
-        entry("input.button",     "Button",     CatalogueSection.Inputs, listOf("button", "action"))   { ButtonShowcase() },
-        entry("input.textfield",  "TextField",  CatalogueSection.Inputs, listOf("input", "form")),
-        entry("input.checkbox",   "Checkbox",   CatalogueSection.Inputs, listOf("input", "form", "selection")),
-        entry("input.radio",      "Radio",      CatalogueSection.Inputs, listOf("input", "form", "selection")),
-        entry("input.switch",     "Switch",     CatalogueSection.Inputs, listOf("input", "form", "toggle")),
+        entry("input.button",            "Button",            CatalogueSection.Inputs, listOf("button", "action"))   { ButtonShowcase() },
+        entry("input.textfield",         "TextField",         CatalogueSection.Inputs, listOf("input", "form")),
+        entry("input.checkbox",          "Checkbox",          CatalogueSection.Inputs, listOf("input", "form", "selection")),
+        entry("input.radio",             "Radio",             CatalogueSection.Inputs, listOf("input", "form", "selection")),
+        entry("input.switch",            "Switch",            CatalogueSection.Inputs, listOf("input", "form", "toggle")),
+        entry("input.slider",            "Slider",            CatalogueSection.Inputs, listOf("input", "range", "value")),
+        entry("input.segmentedControl",  "Segmented control", CatalogueSection.Inputs, listOf("input", "selection", "tabs")),
 
         // Feedback
         entry("feedback.toast",       "Toast",        CatalogueSection.Feedback, listOf("feedback", "notification")),
+        entry("feedback.banner",      "Banner",       CatalogueSection.Feedback, listOf("feedback", "alert", "inline")),
         entry("feedback.modal",       "Modal",        CatalogueSection.Feedback, listOf("feedback", "dialog")),
         entry("feedback.bottomSheet", "Bottom sheet", CatalogueSection.Feedback, listOf("feedback", "sheet")),
+        entry("feedback.popover",     "Popover",      CatalogueSection.Feedback, listOf("feedback", "overlay")),
+        entry("feedback.tooltip",     "Tooltip",      CatalogueSection.Feedback, listOf("feedback", "hint")),
         entry("feedback.loading",     "Loading",      CatalogueSection.Feedback, listOf("feedback", "progress")),
+        entry("feedback.skeleton",    "Skeleton",     CatalogueSection.Feedback, listOf("feedback", "placeholder", "loading")),
         entry("feedback.badge",       "Badge",        CatalogueSection.Feedback, listOf("feedback", "indicator")),
+        entry("feedback.emptyState",  "Empty state",  CatalogueSection.Feedback, listOf("feedback", "empty")),
 
         // Navigation
-        entry("navigation.tabs", "Tabs", CatalogueSection.Navigation, listOf("navigation")),
-        entry("navigation.chip", "Chip", CatalogueSection.Navigation, listOf("selection", "filter")),
+        entry("navigation.tabs",            "Tabs",            CatalogueSection.Navigation, listOf("navigation")),
+        entry("navigation.chip",            "Chip",            CatalogueSection.Navigation, listOf("selection", "filter")),
+        entry("navigation.commandPalette",  "Command palette", CatalogueSection.Navigation, listOf("search", "shortcut", "overlay")),
 
         // Data display
-        entry("data.card", "Card", CatalogueSection.DataDisplay, listOf("container", "surface")),
+        entry("data.card",     "Card",      CatalogueSection.DataDisplay, listOf("container", "surface")),
+        entry("data.listItem", "List item", CatalogueSection.DataDisplay, listOf("row", "list")),
+        entry("data.avatar",   "Avatar",    CatalogueSection.DataDisplay, listOf("user", "image")),
+        entry("data.divider",  "Divider",   CatalogueSection.DataDisplay, listOf("separator", "rule")),
     )
 
     public val sections: ImmutableList<CatalogueSection> =

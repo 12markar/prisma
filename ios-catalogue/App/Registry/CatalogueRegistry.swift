@@ -36,20 +36,31 @@ public enum CatalogueRegistry {
         CatalogueEntry(key: "input.checkbox", title: "Checkbox", section: .inputs, tags: ["input", "form", "selection"]),
         CatalogueEntry(key: "input.radio", title: "Radio", section: .inputs, tags: ["input", "form", "selection"]),
         CatalogueEntry(key: "input.switch", title: "Switch", section: .inputs, tags: ["input", "form", "toggle"]),
+        CatalogueEntry(key: "input.slider", title: "Slider", section: .inputs, tags: ["input", "range", "value"]),
+        CatalogueEntry(key: "input.segmentedControl", title: "Segmented control", section: .inputs, tags: ["input", "selection", "tabs"]),
 
         // Feedback
         CatalogueEntry(key: "feedback.toast", title: "Toast", section: .feedback, tags: ["feedback", "notification"]),
+        CatalogueEntry(key: "feedback.banner", title: "Banner", section: .feedback, tags: ["feedback", "alert", "inline"]),
         CatalogueEntry(key: "feedback.modal", title: "Modal", section: .feedback, tags: ["feedback", "dialog"]),
         CatalogueEntry(key: "feedback.bottomSheet", title: "Bottom sheet", section: .feedback, tags: ["feedback", "sheet"]),
+        CatalogueEntry(key: "feedback.popover", title: "Popover", section: .feedback, tags: ["feedback", "overlay"]),
+        CatalogueEntry(key: "feedback.tooltip", title: "Tooltip", section: .feedback, tags: ["feedback", "hint"]),
         CatalogueEntry(key: "feedback.loading", title: "Loading", section: .feedback, tags: ["feedback", "progress"]),
+        CatalogueEntry(key: "feedback.skeleton", title: "Skeleton", section: .feedback, tags: ["feedback", "placeholder", "loading"]),
         CatalogueEntry(key: "feedback.badge", title: "Badge", section: .feedback, tags: ["feedback", "indicator"]),
+        CatalogueEntry(key: "feedback.emptyState", title: "Empty state", section: .feedback, tags: ["feedback", "empty"]),
 
         // Navigation
         CatalogueEntry(key: "navigation.tabs", title: "Tabs", section: .navigation, tags: ["navigation"]),
         CatalogueEntry(key: "navigation.chip", title: "Chip", section: .navigation, tags: ["selection", "filter"]),
+        CatalogueEntry(key: "navigation.commandPalette", title: "Command palette", section: .navigation, tags: ["search", "shortcut", "overlay"]),
 
         // Data display
         CatalogueEntry(key: "data.card", title: "Card", section: .dataDisplay, tags: ["container", "surface"]),
+        CatalogueEntry(key: "data.listItem", title: "List item", section: .dataDisplay, tags: ["row", "list"]),
+        CatalogueEntry(key: "data.avatar", title: "Avatar", section: .dataDisplay, tags: ["user", "image"]),
+        CatalogueEntry(key: "data.divider", title: "Divider", section: .dataDisplay, tags: ["separator", "rule"]),
     ]
 
     public static func bySection(_ section: CatalogueSection) -> [CatalogueEntry] {

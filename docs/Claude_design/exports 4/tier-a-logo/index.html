@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Prisma — Logo</title>
+<link rel="stylesheet" href="../../site/tokens.css"/>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--surface-base);color:var(--text-primary);font-family:var(--font-sans);padding:64px 40px;min-height:100vh}
+  .wrap{max-width:1100px;margin:0 auto}
+  h1{font-size:48px;line-height:1;letter-spacing:-0.025em;font-weight:600;margin-bottom:12px}
+  h1 em{font-style:italic;color:var(--accent-default);font-weight:500}
+  .lede{color:var(--text-secondary);max-width:48ch;font-size:16px;line-height:1.55;margin-bottom:48px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:24px}
+  .cell{border:1px solid var(--border-subtle);border-radius:16px;background:var(--surface-raised);overflow:hidden}
+  .cell .art{aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;background:var(--surface-sunken)}
+  .cell .art.light{background:#FFFFFF;color:#1A1814}
+  .cell .meta{padding:16px 20px;border-top:1px solid var(--border-subtle)}
+  .name{font-size:14px;font-weight:600}
+  .file{font-family:var(--font-mono);font-size:11px;color:var(--text-tertiary);margin-top:4px}
+  .og{grid-column:1/-1}
+  .og .art{aspect-ratio:1200/630;background:#0F0E0B}
+  img{max-width:80%;max-height:80%}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Logo <em>/ Wordmark</em></h1>
+  <p class="lede">A prism — three planes converging, refracting white into the violet→magenta gradient. Three layers: tokens · components · platforms.</p>
+  <div class="grid">
+    <div class="cell"><div class="art"><img src="logo-mark.svg" style="width:120px;height:120px"/></div><div class="meta"><div class="name">Mark</div><div class="file">logo-mark.svg</div></div></div>
+    <div class="cell"><div class="art light" style="color:#1A1814"><img src="logo-mark-mono.svg" style="width:120px;height:120px"/></div><div class="meta"><div class="name">Mark — mono</div><div class="file">logo-mark-mono.svg</div></div></div>
+    <div class="cell"><div class="art"><img src="wordmark.svg" style="width:300px"/></div><div class="meta"><div class="name">Wordmark</div><div class="file">wordmark.svg</div></div></div>
+    <div class="cell"><div class="art light"><img src="wordmark-mono.svg" style="width:300px"/></div><div class="meta"><div class="name">Wordmark — mono</div><div class="file">wordmark-mono.svg</div></div></div>
+    <div class="cell"><div class="art"><img src="favicon.svg" style="width:64px;height:64px"/></div><div class="meta"><div class="name">Favicon</div><div class="file">favicon.svg</div></div></div>
+    <div class="cell og"><div class="art"><img src="og-image.svg" style="max-width:100%;max-height:100%"/></div><div class="meta"><div class="name">Social preview</div><div class="file">og-image.svg · 1200×630</div></div></div>
+  </div>
+</div>
+</body>
+</html>

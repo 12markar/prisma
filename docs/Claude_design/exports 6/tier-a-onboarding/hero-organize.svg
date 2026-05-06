@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 360" width="360" height="360" fill="none">
+  <defs>
+    <linearGradient id="ho1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#9173FF" stop-opacity="0.26"></stop><stop offset="100%" stop-color="#E03088" stop-opacity="0.18"></stop></linearGradient>
+    <linearGradient id="ho2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#E03088" stop-opacity="0.22"></stop><stop offset="100%" stop-color="#FF7DBF" stop-opacity="0.14"></stop></linearGradient>
+  </defs>
+  
+  <g stroke="currentColor" stroke-opacity="0.16" stroke-dasharray="2 5" stroke-width="1">
+    <path d="M40 290H320 M70 310H290"></path>
+  </g>
+  
+  <g stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round">
+    
+    <rect x="100" y="90" width="60" height="80" rx="6" fill="url(#ho1)"></rect>
+    <rect x="170" y="90" width="60" height="80" rx="6" fill="url(#ho2)"></rect>
+    <rect x="240" y="90" width="60" height="80" rx="6" fill="url(#ho1)" fill-opacity="0.7"></rect>
+    
+    <rect x="65" y="180" width="60" height="80" rx="6" fill="url(#ho2)"></rect>
+    <rect x="135" y="180" width="60" height="80" rx="6" fill="url(#ho1)" fill-opacity="0.85"></rect>
+    <rect x="205" y="180" width="60" height="80" rx="6" fill="url(#ho2)" fill-opacity="0.8"></rect>
+    <rect x="275" y="180" width="20" height="80" rx="3" stroke-dasharray="3 3" stroke-opacity="0.5"></rect>
+    
+    <path d="M115 110 H145 M115 122 H140" stroke-opacity="0.5"></path>
+    <path d="M185 110 H215 M185 122 H205" stroke-opacity="0.5"></path>
+    <path d="M255 110 H285 M255 122 H275" stroke-opacity="0.5"></path>
+    <path d="M80 200 H110 M80 212 H100" stroke-opacity="0.5"></path>
+    <path d="M150 200 H180 M150 212 H170" stroke-opacity="0.5"></path>
+    <path d="M220 200 H250 M220 212 H240" stroke-opacity="0.5"></path>
+  </g>
+  
+  <circle cx="60" cy="60" r="3" fill="#7651F5"></circle>
+  <circle cx="310" cy="60" r="2.5" fill="#E03088"></circle>
+  <path d="M40 150 l4 4 M44 150 l-4 4" stroke="#9173FF" stroke-width="1.4"></path>
+  <circle cx="320" cy="240" r="2.5" fill="#E03088"></circle>
+</svg>

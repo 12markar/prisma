@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Prisma — Empty-State Illustrations</title>
+<link rel="stylesheet" href="../../site/tokens.css"/>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--surface-base);color:var(--text-primary);font-family:var(--font-sans);padding:64px 40px;min-height:100vh}
+  .head{max-width:1200px;margin:0 auto 48px}
+  h1{font-size:48px;line-height:1;letter-spacing:-0.025em;font-weight:600}
+  h1 em{font-style:italic;color:var(--accent-default);font-weight:500}
+  .lede{color:var(--text-secondary);max-width:48ch;margin-top:12px;font-size:16px;line-height:1.55}
+  .grid{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:24px}
+  .cell{border:1px solid var(--border-subtle);border-radius:16px;background:var(--surface-raised);overflow:hidden;transition:border-color 200ms,transform 200ms}
+  .cell:hover{border-color:var(--accent-default);transform:translateY(-2px)}
+  .cell .art{aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;color:var(--text-primary);background:linear-gradient(180deg,transparent,color-mix(in oklab,var(--accent-default) 4%,transparent))}
+  .cell .art img{width:80%;height:80%;object-fit:contain}
+  .cell .meta{padding:16px 20px;border-top:1px solid var(--border-subtle)}
+  .cell .name{font-size:14px;font-weight:600;letter-spacing:-0.005em}
+  .cell .file{font-family:var(--font-mono);font-size:11px;color:var(--text-tertiary);margin-top:4px}
+</style>
+</head>
+<body>
+<div class="head">
+  <h1>Empty-State <em>Illustrations</em></h1>
+  <p class="lede">Eight outline-style illustrations for the moments when there's nothing to show. Geometric shapes, single gradient wash, quietly optimistic.</p>
+</div>
+<div class="grid">
+  <div class="cell"><div class="art"><img src="empty-catalogue.svg"/></div><div class="meta"><div class="name">Nothing here yet.</div><div class="file">empty-catalogue.svg</div></div></div>
+  <div class="cell"><div class="art"><img src="empty-search.svg"/></div><div class="meta"><div class="name">No matches.</div><div class="file">empty-search.svg</div></div></div>
+  <div class="cell"><div class="art"><img src="empty-favorites.svg"/></div><div class="meta"><div class="name">Save items to find them later.</div><div class="file">empty-favorites.svg</div></div></div>
+  <div class="cell"><div class="art"><img src="empty-archive.svg"/></div><div class="meta"><div class="name">Archive is clear.</div><div class="file">empty-archive.svg</div></div></div>
+  <div class="cell"><div class="art"><img src="empty-network.svg"/></div><div class="meta"><div class="name">We can't reach the server.</div><div class="file">empty-network.svg</div></div></div>
+  <div class="cell"><div class="art"><img src="empty-error.svg"/></div><div class="meta"><div class="name">Something went sideways.</div><div class="file">empty-error.svg</div></div></div>
+  <div class="cell"><div class="art"><img src="empty-permissions.svg"/></div><div class="meta"><div class="name">We need camera access to scan.</div><div class="file">empty-permissions.svg</div></div></div>
+  <div class="cell"><div class="art"><img src="empty-collaboration.svg"/></div><div class="meta"><div class="name">Invite someone to start.</div><div class="file">empty-collaboration.svg</div></div></div>
+</div>
+</body>
+</html>

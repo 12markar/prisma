@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Compose-only app: this XML theme exists only as the launch theme parent.
-         Window background follows the system day/night qualifier so the cold-start
-         splash matches Prisma surface.base. All actual theming inside the app
-         happens via PrismaTheme composable.
-         Status / navigation bars are transparent so enableEdgeToEdge can paint
-         under them; appearance (light/dark icons) is set dynamically from
-         CatalogueRoot via WindowInsetsControllerCompat. -->
+    <!-- Night variant inherits everything from values/themes.xml; the swap
+         happens via the @color/window_background_prisma reference resolving
+         to values-night/colors.xml. enforceContrast off so transparent bars
+         truly stay transparent in dark mode too. -->
     <style name="Theme.Prisma" parent="android:Theme.Material.NoActionBar">
         <item name="android:windowBackground">@color/window_background_prisma</item>
         <item name="android:statusBarColor">@android:color/transparent</item>

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dark-mode window background — Prisma surface.base.dark (#1A1814). -->
+    <color name="window_background_prisma">#1A1814</color>
+</resources>

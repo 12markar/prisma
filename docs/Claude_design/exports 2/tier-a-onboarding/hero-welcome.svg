@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 360" width="360" height="360" fill="none">
+  <defs>
+    <linearGradient id="hw1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#9173FF" stop-opacity="0.28"></stop><stop offset="100%" stop-color="#E03088" stop-opacity="0.2"></stop></linearGradient>
+    <linearGradient id="hw2" x1="0" y1="1" x2="1" y2="0"><stop offset="0%" stop-color="#E03088" stop-opacity="0.22"></stop><stop offset="100%" stop-color="#FF7DBF" stop-opacity="0.16"></stop></linearGradient>
+    <radialGradient id="hwGlow" cx="0.5" cy="0.5" r="0.6"><stop offset="0%" stop-color="#7651F5" stop-opacity="0.18"></stop><stop offset="100%" stop-color="#7651F5" stop-opacity="0"></stop></radialGradient>
+  </defs>
+  <circle cx="180" cy="180" r="150" fill="url(#hwGlow)"></circle>
+  
+  <g stroke="currentColor" stroke-opacity="0.18" stroke-dasharray="2 5" stroke-width="1">
+    <path d="M50 280H310 M70 300H290 M90 260H270"></path>
+  </g>
+  
+  <g stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round" transform="translate(180 180)">
+    <path d="M0 -80 L70 40 L-70 40 Z" fill="url(#hw1)"></path>
+    <path d="M0 -80 L70 40 L0 80 Z" fill="url(#hw2)"></path>
+    <path d="M0 -80 L-70 40 L0 80 Z" fill="url(#hw1)" fill-opacity="0.55"></path>
+    <path d="M0 -80 V80" stroke-opacity="0.55"></path>
+    <path d="M-70 40 L70 40" stroke-opacity="0.4"></path>
+  </g>
+  
+  <circle cx="80" cy="80" r="3" fill="#7651F5"></circle>
+  <circle cx="290" cy="100" r="2.5" fill="#E03088"></circle>
+  <path d="M70 200 l4 4 M74 200 l-4 4" stroke="#9173FF" stroke-width="1.4"></path>
+  <path d="M285 250 l4 4 M289 250 l-4 4" stroke="#E03088" stroke-width="1.4"></path>
+  
+  <ellipse cx="180" cy="180" rx="120" ry="40" stroke="#9173FF" stroke-opacity="0.3" stroke-dasharray="2 4" stroke-width="1"></ellipse>
+</svg>
