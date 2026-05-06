@@ -1,0 +1,51 @@
+name: tokens-check
+
+on:
+  pull_request:
+    paths:
+      - 'design-system/tokens/**'
+      - 'design-system/scripts/**'
+      - 'design-system/package.json'
+      - 'design-system/package-lock.json'
+  push:
+    branches: [main]
+    paths:
+      - 'design-system/tokens/**'
+      - 'design-system/scripts/**'
+
+jobs:
+  verify-generated-files-in-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: design-system/package-lock.json
+
+      - name: Install Style Dictionary
+        working-directory: design-system
+        run: npm ci
+
+      - name: Lint DTCG schema
+        working-directory: design-system
+        run: npm run lint-tokens
+
+      - name: WCAG AA contrast check
+        working-directory: design-system
+        run: npm run check-contrast
+
+      - name: Regenerate tokens
+        working-directory: design-system
+        run: npm run build-tokens
+
+      - name: Fail if generated files are out of sync with source tokens
+        run: |
+          if ! git diff --exit-code; then
+            echo ""
+            echo "::error::Generated PrismaTokens.kt / PrismaTokens.swift do not match the JSON tokens."
+            echo "::error::Run \`cd design-system && npm run build-tokens\` locally and commit the result."
+            exit 1
+          fi

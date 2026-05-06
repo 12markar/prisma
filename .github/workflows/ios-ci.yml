@@ -1,0 +1,63 @@
+name: ios-ci
+
+on:
+  pull_request:
+    paths:
+      - 'ios-catalogue/**'
+      - 'design-system/tokens/**'
+      - 'design-system/scripts/**'
+      - 'design-system/package.json'
+  push:
+    branches: [main]
+    paths:
+      - 'ios-catalogue/**'
+      - 'design-system/**'
+
+jobs:
+  build:
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: ios-catalogue
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: design-system/package-lock.json
+
+      - name: Install Style Dictionary
+        working-directory: design-system
+        run: npm ci
+
+      - name: Generate tokens
+        working-directory: design-system
+        run: npm run build-tokens
+
+      - name: Install xcodegen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Build SwiftPM library targets
+        run: swift build
+
+      - name: Build iOS app for Simulator
+        run: |
+          set -o pipefail
+          xcodebuild build \
+            -project Prisma.xcodeproj \
+            -scheme Prisma \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO \
+            | xcbeautify --renderer github-actions || (
+              echo "::warning::xcbeautify not installed, falling back to raw output";
+              xcodebuild build -project Prisma.xcodeproj -scheme Prisma -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO
+            )
+
+      # Phase 1 will add: swift test --filter SnapshotTests for snapshot regression
+      # and upload diff PNGs as PR artefacts on failure.

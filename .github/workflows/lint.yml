@@ -1,0 +1,52 @@
+name: lint
+
+on:
+  pull_request:
+    paths:
+      - 'android-catalogue/**'
+      - 'ios-catalogue/**'
+  push:
+    branches: [main]
+
+jobs:
+  detekt-android:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: android-catalogue
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: design-system/package-lock.json
+
+      - name: Install Style Dictionary (tokens precompile dependency)
+        working-directory: design-system
+        run: npm ci
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Run Detekt + slack/compose-lints
+        run: ./gradlew detekt --no-daemon
+
+  swiftlint-ios:
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: ios-catalogue
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install SwiftLint
+        run: brew install swiftlint
+
+      - name: Run SwiftLint
+        run: swiftlint --strict
