@@ -1,5 +1,6 @@
 import SwiftUI
 import CoreUI
+import Components
 
 struct DetailPane: View {
     let entry: CatalogueEntry?
@@ -55,6 +56,7 @@ struct DetailPane: View {
         case "foundation.radius":     RadiusShowcase()
         case "foundation.elevation":  ElevationShowcase()
         case "foundation.motion":     MotionShowcase()
+        case "input.button":          ButtonShowcase()
         default:
             Text("Phase 0 placeholder — implementation lands per-phase per docs/TODO.md.")
                 .font(PrismaTypography.bodyMd.font)
