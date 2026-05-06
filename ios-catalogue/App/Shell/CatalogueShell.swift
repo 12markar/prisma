@@ -8,7 +8,6 @@ import CoreUI
 /// Selection, search query, and expanded sections all use `@SceneStorage` so
 /// rotation / scene restoration / dark-light toggle preserves state.
 struct CatalogueShell: View {
-
     /// Selected component key — preserved across scene termination.
     @SceneStorage("catalogue.selectedKey") private var selectedKey: String?
 
@@ -20,7 +19,7 @@ struct CatalogueShell: View {
     @SceneStorage("catalogue.expanded") private var expandedRaw: String = "Foundations"
 
     private var expandedSet: Set<String> {
-        get { Set(expandedRaw.split(separator: ",").map(String.init).filter { !$0.isEmpty }) }
+        Set(expandedRaw.split(separator: ",").map(String.init).filter { !$0.isEmpty })
     }
 
     private func toggleExpanded(_ section: CatalogueSection) {

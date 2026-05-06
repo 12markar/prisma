@@ -200,7 +200,7 @@ const formatMotion = (motion) => {
 export function generateComposeFile(tokens) {
   const sections = [];
   sections.push(banner('kotlin'));
-  sections.push(`@file:Suppress("MagicNumber", "TopLevelPropertyNaming")`);
+  sections.push(`@file:Suppress("MagicNumber", "TopLevelPropertyNaming", "MaxLineLength", "LongLine")`);
   sections.push(``);
   sections.push(`package ${KT_PACKAGE}`);
   sections.push(``);

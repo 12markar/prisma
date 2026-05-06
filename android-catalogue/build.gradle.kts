@@ -1,3 +1,5 @@
+import io.gitlab.arturbosch.detekt.extensions.DetektExtension
+
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.android.library) apply false
@@ -5,6 +7,19 @@ plugins {
     alias(libs.plugins.kotlin.compose) apply false
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.detekt)
+}
+
+// Apply Detekt config to every subproject that uses the plugin.
+// This single config file under <root>/detekt.yml is the source of truth.
+subprojects {
+    plugins.withId("io.gitlab.arturbosch.detekt") {
+        extensions.configure<DetektExtension> {
+            toolVersion = libs.versions.detekt.get()
+            config.setFrom(files("${rootProject.rootDir}/detekt.yml"))
+            buildUponDefaultConfig = true
+            autoCorrect = false
+        }
+    }
 }
 
 detekt {

@@ -2,7 +2,6 @@ import SwiftUI
 import CoreUI
 
 struct DetailPane: View {
-
     let entry: CatalogueEntry?
 
     @Environment(\.colorScheme) private var scheme

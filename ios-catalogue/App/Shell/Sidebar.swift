@@ -2,7 +2,6 @@ import SwiftUI
 import CoreUI
 
 struct Sidebar: View {
-
     @Binding var selectedKey: String?
     @Binding var query: String
     let expandedSet: Set<String>

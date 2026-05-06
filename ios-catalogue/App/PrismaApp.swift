@@ -3,7 +3,6 @@ import CoreUI
 
 @main
 struct PrismaApp: App {
-
     /// User's explicit theme override.
     /// `nil` (absent key) means "follow system colorScheme"; `false` light; `true` dark.
     /// Persisted across launches via `@AppStorage`.

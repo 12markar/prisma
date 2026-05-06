@@ -3,7 +3,7 @@
 // Source: design-system/tokens/*.json
 // File: kotlin tokens for Jetpack Compose.
 
-@file:Suppress("MagicNumber", "TopLevelPropertyNaming")
+@file:Suppress("MagicNumber", "TopLevelPropertyNaming", "MaxLineLength", "LongLine")
 
 package xyz.ksharma.prisma.tokens
 
