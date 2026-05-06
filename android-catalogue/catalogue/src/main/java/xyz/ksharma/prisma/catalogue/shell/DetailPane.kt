@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -24,14 +26,9 @@ public fun DetailPane(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(PrismaSemanticColors.SurfaceBase.themed())
-            .padding(PrismaSpacing.Sp7),
+            .background(PrismaSemanticColors.SurfaceBase.themed()),
     ) {
-        if (entry == null) {
-            EmptyDetail()
-        } else {
-            EntryDetail(entry = entry)
-        }
+        if (entry == null) EmptyDetail() else EntryDetail(entry = entry)
     }
 }
 
@@ -49,7 +46,10 @@ private fun EmptyDetail() {
 @Composable
 private fun EntryDetail(entry: CatalogueEntry) {
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(PrismaSpacing.Sp7),
         verticalArrangement = Arrangement.spacedBy(PrismaSpacing.Sp4),
     ) {
         Text(
@@ -62,14 +62,19 @@ private fun EntryDetail(entry: CatalogueEntry) {
             style = PrismaTypography.HeadlineLg,
             color = PrismaSemanticColors.TextPrimary.themed(),
         )
-        // Phase 0 placeholder. Phase 1+ replaces this with real foundation showcases
-        // and component detail layouts (live demo, variants, states, tokens used,
-        // a11y notes, code snippet, interactive playground).
-        Text(
-            text = "Phase 0 placeholder — implementation lands per-phase per docs/TODO.md.",
-            style = PrismaTypography.BodyMd,
-            color = PrismaSemanticColors.TextSecondary.themed(),
-        )
-        entry.content()
+
+        val showcase = entry.content
+        if (showcase != null) {
+            Box(modifier = Modifier.padding(top = PrismaSpacing.Sp4)) {
+                showcase()
+            }
+        } else {
+            Text(
+                text = "Phase 0 placeholder — implementation lands per-phase per docs/TODO.md.",
+                style = PrismaTypography.BodyMd,
+                color = PrismaSemanticColors.TextSecondary.themed(),
+                modifier = Modifier.padding(top = PrismaSpacing.Sp4),
+            )
+        }
     }
 }

@@ -4,6 +4,12 @@ import androidx.compose.runtime.Composable
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
+import xyz.ksharma.prisma.catalogue.foundations.ColorShowcase
+import xyz.ksharma.prisma.catalogue.foundations.ElevationShowcase
+import xyz.ksharma.prisma.catalogue.foundations.MotionShowcase
+import xyz.ksharma.prisma.catalogue.foundations.RadiusShowcase
+import xyz.ksharma.prisma.catalogue.foundations.SpacingShowcase
+import xyz.ksharma.prisma.catalogue.foundations.TypographyShowcase
 
 /** A section grouping in the sidebar. Order here drives display order. */
 public enum class CatalogueSection(public val title: String) {
@@ -14,52 +20,54 @@ public enum class CatalogueSection(public val title: String) {
     DataDisplay("Data display"),
 }
 
-/** A single catalogue entry (a foundation showcase or a component detail page). */
+/** A single catalogue entry (a foundation showcase or a component detail page).
+ *  `content` is null when the entry is still a placeholder (no implementation yet). */
 public data class CatalogueEntry(
     val key: String,
     val title: String,
     val section: CatalogueSection,
     val tags: ImmutableList<String>,
-    val content: @Composable () -> Unit,
+    val content: (@Composable () -> Unit)? = null,
 )
 
 /**
  * Static registry — order here drives display order within each section.
- * Adding a new component = adding one entry. Phase 0 ships placeholder content
- * for every entry; real component implementations replace `content` per phase.
+ * Adding a new component = adding one entry. Foundations have bespoke
+ * showcase composables (Phase 1); component entries are placeholders until
+ * their phase ships.
  */
 public object CatalogueRegistry {
 
     public val entries: ImmutableList<CatalogueEntry> = persistentListOf(
-        // Foundations
-        entry("foundation.typography", "Typography", CatalogueSection.Foundations, "type", "specimen"),
-        entry("foundation.colors", "Colors", CatalogueSection.Foundations, "color", "palette", "swatches"),
-        entry("foundation.icons", "Icons", CatalogueSection.Foundations, "icon", "symbols"),
-        entry("foundation.spacing", "Spacing", CatalogueSection.Foundations, "spacing", "layout"),
-        entry("foundation.elevation", "Elevation", CatalogueSection.Foundations, "shadow", "depth"),
-        entry("foundation.motion", "Motion", CatalogueSection.Foundations, "animation", "duration", "easing"),
-        entry("foundation.radius", "Radius", CatalogueSection.Foundations, "corner", "radius"),
+        // Foundations — bespoke showcase pages (Phase 1)
+        entry("foundation.typography", "Typography", CatalogueSection.Foundations, listOf("type", "specimen"))     { TypographyShowcase() },
+        entry("foundation.colors",     "Colors",     CatalogueSection.Foundations, listOf("color", "palette"))     { ColorShowcase() },
+        entry("foundation.icons",      "Icons",      CatalogueSection.Foundations, listOf("icon", "symbols")),
+        entry("foundation.spacing",    "Spacing",    CatalogueSection.Foundations, listOf("spacing", "layout"))    { SpacingShowcase() },
+        entry("foundation.elevation",  "Elevation",  CatalogueSection.Foundations, listOf("shadow", "depth"))      { ElevationShowcase() },
+        entry("foundation.motion",     "Motion",     CatalogueSection.Foundations, listOf("animation", "duration")) { MotionShowcase() },
+        entry("foundation.radius",     "Radius",     CatalogueSection.Foundations, listOf("corner", "radius"))     { RadiusShowcase() },
 
         // Inputs
-        entry("input.button", "Button", CatalogueSection.Inputs, "button", "action"),
-        entry("input.textfield", "TextField", CatalogueSection.Inputs, "input", "form"),
-        entry("input.checkbox", "Checkbox", CatalogueSection.Inputs, "input", "form", "selection"),
-        entry("input.radio", "Radio", CatalogueSection.Inputs, "input", "form", "selection"),
-        entry("input.switch", "Switch", CatalogueSection.Inputs, "input", "form", "toggle"),
+        entry("input.button",     "Button",     CatalogueSection.Inputs, listOf("button", "action")),
+        entry("input.textfield",  "TextField",  CatalogueSection.Inputs, listOf("input", "form")),
+        entry("input.checkbox",   "Checkbox",   CatalogueSection.Inputs, listOf("input", "form", "selection")),
+        entry("input.radio",      "Radio",      CatalogueSection.Inputs, listOf("input", "form", "selection")),
+        entry("input.switch",     "Switch",     CatalogueSection.Inputs, listOf("input", "form", "toggle")),
 
         // Feedback
-        entry("feedback.toast", "Toast", CatalogueSection.Feedback, "feedback", "notification"),
-        entry("feedback.modal", "Modal", CatalogueSection.Feedback, "feedback", "dialog"),
-        entry("feedback.bottomSheet", "Bottom sheet", CatalogueSection.Feedback, "feedback", "sheet"),
-        entry("feedback.loading", "Loading", CatalogueSection.Feedback, "feedback", "progress"),
-        entry("feedback.badge", "Badge", CatalogueSection.Feedback, "feedback", "indicator"),
+        entry("feedback.toast",       "Toast",        CatalogueSection.Feedback, listOf("feedback", "notification")),
+        entry("feedback.modal",       "Modal",        CatalogueSection.Feedback, listOf("feedback", "dialog")),
+        entry("feedback.bottomSheet", "Bottom sheet", CatalogueSection.Feedback, listOf("feedback", "sheet")),
+        entry("feedback.loading",     "Loading",      CatalogueSection.Feedback, listOf("feedback", "progress")),
+        entry("feedback.badge",       "Badge",        CatalogueSection.Feedback, listOf("feedback", "indicator")),
 
         // Navigation
-        entry("navigation.tabs", "Tabs", CatalogueSection.Navigation, "navigation"),
-        entry("navigation.chip", "Chip", CatalogueSection.Navigation, "selection", "filter"),
+        entry("navigation.tabs", "Tabs", CatalogueSection.Navigation, listOf("navigation")),
+        entry("navigation.chip", "Chip", CatalogueSection.Navigation, listOf("selection", "filter")),
 
         // Data display
-        entry("data.card", "Card", CatalogueSection.DataDisplay, "container", "surface"),
+        entry("data.card", "Card", CatalogueSection.DataDisplay, listOf("container", "surface")),
     )
 
     public val sections: ImmutableList<CatalogueSection> =
@@ -85,12 +93,13 @@ public object CatalogueRegistry {
         key: String,
         title: String,
         section: CatalogueSection,
-        vararg tags: String,
+        tags: List<String> = emptyList(),
+        content: (@Composable () -> Unit)? = null,
     ): CatalogueEntry = CatalogueEntry(
         key = key,
         title = title,
         section = section,
-        tags = tags.toList().toImmutableList(),
-        content = { /* Placeholder until Phase 1+ implementations land. */ },
+        tags = tags.toImmutableList(),
+        content = content,
     )
 }
