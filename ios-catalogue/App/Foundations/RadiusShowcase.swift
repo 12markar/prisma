@@ -7,10 +7,10 @@ struct RadiusShowcase: View {
 
     private static let tiles: [(String, CGFloat)] = [
         ("none", PrismaRadius.none),
-        ("sm",   PrismaRadius.sm),
-        ("md",   PrismaRadius.md),
-        ("lg",   PrismaRadius.lg),
-        ("xl",   PrismaRadius.xl),
+        ("sm", PrismaRadius.sm),
+        ("md", PrismaRadius.md),
+        ("lg", PrismaRadius.lg),
+        ("xl", PrismaRadius.xl),
         ("full", 48)   // visual cap; actual full is 9999 ≈ circle
     ]
 

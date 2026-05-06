@@ -6,16 +6,16 @@ struct SpacingShowcase: View {
     @Environment(\.colorScheme) private var scheme
 
     private static let rows: [(String, CGFloat)] = [
-        ("spacing.0",  PrismaSpacing.sp0),
-        ("spacing.1",  PrismaSpacing.sp1),
-        ("spacing.2",  PrismaSpacing.sp2),
-        ("spacing.3",  PrismaSpacing.sp3),
-        ("spacing.4",  PrismaSpacing.sp4),
-        ("spacing.5",  PrismaSpacing.sp5),
-        ("spacing.6",  PrismaSpacing.sp6),
-        ("spacing.7",  PrismaSpacing.sp7),
-        ("spacing.8",  PrismaSpacing.sp8),
-        ("spacing.9",  PrismaSpacing.sp9),
+        ("spacing.0", PrismaSpacing.sp0),
+        ("spacing.1", PrismaSpacing.sp1),
+        ("spacing.2", PrismaSpacing.sp2),
+        ("spacing.3", PrismaSpacing.sp3),
+        ("spacing.4", PrismaSpacing.sp4),
+        ("spacing.5", PrismaSpacing.sp5),
+        ("spacing.6", PrismaSpacing.sp6),
+        ("spacing.7", PrismaSpacing.sp7),
+        ("spacing.8", PrismaSpacing.sp8),
+        ("spacing.9", PrismaSpacing.sp9),
         ("spacing.10", PrismaSpacing.sp10),
         ("spacing.11", PrismaSpacing.sp11),
         ("spacing.12", PrismaSpacing.sp12)

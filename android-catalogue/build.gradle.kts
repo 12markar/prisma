@@ -33,13 +33,20 @@ dependencies {
     detektPlugins(libs.slack.compose.lints)
 }
 
-// `npm run build-tokens` — invoked from any module's preBuild via dependsOn(rootProject.tasks.named("generateTokens"))
+/**
+ * Regenerate PrismaTokens.kt by running Style Dictionary in ../design-system.
+ * Soft-fails when npm is unavailable — generated tokens are committed to the
+ * repo, so the build can proceed against the existing snapshot. Requiring a
+ * Node toolchain to merely open the project would be hostile.
+ */
 tasks.register<Exec>("generateTokens") {
     group = "prisma"
-    description = "Regenerate PrismaTokens.kt by running Style Dictionary in ../design-system."
+    description = "Regenerate PrismaTokens.kt from design-system tokens via npm."
     workingDir = file("$rootDir/../design-system")
-    commandLine("npm", "run", "build-tokens")
+    // Use a shell so user's PATH (homebrew, nvm, etc.) is sourced reliably.
+    commandLine("sh", "-c", "command -v npm >/dev/null 2>&1 && npm run build-tokens || (echo '[generateTokens] npm not found — using committed tokens snapshot.' && exit 0)")
     inputs.dir("$rootDir/../design-system/tokens")
     inputs.dir("$rootDir/../design-system/scripts")
     outputs.file("$rootDir/core-ui/src/main/java/xyz/ksharma/prisma/tokens/PrismaTokens.kt")
+    isIgnoreExitValue = false
 }

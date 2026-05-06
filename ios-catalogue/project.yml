@@ -61,8 +61,13 @@ targets:
       - name: Generate Prisma tokens
         script: |
           # Regenerate PrismaTokens.swift from design-system/tokens before build.
-          if [ -f "${SRCROOT}/../design-system/package.json" ]; then
-            export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
+          # Soft-fails when npm is unavailable — tokens are committed to the repo,
+          # so the build proceeds against the snapshot. (Xcode strips PATH; we
+          # add common Homebrew/Node locations back in.)
+          export PATH="/opt/homebrew/bin:/usr/local/bin:$HOME/.nvm/versions/node/*/bin:$PATH"
+          if [ -f "${SRCROOT}/../design-system/package.json" ] && command -v npm >/dev/null 2>&1; then
             cd "${SRCROOT}/../design-system" && npm run build-tokens
+          else
+            echo "[generate-tokens] npm not found in PATH — using committed PrismaTokens.swift snapshot."
           fi
         basedOnDependencyAnalysis: false
