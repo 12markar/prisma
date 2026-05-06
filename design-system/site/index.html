@@ -1,0 +1,1022 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Prisma — A design system for native catalogue apps.</title>
+<meta name="description" content="Prisma is a cross-platform design system for native catalogue apps on iOS and Android. Technical-precise with editorial warmth." />
+<link rel="stylesheet" href="tokens.css" />
+<script src="image-slot.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--surface-base);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+    transition: background 400ms var(--ease-emphasized), color 400ms var(--ease-emphasized);
+  }
+  ::selection { background: var(--accent-default); color: var(--on-accent); }
+  a { color: inherit; text-decoration: none; }
+
+  /* ============= Grain overlay ============= */
+  body::before {
+    content: "";
+    position: fixed; inset: 0; pointer-events: none; z-index: 100;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='3'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.4 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    opacity: 0.06;
+    mix-blend-mode: overlay;
+  }
+
+  /* ============= Top nav ============= */
+  .nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+    padding: 24px 40px;
+    display: flex; align-items: center; justify-content: space-between;
+    transition: background 300ms, backdrop-filter 300ms, padding 300ms, border-color 300ms;
+    border-bottom: 1px solid transparent;
+  }
+  .nav.scrolled {
+    background: color-mix(in oklab, var(--surface-base) 80%, transparent);
+    backdrop-filter: saturate(180%) blur(16px);
+    -webkit-backdrop-filter: saturate(180%) blur(16px);
+    padding: 14px 40px;
+    border-bottom-color: var(--border-subtle);
+  }
+  .logo { display: flex; align-items: center; gap: 10px; font-size: 17px; font-weight: 600; letter-spacing: -0.012em; }
+  .logo-mark {
+    width: 26px; height: 26px;
+    border-radius: 5px;
+    background: conic-gradient(from 200deg at 30% 30%, #7651F5, #E03088, #9173FF, #7651F5);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 0 1px color-mix(in oklab, var(--accent-default) 40%, transparent), 0 4px 14px -4px color-mix(in oklab, #E03088 40%, transparent);
+  }
+  .logo-mark::after {
+    content: ""; position: absolute; inset: 0;
+    background: var(--surface-base);
+    clip-path: polygon(58% 0, 100% 42%, 100% 100%, 0 100%, 0 58%);
+    opacity: 0.08;
+  }
+  .logo-version {
+    font-family: var(--font-mono); font-size: 10px;
+    color: var(--text-tertiary);
+    border: 1px solid var(--border-subtle);
+    padding: 2px 6px; border-radius: 4px;
+    margin-left: 4px;
+  }
+  .nav-links { display: flex; gap: 28px; font-size: 13px; color: var(--text-secondary); }
+  .nav-links a { position: relative; transition: color 200ms; }
+  .nav-links a:hover { color: var(--text-primary); }
+  .nav-links a::after { content: ""; position: absolute; left: 0; right: 0; bottom: -4px; height: 1px; background: var(--accent-default); transform: scaleX(0); transition: transform 300ms var(--ease-emphasized); transform-origin: left; }
+  .nav-links a:hover::after { transform: scaleX(1); }
+  .nav-actions { display: flex; align-items: center; gap: 16px; }
+  .theme-tog {
+    background: transparent; border: 1px solid var(--border-subtle); color: var(--text-secondary);
+    width: 36px; height: 36px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
+    transition: all 200ms;
+  }
+  .theme-tog:hover { color: var(--text-primary); border-color: var(--border-default); }
+  .nav-cta {
+    font-family: var(--font-mono); font-size: 12px; font-weight: 500;
+    background: var(--text-primary); color: var(--surface-base);
+    padding: 9px 16px; border-radius: 999px;
+    transition: transform 200ms;
+  }
+  .nav-cta:hover { transform: translateY(-1px); }
+
+  /* ============= Hero ============= */
+  .hero {
+    min-height: 100vh;
+    padding: 140px 40px 80px;
+    display: flex; flex-direction: column; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute; inset: 0; pointer-events: none;
+    background:
+      radial-gradient(ellipse 50% 50% at 25% 10%, color-mix(in oklab, #7651F5 28%, transparent), transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 30%, color-mix(in oklab, #E03088 22%, transparent), transparent 60%),
+      radial-gradient(ellipse 80% 50% at 50% 100%, color-mix(in oklab, #9173FF 16%, transparent), transparent 60%);
+  }
+  [data-theme="light"] .hero-bg {
+    background:
+      radial-gradient(ellipse 50% 50% at 25% 10%, color-mix(in oklab, #7651F5 14%, transparent), transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 30%, color-mix(in oklab, #E03088 12%, transparent), transparent 60%),
+      radial-gradient(ellipse 80% 50% at 50% 100%, color-mix(in oklab, #9173FF 10%, transparent), transparent 60%);
+  }
+  .hero-grid {
+    position: absolute; inset: 0; pointer-events: none; opacity: 0.4;
+    background-image:
+      linear-gradient(to right, var(--border-subtle) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--border-subtle) 1px, transparent 1px);
+    background-size: 96px 96px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 0%, transparent 80%);
+    -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 0%, transparent 80%);
+  }
+  .hero-inner { max-width: 1240px; margin: 0 auto; width: 100%; position: relative; z-index: 1; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--font-mono); font-size: 12px; color: var(--text-tertiary);
+    padding: 6px 14px;
+    background: color-mix(in oklab, var(--surface-raised) 60%, transparent);
+    border: 1px solid var(--border-subtle);
+    border-radius: 999px;
+    margin-bottom: 32px;
+    backdrop-filter: blur(8px);
+  }
+  .eyebrow .pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-default); box-shadow: 0 0 0 0 var(--accent-default); animation: pulse 2.4s infinite; }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--accent-default) 50%, transparent); }
+    70% { box-shadow: 0 0 0 8px transparent; }
+    100% { box-shadow: 0 0 0 0 transparent; }
+  }
+  .hero h1 {
+    font-size: clamp(48px, 8vw, 112px);
+    line-height: 0.96;
+    letter-spacing: -0.035em;
+    font-weight: 600;
+    max-width: 16ch;
+  }
+  .hero h1 .accent {
+    background: linear-gradient(120deg, #9173FF 0%, #E03088 60%, #FF7DBF 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+  [data-theme="light"] .hero h1 .accent {
+    background: linear-gradient(120deg, #5E36DC 0%, #B81F6C 60%, #E03088 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .hero h1 em { font-style: italic; font-weight: 500; color: var(--text-secondary); }
+  .hero-sub {
+    margin-top: 36px;
+    max-width: 56ch;
+    font-size: clamp(17px, 1.6vw, 22px);
+    line-height: 1.5;
+    color: var(--text-secondary);
+  }
+  .hero-cta-row {
+    margin-top: 48px;
+    display: flex; gap: 16px; flex-wrap: wrap; align-items: center;
+  }
+  .btn-primary {
+    background: linear-gradient(120deg, #7651F5 0%, #E03088 100%);
+    color: #FFFFFF;
+    padding: 14px 24px; border-radius: 999px;
+    font-size: 15px; font-weight: 500;
+    display: inline-flex; align-items: center; gap: 8px;
+    border: 0; cursor: pointer; font-family: inherit;
+    transition: transform 200ms, box-shadow 300ms, filter 200ms;
+    box-shadow: 0 8px 24px -8px color-mix(in oklab, #7651F5 60%, transparent), 0 0 0 1px color-mix(in oklab, #FFFFFF 12%, transparent) inset;
+  }
+  .btn-primary:hover { transform: translateY(-2px); filter: brightness(1.08); box-shadow: 0 16px 40px -10px color-mix(in oklab, #E03088 60%, transparent); }
+  .btn-ghost {
+    background: transparent; color: var(--text-primary);
+    padding: 14px 20px; border-radius: 999px;
+    font-size: 15px; font-weight: 500; font-family: inherit;
+    border: 1px solid var(--border-default); cursor: pointer;
+    display: inline-flex; align-items: center; gap: 8px;
+    transition: background 200ms, border-color 200ms;
+  }
+  .btn-ghost:hover { background: var(--surface-sunken); border-color: var(--border-strong); }
+  .arrow { transition: transform 200ms; }
+  .btn-primary:hover .arrow, .btn-ghost:hover .arrow { transform: translateX(3px); }
+
+  .hero-meta {
+    margin-top: 96px;
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px;
+    max-width: 880px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border-subtle);
+  }
+  .meta-item .num { font-size: 36px; font-weight: 500; letter-spacing: -0.02em; line-height: 1; }
+  .meta-item .lbl { font-family: var(--font-mono); font-size: 11px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 8px; }
+
+  /* ============= Quote band ============= */
+  .quote-band {
+    padding: 140px 40px;
+    border-top: 1px solid var(--border-subtle);
+    border-bottom: 1px solid var(--border-subtle);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .quote-band::before {
+    content: ""; position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 40% 50% at 30% 50%, color-mix(in oklab, #7651F5 12%, transparent), transparent 70%),
+      radial-gradient(ellipse 40% 50% at 70% 50%, color-mix(in oklab, #E03088 10%, transparent), transparent 70%);
+  }
+  .quote-text {
+    font-size: clamp(28px, 4.5vw, 56px);
+    line-height: 1.15;
+    letter-spacing: -0.022em;
+    font-weight: 500;
+    max-width: 22ch;
+    margin: 0 auto;
+    position: relative;
+  }
+  .quote-text em {
+    background: linear-gradient(120deg, #9173FF 0%, #E03088 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-style: italic; font-weight: 500;
+  }
+  [data-theme="light"] .quote-text em {
+    background: linear-gradient(120deg, #5E36DC 0%, #B81F6C 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .quote-attr {
+    margin-top: 32px;
+    font-family: var(--font-mono); font-size: 12px;
+    color: var(--text-tertiary); letter-spacing: 0.08em; text-transform: uppercase;
+    position: relative;
+  }
+
+  /* ============= Sections ============= */
+  section { padding: 140px 40px; position: relative; }
+  .section-inner { max-width: 1240px; margin: 0 auto; }
+  .section-head {
+    display: grid; grid-template-columns: 200px 1fr; gap: 48px;
+    margin-bottom: 80px; align-items: end;
+  }
+  .section-num {
+    font-family: var(--font-mono); font-size: 12px;
+    color: var(--text-tertiary); letter-spacing: 0.06em; text-transform: uppercase;
+    padding-top: 8px;
+    border-top: 1px solid var(--border-default);
+  }
+  .section-head h2 {
+    font-size: clamp(36px, 5vw, 64px);
+    line-height: 1.02;
+    letter-spacing: -0.025em;
+    font-weight: 600;
+    max-width: 18ch;
+  }
+  .section-head h2 em { font-style: italic; color: var(--text-tertiary); font-weight: 500; }
+  .section-head p {
+    margin-top: 24px;
+    font-size: 18px;
+    color: var(--text-secondary);
+    max-width: 56ch;
+    line-height: 1.55;
+  }
+
+  /* ============= Philosophy cards ============= */
+  .principles {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+  }
+  .principle {
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px;
+    padding: 40px 32px;
+    background: var(--surface-raised);
+    position: relative; overflow: hidden;
+    transition: transform 300ms var(--ease-emphasized), border-color 300ms;
+  }
+  .principle:hover { transform: translateY(-4px); border-color: var(--border-default); }
+  .principle-num {
+    font-family: var(--font-mono); font-size: 11px; color: var(--accent-default);
+    letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .principle h3 {
+    font-size: 24px; font-weight: 600; letter-spacing: -0.012em; line-height: 1.2;
+    margin-top: 12px; margin-bottom: 16px;
+  }
+  .principle p { color: var(--text-secondary); font-size: 15px; line-height: 1.6; }
+  .principle::after {
+    content: ""; position: absolute; right: -40px; top: -40px;
+    width: 120px; height: 120px; border-radius: 50%;
+    background: radial-gradient(circle, color-mix(in oklab, var(--accent-default) 18%, transparent), transparent 70%);
+    opacity: 0; transition: opacity 400ms;
+  }
+  .principle:hover::after { opacity: 1; }
+
+  /* ============= Showcase reel ============= */
+  .reel {
+    background: var(--surface-sunken);
+    border-top: 1px solid var(--border-subtle);
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 100px 0;
+  }
+  .reel-head {
+    max-width: 1240px; margin: 0 auto 60px; padding: 0 40px;
+    display: flex; justify-content: space-between; align-items: end; flex-wrap: wrap; gap: 24px;
+  }
+  .reel-head h3 { font-size: clamp(28px, 3.5vw, 44px); letter-spacing: -0.02em; line-height: 1.05; max-width: 18ch; font-weight: 600; }
+  .reel-head p { color: var(--text-secondary); max-width: 40ch; }
+
+  .reel-track {
+    display: flex; gap: 24px; padding: 0 40px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    padding-bottom: 24px;
+  }
+  .reel-track::-webkit-scrollbar { display: none; }
+  .reel-card {
+    flex: 0 0 380px;
+    aspect-ratio: 9 / 16;
+    border-radius: 36px;
+    background: var(--surface-base);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-3);
+    scroll-snap-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: transform 300ms var(--ease-emphasized);
+  }
+  .reel-card:hover { transform: translateY(-6px) scale(1.01); }
+  .reel-card .platform-tag {
+    position: absolute; top: 16px; left: 16px; z-index: 2;
+    font-family: var(--font-mono); font-size: 10px;
+    background: color-mix(in oklab, var(--surface-base) 70%, transparent);
+    backdrop-filter: blur(8px);
+    color: var(--text-secondary);
+    padding: 5px 10px; border-radius: 999px;
+    border: 1px solid var(--border-subtle);
+    letter-spacing: 0.06em; text-transform: uppercase;
+  }
+  .reel-card image-slot { width: 100%; height: 100%; display: block; }
+  .reel-card .caption {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    padding: 24px;
+    background: linear-gradient(to top, color-mix(in oklab, var(--surface-base) 95%, transparent), transparent);
+    z-index: 2;
+    pointer-events: none;
+  }
+  .reel-card .caption .t { font-size: 18px; font-weight: 600; letter-spacing: -0.01em; }
+  .reel-card .caption .s { font-family: var(--font-mono); font-size: 11px; color: var(--text-tertiary); margin-top: 4px; }
+
+  /* ============= Token reveal ============= */
+  .tokens-grid {
+    display: grid; grid-template-columns: 1.2fr 1fr; gap: 48px;
+    align-items: stretch;
+  }
+  .ramp-stack { display: flex; flex-direction: column; gap: 8px; }
+  .ramp-line {
+    display: grid; grid-template-columns: 80px 1fr;
+    gap: 16px; align-items: center;
+  }
+  .ramp-line .ramp-name { font-family: var(--font-mono); font-size: 11px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; }
+  .ramp-stops { display: grid; grid-template-columns: repeat(11, 1fr); gap: 2px; height: 44px; }
+  .ramp-stops > div { border-radius: 3px; transition: transform 200ms; }
+  .ramp-stops > div:hover { transform: scaleY(1.15); }
+
+  .token-card {
+    background: var(--surface-raised);
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px;
+    padding: 32px;
+    display: flex; flex-direction: column; justify-content: space-between;
+    overflow: hidden; position: relative;
+  }
+  .token-card pre {
+    font-family: var(--font-mono); font-size: 12px;
+    color: var(--text-secondary); line-height: 1.6;
+    background: var(--surface-sunken);
+    padding: 16px; border-radius: 8px;
+    overflow: auto;
+    border: 1px solid var(--border-subtle);
+  }
+  .token-card pre .k { color: var(--accent-default); }
+  .token-card pre .s { color: var(--text-primary); }
+  .token-card pre .c { color: var(--text-tertiary); }
+  .token-card h4 { font-size: 18px; font-weight: 600; letter-spacing: -0.008em; margin-bottom: 6px; }
+  .token-card .desc { font-size: 13px; color: var(--text-tertiary); margin-bottom: 20px; }
+
+  /* ============= Type specimen ============= */
+  .specimen {
+    background: var(--surface-raised);
+    border: 1px solid var(--border-subtle);
+    border-radius: 24px;
+    padding: 80px 60px;
+    overflow: hidden;
+    position: relative;
+  }
+  .specimen-row { display: grid; grid-template-columns: 100px 1fr 140px; gap: 32px; align-items: baseline; padding: 18px 0; border-bottom: 1px dashed var(--border-subtle); }
+  .specimen-row:last-child { border-bottom: 0; }
+  .specimen-row .lbl { font-family: var(--font-mono); font-size: 11px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; }
+  .specimen-row .meta { font-family: var(--font-mono); font-size: 11px; color: var(--text-tertiary); text-align: right; }
+  .specimen-row .sample { font-weight: 500; letter-spacing: -0.01em; }
+  .s-display { font-size: clamp(40px, 5vw, 72px); line-height: 1.05; letter-spacing: -0.025em; font-weight: 600; }
+  .s-headline { font-size: 30px; font-weight: 600; letter-spacing: -0.014em; }
+  .s-title { font-size: 20px; font-weight: 500; }
+  .s-body { font-size: 15px; font-weight: 400; color: var(--text-secondary); }
+  .s-mono { font-family: var(--font-mono); font-size: 13px; }
+
+  /* ============= Apps section ============= */
+  .apps {
+    background: var(--surface-base);
+    padding: 140px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .apps::before {
+    content: ""; position: absolute; inset: 0;
+    background:
+      radial-gradient(circle at 15% 30%, color-mix(in oklab, #7651F5 16%, transparent), transparent 50%),
+      radial-gradient(circle at 85% 70%, color-mix(in oklab, #E03088 12%, transparent), transparent 50%);
+    pointer-events: none;
+  }
+  .apps-frame {
+    max-width: 1240px; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 80px;
+    align-items: center;
+    position: relative;
+  }
+  .apps-copy h3 { font-size: clamp(36px, 4.5vw, 56px); line-height: 1.05; letter-spacing: -0.025em; font-weight: 600; max-width: 14ch; }
+  .apps-copy p { color: var(--text-secondary); margin-top: 24px; font-size: 17px; line-height: 1.6; max-width: 50ch; }
+  .platform-row { margin-top: 40px; display: flex; gap: 12px; flex-wrap: wrap; }
+  .platform-pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 16px;
+    border: 1px solid var(--border-default);
+    border-radius: 999px;
+    font-family: var(--font-mono); font-size: 12px;
+    color: var(--text-secondary);
+  }
+  .platform-pill svg { color: var(--accent-default); }
+
+  .device-stack {
+    position: relative;
+    height: 600px;
+  }
+  .device {
+    position: absolute;
+    border-radius: 38px;
+    box-shadow: var(--shadow-5);
+    overflow: hidden;
+    background: var(--surface-raised);
+    border: 1px solid var(--border-default);
+    transition: transform 600ms var(--ease-emphasized);
+  }
+  .device-ios {
+    width: 280px; height: 580px;
+    left: 0; top: 10px;
+    transform: rotate(-6deg);
+  }
+  .device-android {
+    width: 280px; height: 580px;
+    right: 0; top: 0;
+    transform: rotate(6deg);
+  }
+  .device-stack:hover .device-ios { transform: rotate(-3deg) translateY(-8px); }
+  .device-stack:hover .device-android { transform: rotate(3deg) translateY(-8px); }
+  .device .device-tag {
+    position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+    z-index: 5;
+    background: color-mix(in oklab, var(--surface-base) 80%, transparent);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-secondary);
+    font-family: var(--font-mono); font-size: 10px;
+    padding: 5px 10px; border-radius: 999px;
+    letter-spacing: 0.06em; text-transform: uppercase;
+  }
+  .device image-slot { width: 100%; height: 100%; display: block; }
+
+  /* ============= Quote 2 ============= */
+  .quote2 {
+    padding: 100px 40px;
+    border-top: 1px solid var(--border-subtle);
+    border-bottom: 1px solid var(--border-subtle);
+    background: var(--surface-sunken);
+  }
+  .quote2 .inner {
+    max-width: 1100px; margin: 0 auto;
+    display: grid; grid-template-columns: auto 1fr; gap: 48px; align-items: start;
+  }
+  .quote2 .mark {
+    font-family: var(--font-mono); font-size: 120px; line-height: 0.7;
+    color: var(--accent-default);
+    user-select: none;
+  }
+  .quote2 .body {
+    font-size: clamp(24px, 3vw, 36px);
+    line-height: 1.25; letter-spacing: -0.018em; font-weight: 500;
+    max-width: 26ch;
+  }
+  .quote2 .body em {
+    font-style: italic;
+    background: linear-gradient(120deg, #9173FF 0%, #E03088 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  [data-theme="light"] .quote2 .body em {
+    background: linear-gradient(120deg, #5E36DC 0%, #B81F6C 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .quote2 .attr { margin-top: 24px; font-family: var(--font-mono); font-size: 12px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.08em; }
+
+  /* ============= Video / showcase video slot ============= */
+  .reel-video {
+    margin: 0 40px;
+    max-width: 1240px;
+  }
+  .video-frame {
+    max-width: 1240px; margin: 0 auto;
+    aspect-ratio: 16 / 9;
+    border-radius: 24px;
+    overflow: hidden;
+    background: var(--surface-sunken);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-4);
+    position: relative;
+  }
+  .video-frame image-slot { width: 100%; height: 100%; display: block; }
+  .video-frame .play {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    pointer-events: none;
+  }
+  .video-frame .play-btn {
+    width: 88px; height: 88px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #7651F5 0%, #E03088 100%);
+    color: #FFFFFF;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 20px 60px -10px color-mix(in oklab, #E03088 60%, transparent), 0 0 0 1px color-mix(in oklab, #FFFFFF 14%, transparent) inset;
+    animation: bob 4s ease-in-out infinite;
+  }
+  @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+  .video-meta {
+    margin-top: 20px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: var(--font-mono); font-size: 11px; color: var(--text-tertiary);
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .video-meta .timeline {
+    flex: 1; max-width: 480px; margin: 0 24px;
+    height: 2px; background: var(--border-subtle); position: relative; border-radius: 1px;
+  }
+  .video-meta .timeline::after {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 35%;
+    background: var(--accent-default); border-radius: 1px;
+  }
+
+  /* ============= Marquee ============= */
+  .marquee {
+    overflow: hidden; padding: 32px 0;
+    border-top: 1px solid var(--border-subtle);
+    border-bottom: 1px solid var(--border-subtle);
+    background: var(--surface-base);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  }
+  .marquee-track {
+    display: flex; gap: 64px;
+    white-space: nowrap;
+    animation: scroll 40s linear infinite;
+    width: max-content;
+  }
+  @keyframes scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  .marquee-item {
+    font-size: clamp(24px, 3vw, 36px); font-weight: 500; letter-spacing: -0.015em;
+    color: var(--text-tertiary);
+    display: inline-flex; align-items: center; gap: 64px;
+  }
+  .marquee-item::after {
+    content: "✦";
+    color: var(--accent-default);
+    font-size: 20px;
+  }
+
+  /* ============= CTA ============= */
+  .cta {
+    padding: 160px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .cta::before {
+    content: ""; position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 40% 60% at 30% 50%, color-mix(in oklab, #7651F5 22%, transparent), transparent 70%),
+      radial-gradient(ellipse 40% 60% at 70% 50%, color-mix(in oklab, #E03088 20%, transparent), transparent 70%);
+  }
+  .cta h3 {
+    font-size: clamp(48px, 7vw, 96px);
+    line-height: 0.98; letter-spacing: -0.03em; font-weight: 600;
+    max-width: 14ch; margin: 0 auto;
+    position: relative;
+  }
+  .cta h3 em {
+    font-style: italic; font-weight: 500;
+    background: linear-gradient(120deg, #9173FF 0%, #E03088 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  [data-theme="light"] .cta h3 em {
+    background: linear-gradient(120deg, #5E36DC 0%, #B81F6C 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .cta-row { margin-top: 48px; display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; position: relative; }
+
+  /* ============= Footer ============= */
+  footer {
+    padding: 60px 40px 40px;
+    border-top: 1px solid var(--border-subtle);
+  }
+  .foot-inner {
+    max-width: 1240px; margin: 0 auto;
+    display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px;
+  }
+  .foot-col h5 { font-family: var(--font-mono); font-size: 11px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 16px; }
+  .foot-col a { display: block; font-size: 14px; color: var(--text-secondary); margin-bottom: 8px; transition: color 200ms; }
+  .foot-col a:hover { color: var(--text-primary); }
+  .foot-brand p { color: var(--text-tertiary); font-size: 13px; max-width: 36ch; margin-top: 16px; line-height: 1.6; }
+  .foot-bottom {
+    max-width: 1240px; margin: 60px auto 0;
+    padding-top: 24px;
+    border-top: 1px solid var(--border-subtle);
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px;
+    font-family: var(--font-mono); font-size: 11px; color: var(--text-tertiary);
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+
+  /* ============= Reveal animations ============= */
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity 800ms var(--ease-emphasized), transform 800ms var(--ease-emphasized); }
+  .reveal.in { opacity: 1; transform: translateY(0); }
+  .reveal-stagger > * { opacity: 0; transform: translateY(16px); transition: opacity 700ms var(--ease-emphasized), transform 700ms var(--ease-emphasized); }
+  .reveal-stagger.in > *:nth-child(1) { opacity: 1; transform: translateY(0); transition-delay: 0ms; }
+  .reveal-stagger.in > *:nth-child(2) { opacity: 1; transform: translateY(0); transition-delay: 100ms; }
+  .reveal-stagger.in > *:nth-child(3) { opacity: 1; transform: translateY(0); transition-delay: 200ms; }
+  .reveal-stagger.in > *:nth-child(4) { opacity: 1; transform: translateY(0); transition-delay: 300ms; }
+
+  @media (max-width: 900px) {
+    .nav { padding: 16px 20px; }
+    .nav-links { display: none; }
+    section, .apps, .quote-band, .quote2, .cta { padding-left: 20px; padding-right: 20px; padding-top: 80px; padding-bottom: 80px; }
+    .hero { padding: 120px 20px 60px; }
+    .section-head { grid-template-columns: 1fr; gap: 16px; }
+    .principles { grid-template-columns: 1fr; }
+    .tokens-grid { grid-template-columns: 1fr; }
+    .apps-frame { grid-template-columns: 1fr; gap: 60px; }
+    .device-stack { height: 480px; }
+    .specimen { padding: 40px 24px; }
+    .specimen-row { grid-template-columns: 80px 1fr; }
+    .specimen-row .meta { display: none; }
+    .foot-inner { grid-template-columns: 1fr 1fr; }
+    .reel-card { flex: 0 0 280px; }
+    .hero-meta { grid-template-columns: 1fr 1fr; gap: 16px; }
+    .quote2 .inner { grid-template-columns: 1fr; gap: 16px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-track { animation: none; }
+    .reveal, .reveal-stagger > * { opacity: 1; transform: none; transition: none; }
+    .play-btn { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav" id="nav">
+  <a href="#" class="logo">
+    <div class="logo-mark"></div>
+    Prisma
+    <span class="logo-version">v0.1.0</span>
+  </a>
+  <div class="nav-links">
+    <a href="#philosophy">Philosophy</a>
+    <a href="#tokens">Tokens</a>
+    <a href="#showcase">Showcase</a>
+    <a href="#apps">Apps</a>
+    <a href="#docs">Docs</a>
+  </div>
+  <div class="nav-actions">
+    <button class="theme-tog" id="themeTog" aria-label="Toggle theme">
+      <svg id="themeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
+    </button>
+    <a href="design-system-output/web-showcase/index.html" class="nav-cta">Open System →</a>
+  </div>
+</nav>
+
+<!-- ============== HERO ============== -->
+<header class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-inner">
+    <div class="eyebrow reveal"><span class="pulse"></span> A design system · v0.1.0 · open source</div>
+    <h1 class="reveal">Catalogues, <em>built quietly.</em><br/>Designed <span class="accent">precisely.</span></h1>
+    <p class="hero-sub reveal">Prisma is a cross-platform design system for native catalogue apps on iOS and Android. Tokens authored in W3C DTCG JSON, components specified for Compose and SwiftUI, and a single warm accent that earns its place.</p>
+    <div class="hero-cta-row reveal">
+      <a href="design-system-output/web-showcase/index.html" class="btn-primary">Explore the system <span class="arrow">→</span></a>
+      <a href="#philosophy" class="btn-ghost">Read the philosophy</a>
+    </div>
+    <div class="hero-meta reveal-stagger">
+      <div class="meta-item"><div class="num">14</div><div class="lbl">Components</div></div>
+      <div class="meta-item"><div class="num">6</div><div class="lbl">Token domains</div></div>
+      <div class="meta-item"><div class="num">2</div><div class="lbl">Native platforms</div></div>
+      <div class="meta-item"><div class="num">AA</div><div class="lbl">WCAG verified</div></div>
+    </div>
+  </div>
+</header>
+
+<!-- ============== Marquee ============== -->
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track">
+    <span class="marquee-item">SwiftUI</span>
+    <span class="marquee-item">Jetpack Compose</span>
+    <span class="marquee-item">W3C DTCG tokens</span>
+    <span class="marquee-item">Style Dictionary</span>
+    <span class="marquee-item">Light + Dark</span>
+    <span class="marquee-item">WCAG AA</span>
+    <span class="marquee-item">SwiftUI</span>
+    <span class="marquee-item">Jetpack Compose</span>
+    <span class="marquee-item">W3C DTCG tokens</span>
+    <span class="marquee-item">Style Dictionary</span>
+    <span class="marquee-item">Light + Dark</span>
+    <span class="marquee-item">WCAG AA</span>
+  </div>
+</div>
+
+<!-- ============== Quote band ============== -->
+<section class="quote-band">
+  <p class="quote-text reveal">A system isn't a kit of parts. It's a <em>set of agreements</em> a team is willing to keep.</p>
+  <div class="quote-attr reveal">— design philosophy / 001</div>
+</section>
+
+<!-- ============== Philosophy ============== -->
+<section id="philosophy">
+  <div class="section-inner">
+    <div class="section-head">
+      <div class="section-num">01 — Philosophy</div>
+      <div>
+        <h2 class="reveal">Technical-precise, <em>with editorial warmth.</em></h2>
+        <p class="reveal">Most systems collapse into one of two failure modes: the cold dashboard or the over-decorated brand showcase. Prisma takes a third path — the visual register of a well-set technical journal.</p>
+      </div>
+    </div>
+
+    <div class="principles reveal-stagger">
+      <div class="principle">
+        <div class="principle-num">001</div>
+        <h3>Type carries the design.</h3>
+        <p>A confident type scale with deliberate weight pairings does most of the visual lifting. Color marks state and intent — never decorates.</p>
+      </div>
+      <div class="principle">
+        <div class="principle-num">002</div>
+        <h3>Surfaces have a temperature.</h3>
+        <p>Backgrounds are warm-neutral, never pure white or pure black. The palette reads as considered, and stays kind to the eye over long sessions.</p>
+      </div>
+      <div class="principle">
+        <div class="principle-num">003</div>
+        <h3>Idiomatic, not opinionated.</h3>
+        <p>Tokens are designed to feel native on both platforms. iOS-style soft shadows in light mode; subtle borders + glows in dark mode. A 4pt grid that maps cleanly to dp and points.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== Tokens ============== -->
+<section id="tokens">
+  <div class="section-inner">
+    <div class="section-head">
+      <div class="section-num">02 — Tokens</div>
+      <div>
+        <h2 class="reveal">Two layers. <em>One source of truth.</em></h2>
+        <p class="reveal">Eleven-stop primitive ramps for raw values. Semantic aliases for the components that consume them. Compiled through Style Dictionary into Tokens.kt and Tokens.swift — never copy-pasted.</p>
+      </div>
+    </div>
+
+    <div class="tokens-grid">
+      <div class="ramp-stack reveal">
+        <div class="ramp-line"><span class="ramp-name">neutral</span><div class="ramp-stops" id="ramp-neutral"></div></div>
+        <div class="ramp-line"><span class="ramp-name">accent</span><div class="ramp-stops" id="ramp-accent"></div></div>
+        <div class="ramp-line"><span class="ramp-name">success</span><div class="ramp-stops" id="ramp-success"></div></div>
+        <div class="ramp-line"><span class="ramp-name">warning</span><div class="ramp-stops" id="ramp-warning"></div></div>
+        <div class="ramp-line"><span class="ramp-name">danger</span><div class="ramp-stops" id="ramp-danger"></div></div>
+        <div class="ramp-line"><span class="ramp-name">info</span><div class="ramp-stops" id="ramp-info"></div></div>
+      </div>
+      <div class="token-card reveal">
+        <div>
+          <h4>color.semantic.surface</h4>
+          <p class="desc">A semantic alias resolves to different primitives per theme.</p>
+        </div>
+<pre><span class="c">// tokens/color.json</span>
+"surface": {
+  "base":   { <span class="k">"$value"</span>: {
+    "light": <span class="s">"{neutral.50}"</span>,
+    "dark":  <span class="s">"{neutral.900}"</span>
+  }, <span class="k">"$type"</span>: <span class="s">"color"</span> },
+  "raised": { <span class="k">"$value"</span>: {
+    "light": <span class="s">"#FFFFFF"</span>,
+    "dark":  <span class="s">"{neutral.800}"</span>
+  }, <span class="k">"$type"</span>: <span class="s">"color"</span> }
+}</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== Type specimen ============== -->
+<section>
+  <div class="section-inner">
+    <div class="section-head">
+      <div class="section-num">03 — Typography</div>
+      <div>
+        <h2 class="reveal">Instrument Sans <em>meets</em> JetBrains Mono.</h2>
+        <p class="reveal">Two faces, one voice. A humanist sans for prose and UI; an engineered mono for data and code. The contrast is intentional.</p>
+      </div>
+    </div>
+
+    <div class="specimen reveal">
+      <div class="specimen-row"><span class="lbl">display.lg</span><span class="sample s-display">Catalogue at rest.</span><span class="meta">56 / 1.05 / 600</span></div>
+      <div class="specimen-row"><span class="lbl">headline</span><span class="sample s-headline">Sleeping Where I Fall</span><span class="meta">30 / 1.20 / 600</span></div>
+      <div class="specimen-row"><span class="lbl">title</span><span class="sample s-title">A field guide to small machines</span><span class="meta">20 / 1.30 / 500</span></div>
+      <div class="specimen-row"><span class="lbl">body</span><span class="sample s-body">Type sets the tempo of an interface. Read at length: a single line of body running across a column of text shows whether a typeface earns its keep — or doesn't.</span><span class="meta">15 / 1.55 / 400</span></div>
+      <div class="specimen-row"><span class="lbl">code</span><span class="sample s-mono">const tokens = await loadTokens('./tokens/*.json');</span><span class="meta">14 / 1.50 / 400</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== Quote 2 ============== -->
+<section class="quote2">
+  <div class="inner">
+    <div class="mark reveal">"</div>
+    <div>
+      <p class="body reveal">Constraints, when chosen well, become the <em>shape of the work</em> — not the cage around it.</p>
+      <div class="attr reveal">— design philosophy / 002</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== Showcase reel — drop screenshots/video here ============== -->
+<section id="showcase" class="reel" style="border-top: 0;">
+  <div class="reel-head">
+    <div>
+      <div class="section-num" style="margin-bottom: 16px;">04 — Showcase</div>
+      <h3 class="reveal">In the wild.</h3>
+    </div>
+    <p class="reveal">Built with Prisma, on iOS and Android. Drop your own screenshots into any frame — they'll persist on reload.</p>
+  </div>
+
+  <div class="reel-track">
+    <div class="reel-card">
+      <div class="platform-tag">iOS · SwiftUI</div>
+      <image-slot id="reel-1" placeholder="Catalogue home — iOS" shape="rounded" radius="36"></image-slot>
+      <div class="caption"><div class="t">Catalogue home</div><div class="s">SwiftUI · iPhone 15</div></div>
+    </div>
+    <div class="reel-card">
+      <div class="platform-tag">Android · Compose</div>
+      <image-slot id="reel-2" placeholder="Item detail — Android" shape="rounded" radius="36"></image-slot>
+      <div class="caption"><div class="t">Item detail</div><div class="s">Compose · Pixel 8</div></div>
+    </div>
+    <div class="reel-card">
+      <div class="platform-tag">iOS · SwiftUI</div>
+      <image-slot id="reel-3" placeholder="Browse / filters" shape="rounded" radius="36"></image-slot>
+      <div class="caption"><div class="t">Browse / filters</div><div class="s">SwiftUI · iPad</div></div>
+    </div>
+    <div class="reel-card">
+      <div class="platform-tag">Android · Compose</div>
+      <image-slot id="reel-4" placeholder="Settings + theme" shape="rounded" radius="36"></image-slot>
+      <div class="caption"><div class="t">Settings + theme</div><div class="s">Compose · Pixel 8</div></div>
+    </div>
+    <div class="reel-card">
+      <div class="platform-tag">iOS · SwiftUI</div>
+      <image-slot id="reel-5" placeholder="Quick add sheet" shape="rounded" radius="36"></image-slot>
+      <div class="caption"><div class="t">Quick add</div><div class="s">SwiftUI · iPhone</div></div>
+    </div>
+  </div>
+
+  <div style="max-width: 1240px; margin: 100px auto 0; padding: 0 40px;">
+    <div class="section-num reveal" style="margin-bottom: 24px;">04.1 — Walkthrough</div>
+    <div class="video-frame reveal">
+      <image-slot id="walkthrough-video" placeholder="Drop walkthrough video poster (or animated GIF)" shape="rounded" radius="24"></image-slot>
+      <div class="play"><div class="play-btn"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div>
+    </div>
+    <div class="video-meta">
+      <span>02:14 — System tour</span>
+      <div class="timeline"></div>
+      <span>iOS + Android</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============== Apps section ============== -->
+<section id="apps" class="apps">
+  <div class="apps-frame">
+    <div class="apps-copy">
+      <div class="section-num" style="margin-bottom: 24px;">05 — Native</div>
+      <h3 class="reveal">One language. <em>Two platforms.</em></h3>
+      <p class="reveal">Tokens compile to native sources — no bridge, no runtime. Components are specified for Compose and SwiftUI separately, but they share the same anatomy, the same a11y contracts, and the same name.</p>
+      <div class="platform-row reveal">
+        <span class="platform-pill"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg> iOS · SwiftUI</span>
+        <span class="platform-pill"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85-.29-.15-.65-.06-.83.22l-1.88 3.24c-2.86-1.21-6.08-1.21-8.94 0L5.65 5.67c-.19-.29-.58-.38-.87-.2-.28.18-.37.54-.22.83L6.4 9.48C3.3 11.25 1.28 14.44 1 18h22c-.28-3.56-2.3-6.75-5.4-8.52zM7 15.25c-.41 0-.75-.34-.75-.75s.34-.75.75-.75.75.34.75.75-.34.75-.75.75zm10 0c-.41 0-.75-.34-.75-.75s.34-.75.75-.75.75.34.75.75-.34.75-.75.75z"/></svg> Android · Compose</span>
+        <span class="platform-pill"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> Style Dictionary</span>
+      </div>
+    </div>
+
+    <div class="device-stack reveal">
+      <div class="device device-ios">
+        <div class="device-tag">iOS · SwiftUI</div>
+        <image-slot id="device-ios" placeholder="Drop iOS catalogue screenshot" shape="rect"></image-slot>
+      </div>
+      <div class="device device-android">
+        <div class="device-tag">Android · Compose</div>
+        <image-slot id="device-android" placeholder="Drop Android catalogue screenshot" shape="rect"></image-slot>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== CTA ============== -->
+<section class="cta" id="docs">
+  <h3>Build it once. <em>Render it everywhere.</em></h3>
+  <div class="cta-row">
+    <a href="design-system-output/web-showcase/index.html" class="btn-primary">Open the showcase <span class="arrow">→</span></a>
+    <a href="design-system-output/README.md" class="btn-ghost">Read the docs</a>
+  </div>
+</section>
+
+<!-- ============== Footer ============== -->
+<footer>
+  <div class="foot-inner">
+    <div class="foot-col foot-brand">
+      <div class="logo"><div class="logo-mark"></div> Prisma <span class="logo-version">v0.1.0</span></div>
+      <p>A design system for native catalogue apps on iOS and Android. Technical-precise with editorial warmth.</p>
+    </div>
+    <div class="foot-col">
+      <h5>System</h5>
+      <a href="#tokens">Tokens</a>
+      <a href="#">Components</a>
+      <a href="#">Type</a>
+      <a href="#">Color</a>
+    </div>
+    <div class="foot-col">
+      <h5>Platform</h5>
+      <a href="#">SwiftUI</a>
+      <a href="#">Compose</a>
+      <a href="#">Style Dictionary</a>
+    </div>
+    <div class="foot-col">
+      <h5>Project</h5>
+      <a href="#">GitHub</a>
+      <a href="#">Changelog</a>
+      <a href="#">License (MIT)</a>
+    </div>
+  </div>
+  <div class="foot-bottom">
+    <span>© 2026 Prisma — released under MIT.</span>
+    <span>Made with Instrument Sans + JetBrains Mono.</span>
+  </div>
+</footer>
+
+<script>
+  // ===== Theme toggle =====
+  const root = document.documentElement;
+  const tog  = document.getElementById('themeTog');
+  const ico  = document.getElementById('themeIcon');
+  const sun  = '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>';
+  const moon = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/>';
+  function setTheme(t) { root.dataset.theme = t; ico.innerHTML = t === 'dark' ? moon : sun; try { localStorage.setItem('prisma-site-theme', t); } catch(e){} }
+  try { const s = localStorage.getItem('prisma-site-theme'); if (s) setTheme(s); else setTheme('dark'); } catch(e){ setTheme('dark'); }
+  tog.addEventListener('click', () => setTheme(root.dataset.theme === 'dark' ? 'light' : 'dark'));
+
+  // ===== Nav scrolled =====
+  const nav = document.getElementById('nav');
+  const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 20);
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  // ===== Reveal on scroll =====
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: 0.1, rootMargin: '0px 0px -10% 0px' });
+  document.querySelectorAll('.reveal, .reveal-stagger').forEach(el => io.observe(el));
+
+  // ===== Render ramps =====
+  const ramps = {
+    neutral: ['#FAF8F5','#F2EFEA','#E6E1D9','#D2CBBF','#A8A092','#7C7567','#5A5447','#3F3A30','#2A2620','#1A1814','#0F0E0B'],
+    accent:  ['#F4F0FF','#E6DDFF','#CFBFFF','#B299FF','#9173FF','#7651F5','#5E36DC','#4A28B0','#371E83','#251457','#150B33'],
+    success: ['#EEF4EC','#D4E4CE','#A9C99E','#7BAB6E','#558D49','#3F7235','#305827','#23401D','#192D15','#0F1B0D','#070D06'],
+    warning: ['#FBF3E0','#F5E2B6','#EAC270','#D69F36','#B58420','#8E6818','#6E5012','#523B0D','#3A2A09','#241A05','#130E03'],
+    danger:  ['#FBECEA','#F5CDC8','#E89C92','#D86E60','#BF4A3B','#9C3528','#79281E','#5A1D16','#3F140F','#260C09','#150605'],
+    info:    ['#EAF1F5','#C9DCE7','#92B6CB','#5C90AE','#3B7390','#2B5C75','#21475A','#193543','#11252F','#0A161C','#050B0E']
+  };
+  Object.entries(ramps).forEach(([name, stops]) => {
+    const el = document.getElementById('ramp-' + name);
+    if (!el) return;
+    stops.forEach((c, i) => {
+      const d = document.createElement('div');
+      d.style.background = c;
+      d.title = name + '.' + (['50','100','200','300','400','500','600','700','800','900','950'][i]) + ' · ' + c;
+      el.appendChild(d);
+    });
+  });
+</script>
+
+</body>
+</html>

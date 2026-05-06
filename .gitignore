@@ -1,0 +1,38 @@
+# Node / Style Dictionary
+node_modules/
+design-system/build/
+.npm/
+*.log
+
+# Android
+.gradle/
+android-catalogue/build/
+android-catalogue/**/build/
+android-catalogue/local.properties
+android-catalogue/.idea/
+android-catalogue/captures/
+android-catalogue/.cxx/
+android-catalogue/app/release/
+*.iml
+*.hprof
+
+# iOS / Swift
+ios-catalogue/.build/
+ios-catalogue/.swiftpm/
+ios-catalogue/build/
+ios-catalogue/DerivedData/
+ios-catalogue/**/xcuserdata/
+ios-catalogue/**/*.xcworkspace/xcuserdata/
+ios-catalogue/Pods/
+*.xcuserstate
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Reference repos (cloned for grep/study, not part of this project)
+references/

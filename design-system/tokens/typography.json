@@ -1,0 +1,46 @@
+{
+  "font": {
+    "family": {
+      "sans": { "$value": "Instrument Sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", "$type": "fontFamily" },
+      "mono": { "$value": "JetBrains Mono, 'SF Mono', Menlo, Consolas, monospace", "$type": "fontFamily" }
+    },
+    "weight": {
+      "regular":  { "$value": 400, "$type": "fontWeight" },
+      "medium":   { "$value": 500, "$type": "fontWeight" },
+      "semibold": { "$value": 600, "$type": "fontWeight" },
+      "bold":     { "$value": 700, "$type": "fontWeight" }
+    }
+  },
+
+  "typography": {
+    "display": {
+      "lg": { "$type": "typography", "$value": { "fontFamily": "{font.family.sans}", "fontWeight": "{font.weight.semibold}", "fontSize": "56px", "lineHeight": "1.05",  "letterSpacing": "-0.02em" } },
+      "md": { "$type": "typography", "$value": { "fontFamily": "{font.family.sans}", "fontWeight": "{font.weight.semibold}", "fontSize": "44px", "lineHeight": "1.08",  "letterSpacing": "-0.02em" } },
+      "sm": { "$type": "typography", "$value": { "fontFamily": "{font.family.sans}", "fontWeight": "{font.weight.semibold}", "fontSize": "36px", "lineHeight": "1.1",   "letterSpacing": "-0.018em" } }
+    },
+    "headline": {
+      "lg": { "$type": "typography", "$value": { "fontFamily": "{font.family.sans}", "fontWeight": "{font.weight.semibold}", "fontSize": "30px", "lineHeight": "1.2",  "letterSpacing": "-0.014em" } },
+      "md": { "$type": "typography", "$value": { "fontFamily": "{font.family.sans}", "fontWeight": "{font.weight.semibold}", "fontSize": "26px", "lineHeight": "1.22", "letterSpacing": "-0.012em" } },
+      "sm": { "$type": "typography", "$value": { "fontFamily": "{font.family.sans}", "fontWeight": "{font.weight.semibold}", "fontSize": "22px", "lineHeight": "1.25", "letterSpacing": "-0.01em" } }
+    },
+    "title": {
+      "lg": { "$type": "typography", "$value": { "fontFamily": "{font.family.sans}", "fontWeight": "{font.weight.medium}",   "fontSize": "20px", "lineHeight": "1.3",  "letterSpacing": "-0.006em" } },
+      "md": { "$type": "typography", "$value": { "fontFamily": "{font.family.sans}", "fontWeight": "{font.weight.medium}",   "fontSize": "17px", "lineHeight": "1.35", "letterSpacing": "-0.004em" } },
+      "sm": { "$type": "typography", "$value": { "fontFamily": "{font.family.sans}", "fontWeight": "{font.weight.medium}",   "fontSize": "15px", "lineHeight": "1.4",  "letterSpacing": "0" } }
+    },
+    "body": {
+      "lg": { "$type": "typography", "$value": { "fontFamily": "{font.family.sans}", "fontWeight": "{font.weight.regular}",  "fontSize": "17px", "lineHeight": "1.55", "letterSpacing": "0" } },
+      "md": { "$type": "typography", "$value": { "fontFamily": "{font.family.sans}", "fontWeight": "{font.weight.regular}",  "fontSize": "15px", "lineHeight": "1.55", "letterSpacing": "0" } },
+      "sm": { "$type": "typography", "$value": { "fontFamily": "{font.family.sans}", "fontWeight": "{font.weight.regular}",  "fontSize": "13px", "lineHeight": "1.5",  "letterSpacing": "0.002em" } }
+    },
+    "label": {
+      "lg": { "$type": "typography", "$value": { "fontFamily": "{font.family.sans}", "fontWeight": "{font.weight.medium}",   "fontSize": "15px", "lineHeight": "1.3",  "letterSpacing": "0" } },
+      "md": { "$type": "typography", "$value": { "fontFamily": "{font.family.sans}", "fontWeight": "{font.weight.medium}",   "fontSize": "13px", "lineHeight": "1.3",  "letterSpacing": "0.004em" } },
+      "sm": { "$type": "typography", "$value": { "fontFamily": "{font.family.sans}", "fontWeight": "{font.weight.medium}",   "fontSize": "11px", "lineHeight": "1.3",  "letterSpacing": "0.04em" } }
+    },
+    "code": {
+      "md": { "$type": "typography", "$value": { "fontFamily": "{font.family.mono}", "fontWeight": "{font.weight.regular}",  "fontSize": "14px", "lineHeight": "1.5",  "letterSpacing": "0" } },
+      "sm": { "$type": "typography", "$value": { "fontFamily": "{font.family.mono}", "fontWeight": "{font.weight.regular}",  "fontSize": "12px", "lineHeight": "1.5",  "letterSpacing": "0" } }
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "motion": {
+    "duration": {
+      "instant": { "$value": "0ms",   "$type": "duration", "$description": "Reduced-motion fallback." },
+      "fast":    { "$value": "120ms", "$type": "duration", "$description": "Press / hover state changes." },
+      "default": { "$value": "220ms", "$type": "duration", "$description": "Most UI transitions." },
+      "slow":    { "$value": "360ms", "$type": "duration", "$description": "Sheets, modals, page-level." },
+      "slower":  { "$value": "520ms", "$type": "duration", "$description": "Hero / showcase moments only." }
+    },
+    "easing": {
+      "linear":     { "$value": "cubic-bezier(0, 0, 1, 1)",        "$type": "cubicBezier" },
+      "standard":   { "$value": "cubic-bezier(0.2, 0, 0, 1)",      "$type": "cubicBezier", "$description": "Default in/out for UI." },
+      "decelerate": { "$value": "cubic-bezier(0, 0, 0.2, 1)",      "$type": "cubicBezier", "$description": "Element entering screen." },
+      "accelerate": { "$value": "cubic-bezier(0.4, 0, 1, 1)",      "$type": "cubicBezier", "$description": "Element leaving screen." },
+      "emphasized": { "$value": "cubic-bezier(0.3, 0, 0, 1)",      "$type": "cubicBezier", "$description": "Hero transitions." },
+      "spring":     { "$value": "cubic-bezier(0.34, 1.56, 0.64, 1)","$type": "cubicBezier", "$description": "Springy bounce — toggles, switches." }
+    }
+  }
+}

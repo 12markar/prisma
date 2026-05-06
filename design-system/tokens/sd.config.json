@@ -1,0 +1,20 @@
+{
+  "source": ["tokens/*.json"],
+  "platforms": {
+    "compose": {
+      "transformGroup": "compose",
+      "buildPath": "build/compose/",
+      "files": [{ "destination": "Tokens.kt", "format": "compose/object", "options": { "import": ["androidx.compose.ui.graphics.Color", "androidx.compose.ui.unit.dp", "androidx.compose.ui.unit.sp"] } }]
+    },
+    "ios-swift": {
+      "transformGroup": "ios-swift",
+      "buildPath": "build/ios/",
+      "files": [{ "destination": "Tokens.swift", "format": "ios-swift/class.swift", "className": "Tokens" }]
+    },
+    "css": {
+      "transformGroup": "css",
+      "buildPath": "build/web/",
+      "files": [{ "destination": "tokens.css", "format": "css/variables" }]
+    }
+  }
+}
