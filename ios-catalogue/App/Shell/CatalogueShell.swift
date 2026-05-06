@@ -40,7 +40,9 @@ struct CatalogueShell: View {
                 expandedSet: expandedSet,
                 onToggleSection: toggleExpanded
             )
-            .navigationTitle("Prisma")
+            // Title is rendered by Sidebar's principal toolbar item (brand mark
+            // + wordmark) — keep this empty so we don't double up.
+            .navigationTitle("")
         } detail: {
             DetailPane(entry: CatalogueRegistry.byKey(selectedKey))
         }

@@ -37,6 +37,30 @@ struct Sidebar: View {
             prompt: "Search components"
         )
         .toolbar {
+            ToolbarItem(placement: .principal) {
+                HStack(spacing: PrismaSpacing.sp3) {
+                    // Brand gradient mark — squircle filled with the official
+                    // Prisma violet→magenta prism gradient. Full SVG render
+                    // queued for asset-pipeline integration in next session.
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(
+                            LinearGradient(
+                                colors: [
+                                    Color(red: 0.569, green: 0.451, blue: 1.0),
+                                    Color(red: 0.463, green: 0.318, blue: 0.961),
+                                    Color(red: 0.878, green: 0.188, blue: 0.533)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .frame(width: 24, height: 24)
+                    Text("Prisma")
+                        .font(PrismaTypography.titleLg.font)
+                        .foregroundStyle(PrismaSemanticColors.textPrimary.themed(scheme))
+                        .tracking(-0.4)
+                }
+            }
             ToolbarItem(placement: .topBarTrailing) {
                 Button(action: cycleTheme) {
                     Image(systemName: themeIconName)
@@ -44,6 +68,7 @@ struct Sidebar: View {
                 .accessibilityLabel(themeAccessibilityLabel)
             }
         }
+        .toolbarTitleDisplayMode(.inline)
     }
 
     // MARK: - Theme toggle
