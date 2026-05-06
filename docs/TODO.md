@@ -6,12 +6,14 @@ The actionable, step-by-step build list. For architectural rationale and tradeof
 
 ---
 
-## 0. Pre-build housekeeping
+## 0. Pre-build housekeeping ✅
 
-- [ ] Decide: keep or remove the duplicate `docs/prisma/design-system-output/` (byte-identical to `design-system/`). **Recommendation: remove the duplicate, keep `docs/prisma/site/` as the deployable showcase site.**
-- [ ] Decide: site deployment path — GitHub Pages from `docs/prisma/site/`, or move to `design-system/site/` first?
-- [ ] Decide: detekt config — mirror krail (share URL) or sensible defaults?
-- [ ] Decide: GitHub username/org for the eventual Option C migration repos (not blocking for v1)
+- [x] Project + folder + repo all renamed to `Prisma`
+- [x] Duplicate `docs/prisma/design-system-output/` removed
+- [x] Site moved to `design-system/site/`
+- [x] Detekt config decision: sensible defaults (Slack-style + compose-lints) until krail config shared
+- [x] GitHub repo created at https://github.com/ksharma-xyz/prisma (public)
+- [x] Reference repos cloned to `references/` (gitignored): cvs-health iOS a11y, kiwicom orbit-compose
 
 ---
 
@@ -33,23 +35,20 @@ Goal: token pipeline working end-to-end on both platforms; both apps build and r
 - [ ] `empty-state.md` — illustration slot + title + description + optional action button
 - [ ] `command-palette.md` — modal ⌘K interface, fuzzy search, sectioned results, keyboard nav
 
-### 0.2 Style Dictionary token pipeline
+### 0.2 Style Dictionary token pipeline ✅
 
-- [ ] `cd design-system && npm install`
-- [ ] Implement custom transforms in `scripts/build.mjs`:
-  - [ ] Compose: hex → `Color(0xFF...)`, `dp`/`sp` extensions, light/dark `@Composable` resolver
-  - [ ] SwiftUI: hex → `Color(red:, green:, blue:)`, `Font.custom(...)`, `Color(light:dark:)` extension, `CGFloat` constants
-- [ ] Implement custom formats:
-  - [ ] `compose/object` — Kotlin `object PrismaTokens { ... }` with grouped sub-objects
-  - [ ] `swiftui/struct` — Swift `struct PrismaTokens { ... }` with grouped sub-structs
-- [ ] Run `npm run build-tokens` — verify generated `Tokens.kt` and `Tokens.swift` are valid
-- [ ] Implement `scripts/check-contrast.mjs` (real WCAG AA check on all semantic text/surface pairs)
-- [ ] Implement `scripts/lint.mjs` (DTCG schema validation)
-- [ ] Implement `scripts/copy-fonts.mjs`:
-  - [ ] Download Instrument Sans + JetBrains Mono `.ttf` from Google Fonts → `design-system/fonts/`
-  - [ ] Copy to `android-catalogue/core-ui/src/main/res/font/` (lowercase, snake_case)
-  - [ ] Copy to `ios-catalogue/CoreUI/Sources/CoreUI/Resources/Fonts/`
-  - [ ] Update iOS `Info.plist` (`UIAppFonts`)
+- [x] `cd design-system && npm install` (Style Dictionary v4 installed)
+- [x] Custom Compose format `prisma/compose` — emits `Color(0xFFxxxxxx)`, `Dp`, `sp`, `PrismaSemanticColor` data class with `@Composable resolve()`, multi-layer `PrismaShadow` + `PrismaElevation`, `TextStyle` referencing `PrismaFonts`, `FloatArray` cubic-bezier easing
+- [x] Custom SwiftUI format `prisma/swiftui` — emits `Color(.sRGB, red:green:blue:opacity:)`, `CGFloat`, `PrismaSemanticColor` struct with `resolve(_ scheme:)`, multi-layer `PrismaShadow` + `PrismaElevation`, `Font.custom` via `PrismaFonts.sans/mono(size:weight:)`, cubic-bezier tuples
+- [x] `npm run build-tokens` runs end-to-end:
+  - `PrismaTokens.kt` → `android-catalogue/core-ui/src/main/java/xyz/ksharma/prisma/tokens/` (453 lines)
+  - `PrismaTokens.swift` → `ios-catalogue/CoreUI/Sources/CoreUI/Tokens/` (420 lines)
+  - `tokens.css` → `design-system/build/css/` (sanity check — gitignored)
+- [x] `scripts/check-contrast.mjs` — real WCAG AA check, 24 semantic text/surface pairs verified, all pass
+- [x] `scripts/lint.mjs` — DTCG schema + reference resolution, 6 token files all valid
+- [x] `scripts/copy-fonts.mjs` — copies any `.ttf`/`.otf` from `design-system/fonts/` to both apps' resource folders
+- [ ] **Pending: drop actual `.ttf` files for Instrument Sans + JetBrains Mono into `design-system/fonts/`** (not blocking — apps fall back to system fonts until provided)
+- [ ] **Pending: update iOS `Info.plist` UIAppFonts after fonts dropped in
 
 ### 0.3 Android scaffold
 
