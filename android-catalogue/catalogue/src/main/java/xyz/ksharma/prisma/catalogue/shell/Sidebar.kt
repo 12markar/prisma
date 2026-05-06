@@ -23,7 +23,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 //   Foundation/Icons showcase lands (Phase 1). Tracked in docs/TODO.md.
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
@@ -40,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import xyz.ksharma.prisma.catalogue.LocalThemeController
 import xyz.ksharma.prisma.catalogue.registry.CatalogueEntry
 import xyz.ksharma.prisma.catalogue.registry.CatalogueRegistry
 import xyz.ksharma.prisma.catalogue.registry.CatalogueSection
@@ -71,12 +74,18 @@ public fun Sidebar(
             .fillMaxSize()
             .background(PrismaSemanticColors.SurfaceSunken.themed()),
     ) {
+        ChromeRow(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = PrismaSpacing.Sp4, vertical = PrismaSpacing.Sp3),
+        )
+
         SearchField(
             query = query,
             onQueryChange = { query = it },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(PrismaSpacing.Sp4),
+                .padding(horizontal = PrismaSpacing.Sp4, vertical = PrismaSpacing.Sp1),
         )
 
         LazyColumn(
@@ -124,6 +133,37 @@ public fun Sidebar(
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun ChromeRow(modifier: Modifier = Modifier) {
+    val controller = LocalThemeController.current
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        Text(
+            text = "Prisma",
+            style = PrismaTypography.HeadlineSm,
+            color = PrismaSemanticColors.TextPrimary.themed(),
+        )
+        Box(
+            modifier = Modifier
+                .size(36.dp)
+                .clip(RoundedCornerShape(PrismaRadius.Full))
+                .background(PrismaSemanticColors.SurfaceRaised.themed())
+                .clickable(onClick = controller.toggle),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                imageVector = if (controller.isDark) Icons.Default.LightMode else Icons.Default.DarkMode,
+                contentDescription = if (controller.isDark) "Switch to light mode" else "Switch to dark mode",
+                tint = PrismaSemanticColors.TextPrimary.themed(),
+                modifier = Modifier.size(18.dp),
+            )
         }
     }
 }

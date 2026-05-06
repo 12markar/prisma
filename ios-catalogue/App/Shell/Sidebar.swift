@@ -9,6 +9,10 @@ struct Sidebar: View {
 
     @Environment(\.colorScheme) private var scheme
 
+    /// Shared with PrismaApp via the same UserDefaults key.
+    /// "" = follow system, "light" = forced light, "dark" = forced dark.
+    @AppStorage("prisma.isDarkOverride") private var isDarkOverrideRaw: String = ""
+
     private var isSearching: Bool { !query.trimmingCharacters(in: .whitespaces).isEmpty }
 
     private var filteredEntries: [CatalogueEntry] {
@@ -32,6 +36,41 @@ struct Sidebar: View {
             placement: .navigationBarDrawer(displayMode: .always),
             prompt: "Search components"
         )
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(action: cycleTheme) {
+                    Image(systemName: themeIconName)
+                }
+                .accessibilityLabel(themeAccessibilityLabel)
+            }
+        }
+    }
+
+    // MARK: - Theme toggle
+
+    /// Cycles: system → dark → light → system.
+    private func cycleTheme() {
+        switch isDarkOverrideRaw {
+        case "":      isDarkOverrideRaw = "dark"
+        case "dark":  isDarkOverrideRaw = "light"
+        default:      isDarkOverrideRaw = ""
+        }
+    }
+
+    private var themeIconName: String {
+        switch isDarkOverrideRaw {
+        case "dark":  "moon.fill"
+        case "light": "sun.max.fill"
+        default:      "circle.lefthalf.filled"   // follow system
+        }
+    }
+
+    private var themeAccessibilityLabel: String {
+        switch isDarkOverrideRaw {
+        case "dark":  "Theme: dark. Tap to switch to light."
+        case "light": "Theme: light. Tap to follow system."
+        default:      "Theme: follows system. Tap to force dark."
+        }
     }
 
     private func entriesFor(_ section: CatalogueSection) -> [CatalogueEntry] {
