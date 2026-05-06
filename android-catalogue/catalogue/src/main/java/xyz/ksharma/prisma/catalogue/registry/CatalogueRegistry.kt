@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
+import xyz.ksharma.prisma.catalogue.components.ButtonShowcase
 import xyz.ksharma.prisma.catalogue.foundations.ColorShowcase
 import xyz.ksharma.prisma.catalogue.foundations.ElevationShowcase
 import xyz.ksharma.prisma.catalogue.foundations.MotionShowcase
@@ -49,7 +50,7 @@ public object CatalogueRegistry {
         entry("foundation.radius",     "Radius",     CatalogueSection.Foundations, listOf("corner", "radius"))     { RadiusShowcase() },
 
         // Inputs
-        entry("input.button",     "Button",     CatalogueSection.Inputs, listOf("button", "action")),
+        entry("input.button",     "Button",     CatalogueSection.Inputs, listOf("button", "action"))   { ButtonShowcase() },
         entry("input.textfield",  "TextField",  CatalogueSection.Inputs, listOf("input", "form")),
         entry("input.checkbox",   "Checkbox",   CatalogueSection.Inputs, listOf("input", "form", "selection")),
         entry("input.radio",      "Radio",      CatalogueSection.Inputs, listOf("input", "form", "selection")),
