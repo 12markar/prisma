@@ -1,6 +1,8 @@
 package xyz.ksharma.prisma.catalogue.shell
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -28,7 +30,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.DarkMode
-import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
@@ -47,6 +48,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import xyz.ksharma.prisma.catalogue.LocalThemeController
@@ -54,6 +56,7 @@ import xyz.ksharma.prisma.catalogue.registry.CatalogueEntry
 import xyz.ksharma.prisma.catalogue.registry.CatalogueRegistry
 import xyz.ksharma.prisma.catalogue.registry.CatalogueSection
 import xyz.ksharma.prisma.coreui.themed
+import xyz.ksharma.prisma.tokens.PrismaMotion
 import xyz.ksharma.prisma.tokens.PrismaRadius
 import xyz.ksharma.prisma.tokens.PrismaSemanticColors
 import xyz.ksharma.prisma.tokens.PrismaSpacing
@@ -109,6 +112,7 @@ public fun Sidebar(
                 item(key = "header_${section.name}") {
                     SectionHeader(
                         title = section.title,
+                        count = sectionEntries.size,
                         expanded = isExpanded,
                         enabled = !isSearching,
                         onToggle = {
@@ -237,31 +241,62 @@ private fun SearchField(
 @Composable
 private fun SectionHeader(
     title: String,
+    count: Int,
     expanded: Boolean,
     enabled: Boolean,
     onToggle: () -> Unit,
 ) {
+    // Chevron rotates 90° on toggle — single icon, animated.
+    val rotation by animateFloatAsState(
+        targetValue = if (expanded) 90f else 0f,
+        animationSpec = tween(durationMillis = PrismaMotion.Duration.Default),
+        label = "chevron",
+    )
     val rowModifier = if (enabled) {
         Modifier.fillMaxWidth().clickable(onClick = onToggle)
     } else {
         Modifier.fillMaxWidth()
     }
     Row(
-        modifier = rowModifier
-            .padding(start = PrismaSpacing.Sp4, end = PrismaSpacing.Sp4, top = PrismaSpacing.Sp4, bottom = PrismaSpacing.Sp2),
+        modifier = rowModifier.padding(
+            start = PrismaSpacing.Sp4,
+            end = PrismaSpacing.Sp4,
+            top = PrismaSpacing.Sp5,
+            bottom = PrismaSpacing.Sp2,
+        ),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(PrismaSpacing.Sp2),
+        horizontalArrangement = Arrangement.spacedBy(PrismaSpacing.Sp3),
     ) {
+        Text(
+            text = title,
+            style = PrismaTypography.TitleMd,
+            color = PrismaSemanticColors.TextPrimary.themed(),
+            modifier = Modifier.weight(1f),
+        )
+        // Count chip — uses surface.raised on collapsed sections so it stands out
+        // as the user's "what's hiding here" cue; subtler when expanded.
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(PrismaRadius.Full))
+                .background(
+                    if (expanded) PrismaSemanticColors.SurfaceSunken.themed()
+                    else PrismaSemanticColors.SurfaceRaised.themed(),
+                )
+                .padding(horizontal = PrismaSpacing.Sp2, vertical = 2.dp),
+        ) {
+            Text(
+                text = count.toString(),
+                style = PrismaTypography.LabelSm.copy(fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace),
+                color = PrismaSemanticColors.TextSecondary.themed(),
+            )
+        }
         Icon(
-            imageVector = if (expanded) Icons.Default.KeyboardArrowDown else Icons.AutoMirrored.Filled.KeyboardArrowRight,
+            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
             contentDescription = null,
             tint = PrismaSemanticColors.TextTertiary.themed(),
-            modifier = Modifier.size(14.dp),
-        )
-        Text(
-            text = title.uppercase(),
-            style = PrismaTypography.LabelSm.copy(letterSpacing = 0.8.sp),
-            color = PrismaSemanticColors.TextTertiary.themed(),
+            modifier = Modifier
+                .size(18.dp)
+                .graphicsLayer { rotationZ = rotation },
         )
     }
 }

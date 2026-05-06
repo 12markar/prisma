@@ -111,18 +111,14 @@ struct Sidebar: View {
         let isExpanded = isSearching || expandedSet.contains(section.rawValue)
 
         if isSearching {
-            // No collapsing during search — flat list per section.
             Section {
                 ForEach(entries) { entry in
                     rowView(entry)
                 }
             } header: {
-                Text(section.rawValue.uppercased())
-                    .font(PrismaTypography.labelSm.font)
-                    .foregroundStyle(PrismaSemanticColors.textSecondary.themed(scheme))
+                sectionLabel(section: section, count: entries.count, expanded: true)
             }
         } else {
-            // DisclosureGroup gives us the collapsible chevron animation natively.
             DisclosureGroup(
                 isExpanded: Binding(
                     get: { isExpanded },
@@ -133,11 +129,35 @@ struct Sidebar: View {
                     rowView(entry)
                 }
             } label: {
-                Text(section.rawValue.uppercased())
-                    .font(PrismaTypography.labelSm.font)
-                    .foregroundStyle(PrismaSemanticColors.textSecondary.themed(scheme))
+                sectionLabel(section: section, count: entries.count, expanded: isExpanded)
             }
         }
+    }
+
+    /// Section header — prominent (title.md / text.primary) instead of the
+    /// default subtle uppercase. Trailing count chip shows how many items
+    /// the section contains.
+    @ViewBuilder
+    private func sectionLabel(section: CatalogueSection, count: Int, expanded: Bool) -> some View {
+        HStack(spacing: PrismaSpacing.sp3) {
+            Text(section.rawValue)
+                .font(PrismaTypography.titleMd.font)
+                .foregroundStyle(PrismaSemanticColors.textPrimary.themed(scheme))
+            Spacer()
+            Text("\(count)")
+                .font(.system(size: 11, weight: .medium, design: .monospaced))
+                .foregroundStyle(PrismaSemanticColors.textSecondary.themed(scheme))
+                .padding(.horizontal, PrismaSpacing.sp2)
+                .padding(.vertical, 2)
+                .background(
+                    expanded
+                        ? PrismaSemanticColors.surfaceSunken.themed(scheme)
+                        : PrismaSemanticColors.surfaceRaised.themed(scheme)
+                )
+                .clipShape(Capsule())
+        }
+        .textCase(nil)              // Override List's default uppercase header treatment
+        .padding(.vertical, 4)
     }
 
     @ViewBuilder
