@@ -25,7 +25,7 @@ if (
 }
 
 const COMPOSE_OUT = join(ROOT, '../android-catalogue/core-ui/src/main/java/xyz/ksharma/prisma/tokens/');
-const SWIFTUI_OUT = join(ROOT, '../ios-catalogue/CoreUI/Sources/CoreUI/Tokens/');
+const SWIFTUI_OUT = join(ROOT, '../ios-catalogue/Sources/CoreUI/Tokens/');
 const CSS_OUT = join(ROOT, 'build/css/');
 
 mkdirSync(COMPOSE_OUT, { recursive: true });

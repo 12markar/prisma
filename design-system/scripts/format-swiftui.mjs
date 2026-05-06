@@ -24,6 +24,20 @@ import {
   f,
 } from './utils.mjs';
 
+// Swift reserved keywords that need backtick-escaping when used as identifiers.
+const SWIFT_RESERVED = new Set([
+  'default', 'class', 'struct', 'enum', 'func', 'var', 'let', 'if', 'else',
+  'switch', 'case', 'for', 'while', 'do', 'return', 'break', 'continue',
+  'in', 'is', 'as', 'nil', 'true', 'false', 'self', 'Self', 'super',
+  'init', 'deinit', 'import', 'where', 'throws', 'try', 'throw', 'protocol',
+  'extension', 'subscript', 'typealias', 'public', 'private', 'internal',
+  'fileprivate', 'open', 'static', 'final', 'lazy', 'weak', 'unowned',
+  'inout', 'operator', 'precedencegroup', 'associatedtype', 'rethrows',
+  'guard', 'defer', 'catch', 'repeat', 'any', 'some',
+]);
+
+const escapeSwift = (name) => (SWIFT_RESERVED.has(name) ? `\`${name}\`` : name);
+
 function* walkLeaves(node, path = []) {
   if (node && typeof node === 'object' && '$value' in node) {
     yield [path, node];
@@ -93,7 +107,7 @@ const formatDimensions = (enumName, group, prefix = '') => {
   const lines = [`public enum ${enumName} {`];
   for (const [path, token] of walkLeaves(group)) {
     const pascalName = prefix + pascalCase(path);
-    const camelName = pascalName.charAt(0).toLowerCase() + pascalName.slice(1);
+    const camelName = escapeSwift(pascalName.charAt(0).toLowerCase() + pascalName.slice(1));
     const px = parsePx(token.$value);
     if (Number.isNaN(px)) {
       lines.push(`  // skipped: ${camelName} (unparseable value ${JSON.stringify(token.$value)})`);
@@ -205,7 +219,7 @@ const formatMotion = (motion) => {
     if (k.startsWith('$')) continue;
     const ms = parseMs(t.$value);
     const seconds = Number((ms / 1000).toFixed(3));
-    const camel = k.charAt(0).toLowerCase() + k.slice(1);
+    const camel = escapeSwift(k.charAt(0).toLowerCase() + k.slice(1));
     lines.push(`    public static let ${camel}: Double = ${seconds} // ${ms}ms`);
   }
   lines.push(`  }`);
@@ -214,7 +228,7 @@ const formatMotion = (motion) => {
   for (const [k, t] of Object.entries(motion.easing || {})) {
     if (k.startsWith('$')) continue;
     const [a, b, c, d] = parseCubicBezier(t.$value);
-    const camel = k.charAt(0).toLowerCase() + k.slice(1);
+    const camel = escapeSwift(k.charAt(0).toLowerCase() + k.slice(1));
     lines.push(`    public static let ${camel}: (Double, Double, Double, Double) = (${a}, ${b}, ${c}, ${d})`);
   }
   lines.push(`  }`);

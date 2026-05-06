@@ -26,6 +26,10 @@ ios-catalogue/**/*.xcworkspace/xcuserdata/
 ios-catalogue/Pods/
 *.xcuserstate
 
+# Xcodegen-generated — regenerate via `xcodegen generate`
+ios-catalogue/Prisma.xcodeproj/
+ios-catalogue/App/Generated/
+
 # macOS
 .DS_Store
 
