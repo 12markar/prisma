@@ -227,6 +227,14 @@ Each: Android + iOS implementation, snapshot tests, a11y tests, catalogue detail
 
 ---
 
+## Future upgrades (not blocking)
+
+- [ ] **Migrate to AGP 9** when stable — currently using AGP 8.7.2. AGP 9 is in alpha as of 2025-05; revisit once it ships stable.
+- [ ] Migrate to **Jetpack Navigation 3** (`androidx.navigation3`) when stable — Phase 0 uses `NavigableListDetailPaneScaffold`'s built-in back stack, which is sufficient for a list-detail catalogue. Nav 3 becomes valuable for deeper navigation graphs.
+- [ ] **Replace Material icons in catalogue chrome with design-system-supplied icon set.** Currently `Icons.Default.Search`, `Icons.Default.KeyboardArrowDown`, `Icons.AutoMirrored.Filled.KeyboardArrowRight` (Sidebar.kt). The Foundations / Icons showcase page (Phase 1) will define the canonical icon set; once it lands, the catalogue chrome should consume from there too. iOS equivalent: replace SF Symbols defaults with the same canonical set bridged via SFSafeSymbols.
+
+---
+
 ## Open questions / decisions queued
 
 These don't block Phase 0 but should be resolved before they become blockers:

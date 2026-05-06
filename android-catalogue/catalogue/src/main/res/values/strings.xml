@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Prisma</string>
+    <string name="catalogue_search_placeholder">Search components</string>
+    <string name="catalogue_section_foundations">Foundations</string>
+    <string name="catalogue_section_inputs">Inputs</string>
+    <string name="catalogue_section_feedback">Feedback</string>
+    <string name="catalogue_section_navigation">Navigation</string>
+    <string name="catalogue_section_data_display">Data display</string>
+    <string name="catalogue_empty_detail">Select a component to see its showcase.</string>
+</resources>

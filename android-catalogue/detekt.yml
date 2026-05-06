@@ -1,0 +1,43 @@
+# Prisma Detekt configuration.
+# Sensible Slack-style strict defaults + slack/compose-lints (added via the
+# detektPlugins configuration in the root build.gradle.kts).
+# Mirror krail's config when shared.
+
+build:
+  maxIssues: 0
+  excludeCorrectable: false
+
+config:
+  validation: true
+
+complexity:
+  active: true
+  LongMethod:
+    threshold: 60
+  LongParameterList:
+    functionThreshold: 8
+  CyclomaticComplexMethod:
+    threshold: 15
+  TooManyFunctions:
+    thresholdInClasses: 30
+    thresholdInFiles: 30
+
+style:
+  active: true
+  MaxLineLength:
+    maxLineLength: 140
+  MagicNumber:
+    active: false      # Generated tokens use raw numbers everywhere; suppressed at file level via @file:Suppress
+  ReturnCount:
+    max: 4
+
+naming:
+  active: true
+  TopLevelPropertyNaming:
+    active: false      # Generated tokens use mixed naming styles
+  FunctionNaming:
+    functionPattern: "[a-zA-Z][a-zA-Z0-9]*"
+
+# slack/compose-lints rules (pulled in via detektPlugins) — defaults are reasonable.
+Compose:
+  active: true
