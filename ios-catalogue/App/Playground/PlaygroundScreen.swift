@@ -37,24 +37,26 @@ struct PlaygroundScreen<Preview: View, Knobs: View, Footer: View>: View {
 
     @State private var knobsOpen = false
     @State private var a11yOpen = false
+    @State private var codeOpen = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: PrismaSpacing.sp5) {
             PreviewSurface { preview() }
                 .frame(minHeight: previewMinHeight)
 
+            // Three action pills — Edit, A11y, Code — each opens its own
+            // bottom sheet so the playground stays focused on the live
+            // preview.
             HStack(spacing: PrismaSpacing.sp3) {
                 actionPill(icon: .edit, label: "Edit") { knobsOpen = true }
                 actionPill(icon: .eye, label: "A11y") { a11yOpen = true }
+                actionPill(icon: .doc, label: "Code") { codeOpen = true }
             }
 
             if !states.isEmpty {
                 sectionLabel("States — swipe to compare")
                 StatesPager(states: states)
             }
-
-            sectionLabel("Usage")
-            CodeBlock(code: code())
 
             footer()
         }
@@ -78,6 +80,23 @@ struct PlaygroundScreen<Preview: View, Knobs: View, Footer: View>: View {
             A11ySheetContent(report: a11y)
                 .presentationDetents([.large])
                 .presentationDragIndicator(.visible)
+        }
+        .sheet(isPresented: $codeOpen) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: PrismaSpacing.sp4) {
+                    Text("Usage")
+                        .font(PrismaTypography.headlineSm.font)
+                        .foregroundStyle(PrismaSemanticColors.textPrimary.themed(scheme))
+                    Text("Drop this in to render the component as it appears above. Only knobs that differ from defaults are shown.")
+                        .font(PrismaTypography.bodySm.font)
+                        .foregroundStyle(PrismaSemanticColors.textSecondary.themed(scheme))
+                    CodeBlock(code: code())
+                }
+                .padding(.horizontal, PrismaSpacing.sp5)
+                .padding(.vertical, PrismaSpacing.sp4)
+            }
+            .presentationDetents([.medium, .large])
+            .presentationDragIndicator(.visible)
         }
     }
 

@@ -27,15 +27,6 @@ struct CheckboxShowcase: View {
                 StringKnobRow(label: "Label", value: $label)
                 StringKnobRow(label: "Helper", value: $helper)
             },
-            states: {
-                StateCell("Unchecked") { PrismaCheckbox(checked: .constant(false), label: "Default unchecked") }
-                StateCell("Checked") { PrismaCheckbox(checked: .constant(true), label: "Default checked") }
-                StateCell("Indeterminate") { PrismaCheckbox(state: .constant(.indeterminate), label: "Indeterminate") }
-                StateCell("Disabled checked") { PrismaCheckbox(checked: .constant(true), label: "Locked on", enabled: false) }
-                StateCell("Disabled unchecked") { PrismaCheckbox(checked: .constant(false), label: "Locked off", enabled: false) }
-                StateCell("Error") { PrismaCheckbox(checked: .constant(false), label: "Required", helperText: "This field is required.", isError: true) }
-                StateCell("Group + parent") { GroupExample() }
-            },
             code: {
                 var lines: [String] = ["PrismaCheckbox("]
                 lines.append("    checked: $checked,")
@@ -46,18 +37,25 @@ struct CheckboxShowcase: View {
                 lines.append(")")
                 return lines.joined(separator: "\n")
             },
-            a11y: {
-                A11yPanel(
-                    role: ".isToggle (tri-state via accessibilityValue)",
-                    minTouchTarget: "44 × 44 pt",
-                    bullets: [
-                        "State (checked / unchecked / indeterminate) announced; label read in same pass.",
-                        "Indeterminate is for parent groups — children remain individual booleans.",
-                        "Error appends \"required\" or the error message via accessibilityHint.",
-                        "Disabled communicated via the role; visual dim is supporting, not primary."
-                    ]
-                )
-            }
+            pagerStates: [
+                AnyPlaygroundState("Unchecked") { PrismaCheckbox(checked: .constant(false), label: "Default unchecked") },
+                AnyPlaygroundState("Checked") { PrismaCheckbox(checked: .constant(true), label: "Default checked") },
+                AnyPlaygroundState("Indeterminate") { PrismaCheckbox(state: .constant(.indeterminate), label: "Indeterminate") },
+                AnyPlaygroundState("Disabled checked") { PrismaCheckbox(checked: .constant(true), label: "Locked on", enabled: false) },
+                AnyPlaygroundState("Error") { PrismaCheckbox(checked: .constant(false), label: "Required", helperText: "This field is required.", isError: true) },
+                AnyPlaygroundState("Group + parent") { GroupExample() }
+            ],
+            a11yReport: A11yReport(
+                role: "Checkbox / TriStateCheckbox (parent-child group)",
+                minTouchTarget: "48 × 48 dp / 44 × 44 pt — full row is the tap target",
+                screenReader: "TalkBack and VoiceOver announce the role (\"Checkbox\"), the label, then the state (\"Checked\" / \"Not checked\" / \"Partially checked\"). The label is read in the same pass — no re-focus needed. Indeterminate is reserved for parent rows whose children disagree.",
+                voiceControl: "Voice Access targets the visible label (\"Tap Mentions\"). Saying the label toggles the box without precise targeting. The full row is clickable, not just the box itself.",
+                keyboard: "Tab focuses, Space toggles. Enter does not toggle (matches platform convention). Disabled boxes are skipped from Tab order via the role; visual dimming is supporting, not primary.",
+                contrast: "Unchecked outline uses border.strong (3:1 non-text contrast); checked fill uses accent.default at 4.6:1; the check glyph itself meets 4.5:1 against the fill. Error border uses status.danger at 4.7:1.",
+                touchTarget: "Whole row is the tap target — at least 48 × 48 dp / 44 × 44 pt — even when the visible box is 20 dp. Spacing between adjacent checkboxes prevents fat-finger toggles on the wrong row.",
+                wcagQuote: "For all user interface components … the name and role can be programmatically determined; states, properties, and values that can be set by the user can be programmatically set.",
+                wcagRef: "4.1.2 Name, Role, Value, Level A"
+            )
         )
     }
 }

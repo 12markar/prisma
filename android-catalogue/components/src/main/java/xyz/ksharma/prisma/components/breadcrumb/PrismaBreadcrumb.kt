@@ -2,12 +2,12 @@ package xyz.ksharma.prisma.components.breadcrumb
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -20,16 +20,21 @@ import xyz.ksharma.prisma.tokens.PrismaTypography
 
 public data class PrismaBreadcrumbItem(val label: String, val onClick: (() -> Unit)? = null)
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 public fun PrismaBreadcrumb(
     items: ImmutableList<PrismaBreadcrumbItem>,
     modifier: Modifier = Modifier,
 ) {
     val isDark = LocalPrismaIsDark.current
-    Row(
+    // FlowRow so longer paths (4+ levels) wrap onto a second line on narrow
+    // widths instead of clipping. Each crumb + chevron pair flows together
+    // — the chevron breaks to the next line if the crumb fits but the
+    // chevron doesn't, which is the exactly-right wrap point.
+    FlowRow(
         modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(PrismaSpacing.Sp2),
+        verticalArrangement = Arrangement.spacedBy(PrismaSpacing.Sp1),
     ) {
         items.forEachIndexed { i, item ->
             val isLast = i == items.lastIndex

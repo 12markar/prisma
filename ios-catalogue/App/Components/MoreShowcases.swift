@@ -38,13 +38,6 @@ struct SwitchShowcase: View {
                 StringKnobRow(label: "Label", value: $label)
                 StringKnobRow(label: "Helper", value: $helper)
             },
-            states: {
-                StateCell("On") { PrismaSwitch(checked: .constant(true), label: "Push notifications") }
-                StateCell("Off") { PrismaSwitch(checked: .constant(false), label: "Auto-sync") }
-                StateCell("Disabled (on)") { PrismaSwitch(checked: .constant(true), label: "Locked on", enabled: false) }
-                StateCell("Disabled (off)") { PrismaSwitch(checked: .constant(false), label: "Locked off", enabled: false) }
-                StateCell("Standalone") { PrismaSwitch(checked: .constant(true)) }
-            },
             code: {
                 var s = "PrismaSwitch(checked: $checked"
                 if withLabel && !label.isEmpty { s += ", label: \"\(label)\"" }
@@ -52,17 +45,24 @@ struct SwitchShowcase: View {
                 s += ")"
                 return s
             },
-            a11y: {
-                A11yPanel(
-                    role: ".isToggle",
-                    minTouchTarget: "44 × 44 pt",
-                    bullets: [
-                        "On/off state announced as part of the role; label read alongside.",
-                        "Selection haptic fires on each toggle so the change is felt as well as heard.",
-                        "Disabled communicated by the role; visual dim is supporting, not primary."
-                    ]
-                )
-            }
+            pagerStates: [
+                AnyPlaygroundState("On") { PrismaSwitch(checked: .constant(true), label: "Push notifications") },
+                AnyPlaygroundState("Off") { PrismaSwitch(checked: .constant(false), label: "Auto-sync") },
+                AnyPlaygroundState("Disabled (on)") { PrismaSwitch(checked: .constant(true), label: "Locked on", enabled: false) },
+                AnyPlaygroundState("With helper") { PrismaSwitch(checked: .constant(true), label: "Auto-sync", helperText: "Updates over Wi-Fi only.") },
+                AnyPlaygroundState("Standalone") { PrismaSwitch(checked: .constant(true)) }
+            ],
+            a11yReport: A11yReport(
+                role: "Switch",
+                minTouchTarget: "48 × 48 dp / 44 × 44 pt",
+                screenReader: "TalkBack and VoiceOver announce the role (\"Switch\"), the label, then the current state (\"On\" / \"Off\"). Toggling fires Selection haptic and announces the new state without re-focusing.",
+                voiceControl: "Voice Access / Voice Control target the visible label (\"Tap Push notifications\"). Saying \"Toggle Push notifications\" works whether the switch is currently on or off.",
+                keyboard: "Tab focuses the switch; Space / Enter toggles. Focus ring matches the accent color and meets the 3:1 non-text contrast bar in light + dark themes.",
+                contrast: "Track-off uses border.default (3.1:1 against the surface); track-on uses accent.default (4.6:1). The thumb sits at 4.5:1 against either track. Build-time check-contrast.mjs gates regressions.",
+                touchTarget: "Hit area extends 48 × 48 dp / 44 × 44 pt around the visible thumb so misses on the edge of the track still register as a toggle.",
+                wcagQuote: "For all user interface components … the name and role can be programmatically determined; states, properties, and values that can be set by the user can be programmatically set.",
+                wcagRef: "4.1.2 Name, Role, Value, Level A"
+            )
         )
     }
 }
@@ -97,26 +97,26 @@ struct RadioShowcase: View {
                 IntKnobRow(label: "Selected index", value: $selectedIdx, range: 0...max(options.count - 1, 0))
                 BoolKnobRow(label: "Enabled", value: $enabled)
             },
-            states: {
-                StateCell("Selected") { PrismaRadio(selected: true, onClick: {}, label: "Selected option") }
-                StateCell("Unselected") { PrismaRadio(selected: false, onClick: {}, label: "Unselected option") }
-                StateCell("With helper") { PrismaRadio(selected: false, onClick: {}, label: "Yearly", helperText: "$90 per year (save 17%).") }
-                StateCell("Disabled") { PrismaRadio(selected: false, onClick: nil, label: "Locked", enabled: false) }
-            },
             code: {
                 "PrismaRadio(\n    selected: idx == \(safeIdx),\n    onClick: { selectedIdx = idx },\n    label: options[idx]\n)"
             },
-            a11y: {
-                A11yPanel(
-                    role: ".isButton + accessibilityAddTraits(.isSelected) when on",
-                    minTouchTarget: "44 × 44 pt",
-                    bullets: [
-                        "Wrap the radio set in accessibilityElement(children: .contain) so position-in-set is announced.",
-                        "Only one radio in a group can be selected; the selected state is announced.",
-                        "Helper text is read after the label; keep helpers brief."
-                    ]
-                )
-            }
+            pagerStates: [
+                AnyPlaygroundState("Selected") { PrismaRadio(selected: true, onClick: {}, label: "Selected option") },
+                AnyPlaygroundState("Unselected") { PrismaRadio(selected: false, onClick: {}, label: "Unselected option") },
+                AnyPlaygroundState("With helper") { PrismaRadio(selected: false, onClick: {}, label: "Yearly", helperText: "$90 per year (save 17%).") },
+                AnyPlaygroundState("Disabled") { PrismaRadio(selected: false, onClick: nil, label: "Locked", enabled: false) }
+            ],
+            a11yReport: A11yReport(
+                role: "RadioButton (inside selectableGroup)",
+                minTouchTarget: "48 × 48 dp / 44 × 44 pt",
+                screenReader: "Wrapping the radio set in selectableGroup means TalkBack and VoiceOver announce \"option N of M\". Only one radio in the group is selected; the selected state is read alongside the label.",
+                voiceControl: "Voice Access / Voice Control target the visible label (\"Tap Yearly\"). The full row is the tap target — assistive tech doesn't need to land precisely on the radio circle.",
+                keyboard: "Tab moves into the group, then arrow keys move between radios within the group (per Material guidelines). Selection follows focus so screen reader users hear the current option immediately.",
+                contrast: "Selected ring uses accent.default (4.6:1); unselected ring uses border.strong (3:1) — the 3:1 floor for non-text UI matches WCAG 1.4.11. Helper text is text.tertiary, still above the 4.5:1 body bar.",
+                touchTarget: "Entire row is clickable so the tap target extends well past the 48 dp visible circle. Spacing between rows keeps adjacent radios from accidentally registering.",
+                wcagQuote: "Information, structure, and relationships conveyed through presentation can be programmatically determined or are available in text.",
+                wcagRef: "1.3.1 Info and Relationships, Level A"
+            )
         )
     }
 }
@@ -158,11 +158,22 @@ struct SliderShowcase: View {
                 BoolKnobRow(label: "Show current value", value: $showValue)
                 BoolKnobRow(label: "Format as percentage", value: $asPercent)
             },
-            states: {
-                StateCell("Continuous") { ContinuousSliderState() }
-                StateCell("Stepped (1–5)") { SteppedSliderState() }
-                StateCell("Disabled") { PrismaSlider(value: .constant(0.7), label: "Read-only", enabled: false) }
-            }
+            pagerStates: [
+                AnyPlaygroundState("Continuous") { ContinuousSliderState() },
+                AnyPlaygroundState("Stepped (1–5)") { SteppedSliderState() },
+                AnyPlaygroundState("Disabled") { PrismaSlider(value: .constant(0.7), label: "Read-only", enabled: false) }
+            ],
+            a11yReport: A11yReport(
+                role: "SeekBar / Slider (progressSemantics)",
+                minTouchTarget: "Thumb 48 × 48 dp / 44 × 44 pt hit area",
+                screenReader: "TalkBack reads the label, current value, and range. Supply a valueFormatter so \"60 percent\" or \"4 of 5 stars\" is spoken instead of a raw 0.6 — much more useful to a non-sighted user.",
+                voiceControl: "Voice Access supports \"Set Volume to 80\" by name. The thumb is independently focusable so \"Tap thumb\" works as a fallback when the label is not announced.",
+                keyboard: "Arrow keys nudge by the step value (or 1% for continuous); Home / End jump to min / max. Page-Up / Page-Down move by 10% chunks for fine-vs-coarse control.",
+                contrast: "Active track uses accent.default (4.6:1); inactive track is border.subtle (3.1:1) — the 3:1 floor for non-text UI is met. The thumb has a 2 dp shadow for tactile separation in light theme.",
+                touchTarget: "Slider thumb hit-tests as 48 dp even when the visible thumb is smaller — drag accuracy doesn't degrade with one-handed phone use.",
+                wcagQuote: "All functionality that uses single-pointer dragging movements for operation can be achieved by a single pointer without dragging — unless dragging is essential.",
+                wcagRef: "2.5.7 Dragging Movements, Level AA (WCAG 2.2)"
+            )
         )
     }
 }
@@ -207,26 +218,26 @@ struct SegmentedControlShowcase: View {
                 StringKnobRow(label: "Options (comma separated)", value: $optionsCsv)
                 IntKnobRow(label: "Selected index", value: $selectedIdx, range: 0...max(opts.count - 1, 0))
             },
-            states: {
-                StateCell("Two") { TwoSegState() }
-                StateCell("Three") { ThreeSegState() }
-                StateCell("Sizes") { SizeSegState() }
-            },
             code: {
                 let joined = opts.map { "\"\($0)\"" }.joined(separator: ", ")
                 return "PrismaSegmentedControl(\n    options: [\(joined)],\n    selected: $selected\n)"
             },
-            a11y: {
-                A11yPanel(
-                    role: "SwiftUI Picker (.isSelected on chosen segment)",
-                    minTouchTarget: "44 pt height across the segment",
-                    bullets: [
-                        "Each segment is a button; selection is announced with position-in-set.",
-                        "Distinct from PrismaTabs: segmented control filters content in place, not navigation.",
-                        "Avoid >5 options — at that point use a Picker / dropdown instead."
-                    ]
-                )
-            }
+            pagerStates: [
+                AnyPlaygroundState("Two") { TwoSegState() },
+                AnyPlaygroundState("Three") { ThreeSegState() },
+                AnyPlaygroundState("Sizes") { SizeSegState() }
+            ],
+            a11yReport: A11yReport(
+                role: "Tab (inside selectableGroup) — for in-place filtering, not navigation",
+                minTouchTarget: "48 dp / 44 pt height across the entire row",
+                screenReader: "Each segment is a Tab; the row is a selectableGroup so screen readers announce \"selected N of M\". Switching segment immediately reads the new selection without re-focusing.",
+                voiceControl: "Voice Access targets each visible label (\"Tap Week\"). Numbers can also work as fallbacks (\"Tap 2\") via the labels overlay.",
+                keyboard: "Tab moves into the group, arrow keys cycle between segments — selection follows focus so a screen reader user hears each segment as they move.",
+                contrast: "Selected segment uses surface.raised on accent.subtle (4.7:1 against the indicator); unselected segments are text.secondary on surface.sunken — both above 4.5:1 body.",
+                touchTarget: "Even the small (S/M/L) variant keeps the row at 44 pt — the cell width may shrink but the height never drops below the minimum.",
+                wcagQuote: "For all user interface components … the name and role can be programmatically determined; states, properties, and values that can be set by the user can be programmatically set.",
+                wcagRef: "4.1.2 Name, Role, Value, Level A"
+            )
         )
     }
 }
@@ -254,24 +265,24 @@ struct SearchBarShowcase: View {
             knobs: {
                 StringKnobRow(label: "Placeholder", value: $placeholder)
             },
-            states: {
-                StateCell("Empty") { SearchBarState(initial: "") }
-                StateCell("With query") { SearchBarState(initial: "compose") }
-            },
             code: {
                 "PrismaSearchBar(value: $query, placeholder: \"\(placeholder)\")"
             },
-            a11y: {
-                A11yPanel(
-                    role: "TextField (search semantics)",
-                    minTouchTarget: "44 pt height",
-                    bullets: [
-                        "Placeholder is announced as a hint, not as the label — supply explicit label when needed.",
-                        "Submit on return; the keyboard returns the search affordance.",
-                        "Clearing the field is a single action read as \"Clear search\"."
-                    ]
-                )
-            }
+            pagerStates: [
+                AnyPlaygroundState("Empty") { SearchBarState(initial: "") },
+                AnyPlaygroundState("With query") { SearchBarState(initial: "compose") }
+            ],
+            a11yReport: A11yReport(
+                role: "EditText (search semantics)",
+                minTouchTarget: "48 dp / 44 pt height",
+                screenReader: "TalkBack and VoiceOver announce \"Search field\" and read the placeholder as a hint, not as a label. The clear button is its own focusable element labelled \"Clear search\" so it can be activated independently.",
+                voiceControl: "Voice Access / Voice Control target the placeholder or label as the spoken handle. Saying \"Clear search\" hits the trailing × button without the user knowing its visual location.",
+                keyboard: "Tab focuses the input; the IME action is Search, so the on-screen keyboard returns the search affordance. ESC clears focus without committing a query.",
+                contrast: "Placeholder uses text.tertiary (4.5:1 against surface.raised); the search icon is text.secondary (5.4:1). Focus ring meets the 3:1 floor for non-text UI in light + dark themes.",
+                touchTarget: "The whole row is the tap target — 48 dp / 44 pt. The clear × is also independently 48 × 48 dp / 44 × 44 pt so it's hittable on devices with no styling overrides.",
+                wcagQuote: "Labels or instructions are provided when content requires user input.",
+                wcagRef: "3.3.2 Labels or Instructions, Level A"
+            )
         )
     }
 }
@@ -313,11 +324,6 @@ struct StepperShowcase: View {
                 IntKnobRow(label: "Step", value: $step, range: 1...10)
                 BoolKnobRow(label: "Enabled", value: $enabled)
             },
-            states: {
-                StateCell("Default") { StepperState(initial: 1) }
-                StateCell("At max") { StepperState(initial: 10) }
-                StateCell("Disabled") { PrismaStepper(value: .constant(5), range: 0...10, enabled: false) }
-            },
             code: {
                 var s = "PrismaStepper(value: $value, range: \(minVal)...\(safeMax)"
                 if step > 1 { s += ", step: \(step)" }
@@ -325,17 +331,22 @@ struct StepperShowcase: View {
                 s += ")"
                 return s
             },
-            a11y: {
-                A11yPanel(
-                    role: ".adjustable (custom Increment / Decrement actions)",
-                    minTouchTarget: "44 × 44 pt per button",
-                    bullets: [
-                        "Each button is independently focusable; current value announced when changed.",
-                        "Disabled at min/max — buttons individually disabled, value still readable.",
-                        "VoiceOver users adjust via swipe-up / swipe-down on the value."
-                    ]
-                )
-            }
+            pagerStates: [
+                AnyPlaygroundState("Default") { StepperState(initial: 1) },
+                AnyPlaygroundState("At max") { StepperState(initial: 10) },
+                AnyPlaygroundState("Disabled") { PrismaStepper(value: .constant(5), range: 0...10, enabled: false) }
+            ],
+            a11yReport: A11yReport(
+                role: "Stepper (separate Increment / Decrement buttons)",
+                minTouchTarget: "48 × 48 dp / 44 × 44 pt per button",
+                screenReader: "Each button is independently focusable. TalkBack reads the role (\"Decrement\" / \"Increment\") plus the current value (\"3 of 10\"). When the limit is reached, the disabled state is announced so users don't keep tapping a no-op button.",
+                voiceControl: "Voice Access / Voice Control work via the visible labels. Saying \"Tap Plus\" or \"Tap Increment\" both work — no precise tap needed.",
+                keyboard: "Custom accessibilityActions for Increment / Decrement let switch-control and keyboard users adjust the value without precise targeting; arrow keys also work when the stepper is focused.",
+                contrast: "Button glyphs (+ / −) use text.primary (10:1+); disabled state is text.disabled at exactly the 3:1 floor for non-text UI to communicate the limit visually as well as via role.",
+                touchTarget: "Each button is exactly 48 × 48 dp / 44 × 44 pt — never compressed below the minimum. Spacing between + and − keeps fat-finger taps from hitting both.",
+                wcagQuote: "The size of the target for pointer inputs is at least 24 by 24 CSS pixels, except where the target is exempted.",
+                wcagRef: "2.5.8 Target Size (Minimum), Level AA (WCAG 2.2)"
+            )
         )
     }
 }
@@ -364,27 +375,27 @@ struct TagInputShowcase: View {
                 StringKnobRow(label: "Label", value: $label)
                 StringKnobRow(label: "Placeholder", value: $placeholder)
             },
-            states: {
-                StateCell("Empty") { TagInputState(initial: []) }
-                StateCell("Filled") { TagInputState(initial: ["swift", "swiftui"]) }
-            },
             code: {
                 var s = "PrismaTagInput(\n    tags: $tags"
                 if !label.isEmpty { s += ",\n    label: \"\(label)\"" }
                 s += ",\n    placeholder: \"\(placeholder)\"\n)"
                 return s
             },
-            a11y: {
-                A11yPanel(
-                    role: "TextField with associated chip list",
-                    minTouchTarget: "44 pt per chip; chip × also 44 × 44 pt",
-                    bullets: [
-                        "Adding a tag triggers an announcement (\"swift added\") via accessibilityAnnouncement.",
-                        "Each chip's × is its own focusable element; remove announces (\"swift removed\").",
-                        "Backspace on empty input deletes the last chip and announces it."
-                    ]
-                )
-            }
+            pagerStates: [
+                AnyPlaygroundState("Empty") { TagInputState(initial: []) },
+                AnyPlaygroundState("Filled") { TagInputState(initial: ["swift", "swiftui"]) }
+            ],
+            a11yReport: A11yReport(
+                role: "EditText + associated chip list (polite live region)",
+                minTouchTarget: "48 dp / 44 pt per chip; chip × also 48 × 48 dp / 44 × 44 pt",
+                screenReader: "Adding a tag fires a polite announcement (\"swift added\"). Removing fires \"swift removed\". Each chip's × is its own focusable element so deletion is discoverable without backspace tricks.",
+                voiceControl: "Voice Access / Voice Control target each chip's visible label, and \"Remove kotlin\" hits its × directly. The input itself is a regular text field so dictation works as expected.",
+                keyboard: "Backspace on empty input deletes the last chip and announces it. Each chip is reachable via Tab; pressing Delete / Backspace on a focused chip removes it.",
+                contrast: "Chip background is surface.sunken with text.primary (10:1+); the × icon uses text.secondary (5.4:1). Focus ring on chips meets 3:1 non-text contrast.",
+                touchTarget: "Chips are 32 dp tall but reside in a 48 dp row; the × is independently 24 dp visible / 48 dp hit. Spacing is Sp2 horizontally so adjacent chips don't merge under fat fingers.",
+                wcagQuote: "In content implemented using markup languages, status messages can be programmatically determined through role or properties such that they can be presented to the user by assistive technologies without receiving focus.",
+                wcagRef: "4.1.3 Status Messages, Level AA"
+            )
         )
     }
 }
@@ -421,23 +432,23 @@ struct AutocompleteShowcase: View {
                 StringKnobRow(label: "Label", value: $label)
                 StringKnobRow(label: "Placeholder", value: $placeholder)
             },
-            states: {
-                StateCell("Default") { AutocompleteState() }
-            },
             code: {
                 "PrismaAutocomplete(\n    value: $query,\n    suggestions: corpus.filter { $0.localizedCaseInsensitiveContains(query) },\n    onSelect: { query = $0 },\n    label: \"\(label)\"\n)"
             },
-            a11y: {
-                A11yPanel(
-                    role: "Combobox (input + listbox popup)",
-                    minTouchTarget: "44 pt per suggestion row",
-                    bullets: [
-                        "Suggestion count announced when popup opens (\"6 suggestions\") via accessibilityAnnouncement.",
-                        "Arrow up/down moves focus through suggestions while keeping caret in input.",
-                        "Return / tap selects; Escape closes the popup and returns focus to input."
-                    ]
-                )
-            }
+            pagerStates: [
+                AnyPlaygroundState("Default") { AutocompleteState() }
+            ],
+            a11yReport: A11yReport(
+                role: "Combobox (input + listbox popup)",
+                minTouchTarget: "48 dp / 44 pt per suggestion row",
+                screenReader: "Suggestion count is announced when the popup opens (\"6 suggestions\"). Each row reads as the typed-ahead match. Selecting a row dismisses the popup and announces the chosen value back into the field.",
+                voiceControl: "Voice Access / Voice Control target each suggestion by its visible text. Saying \"Tap Bangkok\" picks it without the user needing to know its index in the list.",
+                keyboard: "Arrow up / down moves focus through suggestions while the caret stays in the input. Enter / tap selects; Escape closes the popup and returns focus to the input — the typed query is preserved.",
+                contrast: "Suggestion rows use text.primary (10:1+); the active row highlight is surface.sunken (3:1 against base). Hover and focus rings are accent.default at 4.6:1.",
+                touchTarget: "Each row is at least 48 dp / 44 pt. The popup auto-sizes to the input width on phones and switches to a centred sheet on small screens to keep rows full-width.",
+                wcagQuote: "For all user interface components … the name and role can be programmatically determined; states, properties, and values that can be set by the user can be programmatically set.",
+                wcagRef: "4.1.2 Name, Role, Value, Level A"
+            )
         )
     }
 }
@@ -454,21 +465,19 @@ struct DatePickerShowcase: View {
     var body: some View {
         PlaygroundScaffold(
             preview: { PrismaDatePicker(date: $date) },
-            states: {
-                StateCell("Default", minWidth: 360) { DatePickerState() }
-            },
             code: { "PrismaDatePicker(date: $date)" },
-            a11y: {
-                A11yPanel(
-                    role: "SwiftUI DatePicker (.graphical)",
-                    minTouchTarget: "Per Apple HIG — 44pt grid cells",
-                    bullets: [
-                        "SwiftUI DatePicker handles month / year navigation announcements.",
-                        "Today is announced; selected date announced on commit.",
-                        "VoiceOver rotor exposes day / month / year as separate adjustables."
-                    ]
-                )
-            }
+            // No states pager — date pickers are large; the live preview is enough.
+            a11yReport: A11yReport(
+                role: "Calendar (Material 3 / native iOS DatePicker)",
+                minTouchTarget: "48 dp / 44 pt grid cells",
+                screenReader: "Native DatePicker handles month / year navigation announcements. \"Today\" is announced when focused; the selected date is announced on commit. Each cell reads as the full date (\"7 May 2026, Thursday\") to remove ambiguity.",
+                voiceControl: "Voice Access / Voice Control work on the month/year header for fast navigation, then individual cells (\"Tap 23\"). Voice-Control numbers overlay also lets users select any visible cell by index.",
+                keyboard: "Arrow keys move by day; Page-Up / Page-Down by month; Shift-Page-Up / Down by year. Tab moves between header controls and the grid.",
+                contrast: "Today's outline is accent.default (4.6:1 against surface); the selected fill uses accent.default with text.onAccent for 4.5:1+ readability. Out-of-month dimmed days still meet 3:1.",
+                touchTarget: "Grid cells are 48 dp / 44 pt minimum even when the picker is shown in a narrow modal. Header chevrons are independently 48 × 48 dp / 44 × 44 pt.",
+                wcagQuote: "The purpose of each input field collecting information about the user can be programmatically determined when … the field serves a purpose identified in the Input Purposes for User Interface Components.",
+                wcagRef: "1.3.5 Identify Input Purpose, Level AA"
+            )
         )
     }
 }
@@ -492,21 +501,19 @@ struct TimePickerShowcase: View {
                     Spacer()
                 }
             },
-            states: {
-                StateCell("Default", minWidth: 280) { TimePickerState() }
-            },
             code: { "PrismaTimePicker(date: $date)" },
-            a11y: {
-                A11yPanel(
-                    role: "SwiftUI DatePicker (.compact, .hourAndMinute)",
-                    minTouchTarget: "Per Apple HIG",
-                    bullets: [
-                        "Hour and minute exposed as separate adjustables.",
-                        "AM/PM toggle is a button group; current selection announced.",
-                        "Increment / decrement supported via swipe-up / swipe-down."
-                    ]
-                )
-            }
+            // No states pager — single canonical visual; the live preview is enough.
+            a11yReport: A11yReport(
+                role: "Time picker (Material 3 / native iOS DatePicker .time)",
+                minTouchTarget: "48 dp / 44 pt per control",
+                screenReader: "Hour and minute controls have separate roles and announce the current value on focus. Switching between hour and minute fires an immediate announcement so users know which segment they're editing.",
+                voiceControl: "AM/PM is a button group with explicit labels (\"Tap PM\"). Hour and minute can be set by voice via the keyboard input mode (\"Use keyboard\" toggle on iOS / Android).",
+                keyboard: "Tab cycles hour → minute → AM/PM → OK / Cancel. Arrow keys increment / decrement the focused segment. Numeric keys (when in keyboard mode) overwrite the segment directly.",
+                contrast: "Active segment is filled accent.default at 4.6:1; inactive segment is surface.sunken with text.primary (10:1). Dial numbers meet 4.5:1 against the dial surface in both themes.",
+                touchTarget: "Dial cells are 48 dp / 44 pt minimum. The mode-switch icon (clock / keyboard) is independently 48 × 48 / 44 × 44 so users can flip modes with a single tap.",
+                wcagQuote: "The purpose of each input field collecting information about the user can be programmatically determined when … the field serves a purpose identified in the Input Purposes for User Interface Components.",
+                wcagRef: "1.3.5 Identify Input Purpose, Level AA"
+            )
         )
     }
 }
@@ -528,21 +535,19 @@ struct ColorPickerShowcase: View {
                     .font(PrismaTypography.bodyMd.font)
                     .foregroundStyle(PrismaSemanticColors.textSecondary.themed(scheme))
             },
-            states: {
-                StateCell("Orange") { ColorPickerState() }
-            },
             code: { "PrismaColorPicker(color: $color)" },
-            a11y: {
-                A11yPanel(
-                    role: "SwiftUI ColorPicker",
-                    minTouchTarget: "Slider thumb 44 × 44 pt",
-                    bullets: [
-                        "Current colour announced as RGB or hex; consider naming common colours.",
-                        "Each channel slider is independently focusable and announces its value.",
-                        "Avoid colour-only meaning — pair the swatch with a hex / name label."
-                    ]
-                )
-            }
+            // No states pager — single canonical visual; the live preview is enough.
+            a11yReport: A11yReport(
+                role: "ColorPicker (RGB sliders + swatch)",
+                minTouchTarget: "Slider thumb 48 × 48 dp / 44 × 44 pt",
+                screenReader: "Each channel slider is independently focusable and announces its value (\"Red, 199 of 255\"). The current colour is also announced as a hex value when the swatch is focused so non-sighted users get a precise readout.",
+                voiceControl: "Voice Access / Voice Control target each slider by label (\"Tap Red\"). Number-input mode lets users dictate exact values (\"Set Red to 200\").",
+                keyboard: "Tab cycles between R / G / B sliders. Arrow keys nudge the channel by 1; Page-Up / Page-Down by 10. Hex input field accepts a 6-character code via paste / typing.",
+                contrast: "Slider tracks meet 3:1 non-text contrast against the surface. The hex / RGB readout uses text.primary (10:1+) so values stay readable at any selected colour.",
+                touchTarget: "Slider thumbs hit-test as 48 × 48 dp. The colour swatch button is independently 48 × 48 / 44 × 44 to copy the hex to the clipboard.",
+                wcagQuote: "Color is not used as the only visual means of conveying information, indicating an action, prompting a response, or distinguishing a visual element.",
+                wcagRef: "1.4.1 Use of Color, Level A"
+            )
         )
     }
 }
@@ -612,12 +617,6 @@ struct ToastShowcase: View {
                 BoolKnobRow(label: "With action", value: $hasAction)
                 StringKnobRow(label: "Action label", value: $actionLabel, placeholder: "Undo")
             },
-            states: {
-                StateCell("Info") { PrismaToast(message: "New version available.", kind: .info) }
-                StateCell("Success") { PrismaToast(message: "Saved successfully.", kind: .success, actionLabel: "Undo") {} }
-                StateCell("Warning") { PrismaToast(message: "Connection looks slow.", kind: .warning) }
-                StateCell("Danger") { PrismaToast(message: "Could not reach server.", kind: .danger, actionLabel: "Retry") {} }
-            },
             code: {
                 var s = "PrismaToast(\n    message: \"\(message)\",\n    kind: .\(String(describing: kind))"
                 if hasAction { s += ",\n    actionLabel: \"\(actionLabel)\"" }
@@ -625,17 +624,23 @@ struct ToastShowcase: View {
                 if hasAction { s += " { /* … */ }" }
                 return s
             },
-            a11y: {
-                A11yPanel(
-                    role: "Live region (.updatesFrequently)",
-                    minTouchTarget: "Action button 44 × 44 pt",
-                    bullets: [
-                        "Info / success use polite announcement; warning / danger use assertive (.priority).",
-                        "accessibilityLabel combines kind + message — e.g. \"Danger. Could not reach server.\"",
-                        "Action button keeps its own .isButton trait for direct activation."
-                    ]
-                )
-            }
+            pagerStates: [
+                AnyPlaygroundState("Info") { PrismaToast(message: "New version available.", kind: .info) },
+                AnyPlaygroundState("Success") { PrismaToast(message: "Saved successfully.", kind: .success, actionLabel: "Undo") {} },
+                AnyPlaygroundState("Warning") { PrismaToast(message: "Connection looks slow.", kind: .warning) },
+                AnyPlaygroundState("Danger") { PrismaToast(message: "Could not reach server.", kind: .danger, actionLabel: "Retry") {} }
+            ],
+            a11yReport: A11yReport(
+                role: "Live region (transient announcement)",
+                minTouchTarget: "Action button 48 × 48 dp / 44 × 44 pt",
+                screenReader: "Info / success use Polite live region — they're announced after the current speech finishes. Warning / danger use Assertive so they interrupt mid-utterance. The kind prefix (\"Danger.\") makes the severity unambiguous.",
+                voiceControl: "Action labels (\"Undo\", \"Retry\") are spoken targets — Voice Access supports \"Tap Undo\" without the user knowing where the toast sits on screen.",
+                keyboard: "Action button retains its own Role.Button so Tab can reach it during the toast's lifetime. Pressing ESC dismisses the toast (matches Material 3 behaviour).",
+                contrast: "Each kind pairs background and text colours that meet 4.5:1 body — danger uses status.danger background with on-status.danger text. Action label keeps 4.5:1 against either kind background.",
+                touchTarget: "Action button is at least 48 dp / 44 pt tall. The toast's swipe-to-dismiss area extends across the full toast width.",
+                wcagQuote: "In content implemented using markup languages, status messages can be programmatically determined through role or properties such that they can be presented to the user by assistive technologies without receiving focus.",
+                wcagRef: "4.1.3 Status Messages, Level AA"
+            )
         )
     }
 }
@@ -678,12 +683,6 @@ struct BannerShowcase: View {
                 StringKnobRow(label: "Action label", value: $actionLabel, placeholder: "Learn more")
                 BoolKnobRow(label: "With dismiss", value: $hasDismiss)
             },
-            states: {
-                StateCell("Info") { PrismaBanner(title: "Server upgrade", description: "Slower response times expected.", kind: .info, actionLabel: "Learn more", onAction: {}, onDismiss: {}) }
-                StateCell("Success") { PrismaBanner(title: "Profile updated", description: "Saved across all devices.", kind: .success, onDismiss: {}) }
-                StateCell("Warning") { PrismaBanner(title: "Storage almost full", description: "Less than 1GB free.", kind: .warning, actionLabel: "Manage", onAction: {}) }
-                StateCell("Danger") { PrismaBanner(title: "Action required", description: "Verify your email.", kind: .danger, actionLabel: "Verify", onAction: {}) }
-            },
             code: {
                 var s = "PrismaBanner(\n    title: \"\(title)\""
                 if !bannerDescription.isEmpty { s += ",\n    description: \"\(bannerDescription)\"" }
@@ -693,17 +692,23 @@ struct BannerShowcase: View {
                 s += "\n)"
                 return s
             },
-            a11y: {
-                A11yPanel(
-                    role: "Live region (inline alert)",
-                    minTouchTarget: "Action / dismiss buttons 44 × 44 pt",
-                    bullets: [
-                        "Title + description merge into one announcement; no need to focus the banner.",
-                        "Polite for info / success; assertive for warning / danger.",
-                        "Dismiss read as \"Close banner\"; reappearance only on relevant state change."
-                    ]
-                )
-            }
+            pagerStates: [
+                AnyPlaygroundState("Info") { PrismaBanner(title: "Server upgrade", description: "Slower response times expected.", kind: .info, actionLabel: "Learn more", onAction: {}, onDismiss: {}) },
+                AnyPlaygroundState("Success") { PrismaBanner(title: "Profile updated", description: "Saved across all devices.", kind: .success, onDismiss: {}) },
+                AnyPlaygroundState("Warning") { PrismaBanner(title: "Storage almost full", description: "Less than 1GB free.", kind: .warning, actionLabel: "Manage", onAction: {}) },
+                AnyPlaygroundState("Danger") { PrismaBanner(title: "Action required", description: "Verify your email.", kind: .danger, actionLabel: "Verify", onAction: {}) }
+            ],
+            a11yReport: A11yReport(
+                role: "Live region (inline alert)",
+                minTouchTarget: "Action / dismiss buttons 48 × 48 dp / 44 × 44 pt",
+                screenReader: "Title + description merge into a single announcement on appearance — users don't need to focus the banner to hear it. Polite for info / success, Assertive for warning / danger so they pre-empt the current speech.",
+                voiceControl: "Action and dismiss labels are individually spoken targets. \"Tap Verify\" or \"Tap Close banner\" both work without the user needing to find the banner visually.",
+                keyboard: "Tab moves into the banner reaching action then dismiss. Pressing ESC closes a dismissable banner; non-dismissable banners stay anchored.",
+                contrast: "Each kind pairs an accent strip with text on a tinted background — all combinations meet 4.5:1 body across light + dark themes. The 4 dp left strip uses kind.default at 3:1 against surface for non-text contrast.",
+                touchTarget: "Action and dismiss are independently 48 × 48 dp / 44 × 44 pt even when the banner is rendered tightly. Spacing between them prevents accidental dismiss when the user means to act.",
+                wcagQuote: "In content implemented using markup languages, status messages can be programmatically determined through role or properties such that they can be presented to the user by assistive technologies without receiving focus.",
+                wcagRef: "4.1.3 Status Messages, Level AA"
+            )
         )
     }
 }
@@ -739,18 +744,6 @@ struct ModalShowcase: View {
                 StringKnobRow(label: "Dismiss label", value: $dismissLabel)
                 BoolKnobRow(label: "Destructive", value: $destructive)
             },
-            states: {
-                StateCell("Confirm action") {
-                    Text("Tap the live preview's button to open.\nDestructive variant uses red confirm.")
-                        .font(PrismaTypography.bodySm.font)
-                        .foregroundStyle(PrismaSemanticColors.textSecondary.themed(scheme))
-                }
-                StateCell("Single action") {
-                    Text("Set 'With dismiss button' off to render a single-action modal (e.g. 'Got it').")
-                        .font(PrismaTypography.bodySm.font)
-                        .foregroundStyle(PrismaSemanticColors.textSecondary.themed(scheme))
-                }
-            },
             code: {
                 var s = "PrismaModalContent(\n    title: \"\(title)\",\n    message: \"\(message)\",\n    confirmLabel: \"\(confirmLabel)\",\n    onConfirm: { /* … */ }"
                 if hasDismiss { s += ",\n    dismissLabel: \"\(dismissLabel)\",\n    onDismiss: { /* … */ }" }
@@ -758,17 +751,18 @@ struct ModalShowcase: View {
                 s += "\n)"
                 return s
             },
-            a11y: {
-                A11yPanel(
-                    role: ".isModal",
-                    minTouchTarget: "44 × 44 pt confirm / dismiss",
-                    bullets: [
-                        "Focus traps inside the sheet; swipe-down or scrim dismisses and returns focus.",
-                        "Title is read on open; body follows; confirm + dismiss are focusable in order.",
-                        "Destructive variant tints the confirm button danger; the role doesn't change."
-                    ]
-                )
-            }
+            // No states pager — modals are trigger-based; the live preview is enough.
+            a11yReport: A11yReport(
+                role: "Modal Dialog (focus trap)",
+                minTouchTarget: "48 × 48 dp / 44 × 44 pt confirm / dismiss",
+                screenReader: "Title is announced on open with role \"alert\" so screen readers read it immediately. Body follows; confirm and dismiss buttons are focusable in order. Destructive variant tints the confirm button red — the role itself doesn't change, so screen readers still announce \"button\".",
+                voiceControl: "Confirm and dismiss labels are individually spoken targets. \"Tap Delete\" or \"Tap Cancel\" works without precise targeting; the trigger stays disabled until the modal closes.",
+                keyboard: "Focus traps inside the modal — Tab cycles between buttons without escaping. ESC dismisses (returns focus to the trigger). Enter activates the focused button.",
+                contrast: "Scrim is surface.inverse @ 64% so the underlying screen is dimmed but visible. Modal background is surface.raised. Destructive confirm uses status.danger at 4.6:1 against the surface.",
+                touchTarget: "Confirm and dismiss are at least 48 × 48 dp / 44 × 44 pt. Stacked layout on narrow screens still respects the minimum height; spacing between buttons prevents mis-taps.",
+                wcagQuote: "If keyboard focus can be moved to a component … then focus can be moved away from that component using only a keyboard interface, and, if it requires more than unmodified arrow or tab keys or other standard exit methods, the user is advised of the method.",
+                wcagRef: "2.1.2 No Keyboard Trap, Level A"
+            )
         )
         .sheet(isPresented: $open) {
             PrismaModalContent(
@@ -806,17 +800,18 @@ struct BottomSheetShowcase: View {
                 StringKnobRow(label: "Body", value: $bodyText)
             },
             code: { ".sheet(isPresented: $open) {\n    VStack { /* sheet content */ }\n        .presentationDetents([.medium])\n}" },
-            a11y: {
-                A11yPanel(
-                    role: ".isModal (sheet)",
-                    minTouchTarget: "Drag handle 44 × 44 pt; content interactive",
-                    bullets: [
-                        "Focus traps inside the sheet; swipe-down or scrim dismisses and returns focus.",
-                        "Drag handle has its own .isButton announcing \"drag handle\".",
-                        "Hide content behind the sheet from VoiceOver via .accessibilityHidden(true)."
-                    ]
-                )
-            }
+            // No states pager — sheet is trigger-based; the live preview is enough.
+            a11yReport: A11yReport(
+                role: "Modal Sheet (focus trap)",
+                minTouchTarget: "Drag handle 48 × 48 dp / 44 × 44 pt; content interactive",
+                screenReader: "TalkBack and VoiceOver announce \"Sheet\" on open. Content behind the sheet is hidden from a11y so swipe-explore stays inside the sheet. Drag handle has its own Role.Button announcing \"drag handle, double-tap to expand\".",
+                voiceControl: "Drag handle is independently spoken (\"Tap drag handle\") for users who can't reach it visually. All sheet content is targetable by its visible label.",
+                keyboard: "Focus traps inside the sheet. Swipe-down (or scrim tap) and ESC dismiss the sheet, returning focus to the trigger button. Tab cycles within the sheet.",
+                contrast: "Sheet uses surface.raised against a surface.inverse @ 64% scrim so depth is communicated visually as well as via role. Drag handle is border.strong at 3:1 non-text contrast.",
+                touchTarget: "Drag handle is 48 × 48 dp / 44 × 44 pt. Sheet content respects component-level minimums; sheet itself can grow to multiple presentation detents.",
+                wcagQuote: "If keyboard focus can be moved to a component … then focus can be moved away from that component using only a keyboard interface.",
+                wcagRef: "2.1.2 No Keyboard Trap, Level A"
+            )
         )
         .sheet(isPresented: $open) {
             VStack(alignment: .leading, spacing: PrismaSpacing.sp3) {
@@ -859,17 +854,18 @@ struct PopoverShowcase: View {
                 StringKnobRow(label: "Body", value: $bodyText)
             },
             code: { ".popover(isPresented: $open) {\n    VStack { /* popover content */ }\n        .presentationCompactAdaptation(.popover)\n}" },
-            a11y: {
-                A11yPanel(
-                    role: "Popover (non-modal overlay)",
-                    minTouchTarget: "Trigger 44 × 44 pt",
-                    bullets: [
-                        "Lighter than Modal — does not trap focus; tap outside or ESC dismisses.",
-                        "Anchored to the trigger; positioning auto-flips to stay on-screen.",
-                        "For destructive / blocking flows use Modal, not Popover."
-                    ]
-                )
-            }
+            // No states pager — popover is trigger-based; the live preview is enough.
+            a11yReport: A11yReport(
+                role: "Popover (non-modal overlay)",
+                minTouchTarget: "Trigger 48 × 48 dp / 44 × 44 pt",
+                screenReader: "Lighter than Modal — does not trap focus. Screen readers announce the popover content but the user can also explore the page underneath. Tap-outside / ESC dismisses and returns focus to the trigger.",
+                voiceControl: "Anchored to the trigger; positioning auto-flips to stay on-screen so Voice Control's number overlay can hit any visible label inside the popover.",
+                keyboard: "Tab moves into the popover from the trigger. ESC closes. Tab past the last popover element returns to the next page-level focus stop — no trap.",
+                contrast: "Popover uses surface.raised with a 1 dp border.subtle (3:1 non-text contrast). The shadow gives depth in light theme; in dark theme the border alone communicates the boundary.",
+                touchTarget: "Trigger respects component-level minimums (48 × 48 dp / 44 × 44 pt). Popover content matches component-level minimums for any embedded controls.",
+                wcagQuote: "Additional content that becomes visible and then hidden, in response to keyboard focus or pointer hover, [must be] dismissable, hoverable, persistent.",
+                wcagRef: "1.4.13 Content on Hover or Focus, Level AA"
+            )
         )
     }
 }
@@ -893,32 +889,32 @@ struct TooltipShowcase: View {
                     helper: "Long-press the icon (or hover) to surface the tooltip."
                 )
             },
-            states: {
-                StateCell("Copy") {
+            code: { "Image(prisma: .copy)\n    .help(\"\(hint)\")" },
+            pagerStates: [
+                AnyPlaygroundState("Copy") {
                     Image(prisma: .copy).renderingMode(.template).resizable()
                         .frame(width: 24, height: 24)
                         .foregroundStyle(PrismaSemanticColors.textPrimary.themed(scheme))
                         .help("Save to clipboard")
-                }
-                StateCell("Star") {
+                },
+                AnyPlaygroundState("Star") {
                     Image(prisma: .star).renderingMode(.template).resizable()
                         .frame(width: 24, height: 24)
                         .foregroundStyle(PrismaSemanticColors.textPrimary.themed(scheme))
                         .help("Star this item")
                 }
-            },
-            code: { "Image(prisma: .copy)\n    .help(\"\(hint)\")" },
-            a11y: {
-                A11yPanel(
-                    role: "Tooltip (label association via .help)",
-                    minTouchTarget: "Trigger element 44 × 44 pt",
-                    bullets: [
-                        "Tooltip text serves as the trigger's accessibilityLabel — never use as the only source of meaning.",
-                        "Long-press / hover surfaces the tooltip; VoiceOver reads the label without it appearing.",
-                        "Don't put critical info in tooltips alone — keyboard / touch users may never trigger them."
-                    ]
-                )
-            }
+            ],
+            a11yReport: A11yReport(
+                role: "Tooltip (label association — not interactive itself)",
+                minTouchTarget: "Trigger element 48 × 48 dp / 44 × 44 pt",
+                screenReader: "Tooltip text serves as the trigger's accessible label. Screen readers read \"Copy\" without the tooltip needing to visually appear — the popup is just the visual representation of a label assistive tech already had.",
+                voiceControl: "Voice Access targets the tooltip text directly (\"Tap Copy\"). The visible icon-only trigger is reachable by its hidden label.",
+                keyboard: "Focusing the trigger surfaces the tooltip after the platform delay. ESC dismisses without losing focus. The tooltip is dismissable (can be hidden), hoverable (can be entered), and persistent (stays until dismissed).",
+                contrast: "Tooltip uses surface.inverse with text.onInverse — both meet 4.5:1 body in light + dark themes. The arrow / pointer is the same colour for visual continuity.",
+                touchTarget: "Tooltip is non-interactive — only the trigger needs the touch-target minimum. Icon-only triggers must size to 48 × 48 dp / 44 × 44 pt regardless of glyph size.",
+                wcagQuote: "Where receiving and then removing pointer hover or keyboard focus triggers additional content to become visible and then hidden, the additional content [must be] dismissable, hoverable, persistent.",
+                wcagRef: "1.4.13 Content on Hover or Focus, Level AA"
+            )
         )
     }
 }
@@ -945,30 +941,30 @@ struct LoadingShowcase: View {
                 BoolKnobRow(label: "Indeterminate (linear)", value: $indeterminate)
                 IntKnobRow(label: "Progress %", value: $progressPct, range: 0...100)
             },
-            states: {
-                StateCell("Circular Sm") { PrismaCircularLoading(size: .sm) }
-                StateCell("Circular Md") { PrismaCircularLoading(size: .md) }
-                StateCell("Circular Lg") { PrismaCircularLoading(size: .lg) }
-                StateCell("Linear (indeterminate)") { PrismaLinearLoading() }
-                StateCell("Linear (60%)") { PrismaLinearLoading(progress: 0.6) }
-            },
             code: {
                 switch shape {
                 case .circular: return "PrismaCircularLoading(size: .\(String(describing: size)))"
                 case .linear: return indeterminate ? "PrismaLinearLoading()" : "PrismaLinearLoading(progress: \(Double(progressPct) / 100.0))"
                 }
             },
-            a11y: {
-                A11yPanel(
-                    role: "ProgressView",
-                    minTouchTarget: "n/a (non-interactive)",
-                    bullets: [
-                        "Indeterminate variant has no value — read as \"loading\".",
-                        "Determinate variant exposes 0–1 progress; VoiceOver announces percentage.",
-                        "Pair with a textual label (\"Loading projects…\") for context — the role alone isn't enough."
-                    ]
-                )
-            }
+            pagerStates: [
+                AnyPlaygroundState("Circular Sm") { PrismaCircularLoading(size: .sm) },
+                AnyPlaygroundState("Circular Md") { PrismaCircularLoading(size: .md) },
+                AnyPlaygroundState("Circular Lg") { PrismaCircularLoading(size: .lg) },
+                AnyPlaygroundState("Linear (indeterminate)") { PrismaLinearLoading() },
+                AnyPlaygroundState("Linear (60%)") { PrismaLinearLoading(progress: 0.6) }
+            ],
+            a11yReport: A11yReport(
+                role: "ProgressBar (non-interactive)",
+                minTouchTarget: "n/a — loaders aren't tappable",
+                screenReader: "Indeterminate variant uses progressSemantics with no value — TalkBack and VoiceOver read it as \"In progress\" or \"Loading\". Determinate variant exposes 0–1; screen readers announce the percentage on focus / change.",
+                voiceControl: "Loader has no spoken target by itself. Pair it with a sibling label (\"Loading projects…\") so users have something to talk about while waiting.",
+                keyboard: "Loader is not focusable. Surrounding container should hold focus (or move it to the loaded content once ready) so Tab order doesn't break.",
+                contrast: "Active arc / bar uses accent.default at 4.6:1; the inactive track is border.subtle at 3:1 — non-text contrast minimum is met. Reduce-motion users still see colour change without animation.",
+                touchTarget: "n/a. The loader itself is purely visual; ensure any cancel button next to it respects the 48 × 48 dp / 44 × 44 pt minimum.",
+                wcagQuote: "In content implemented using markup languages, status messages can be programmatically determined through role or properties such that they can be presented to the user by assistive technologies without receiving focus.",
+                wcagRef: "4.1.3 Status Messages, Level AA"
+            )
         )
     }
 }
@@ -1012,11 +1008,6 @@ struct SkeletonShowcase: View {
                 IntKnobRow(label: "Line count (Lines)", value: $lineCount, range: 1...6)
                 IntKnobRow(label: "Block height (Card)", value: $blockHeight, range: 60...240, step: 20)
             },
-            states: {
-                StateCell("Line") { PrismaSkeletonLine().frame(width: 220, height: 12) }
-                StateCell("Circle") { PrismaSkeletonCircle().frame(width: 40, height: 40) }
-                StateCell("Block") { PrismaSkeletonBlock(cornerRadius: 12).frame(width: 220, height: 80) }
-            },
             code: {
                 switch kind {
                 case .lines: return "ForEach(0..<\(lineCount)) { _ in\n    PrismaSkeletonLine().frame(height: 12)\n}"
@@ -1024,17 +1015,22 @@ struct SkeletonShowcase: View {
                 case .postPlaceholder: return "HStack {\n    PrismaSkeletonCircle().frame(width: 40, height: 40)\n    VStack { /* skeleton lines */ }\n}"
                 }
             },
-            a11y: {
-                A11yPanel(
-                    role: "Decorative (.accessibilityHidden(true))",
-                    minTouchTarget: "n/a",
-                    bullets: [
-                        "Skeleton placeholders are hidden from VoiceOver entirely.",
-                        "Pair with a sibling \"Loading…\" announcement so AT users still know content is coming.",
-                        "When real content arrives, focus / announcement should pick it up automatically."
-                    ]
-                )
-            }
+            pagerStates: [
+                AnyPlaygroundState("Line") { PrismaSkeletonLine().frame(width: 220, height: 12) },
+                AnyPlaygroundState("Circle") { PrismaSkeletonCircle().frame(width: 40, height: 40) },
+                AnyPlaygroundState("Block") { PrismaSkeletonBlock(cornerRadius: 12).frame(width: 220, height: 80) }
+            ],
+            a11yReport: A11yReport(
+                role: "Decorative (hidden from a11y tree)",
+                minTouchTarget: "n/a — skeletons are decorative",
+                screenReader: "Marked invisibleToUser so TalkBack and VoiceOver skip the placeholder entirely. Pair with a sibling polite announcement (\"Loading projects…\") so AT users know content is on the way.",
+                voiceControl: "No spoken targets — the skeleton has no labels. The user interacts with the loaded content once the skeleton swaps out.",
+                keyboard: "Skeleton is not focusable. Once real content arrives, focus / live region should pick it up automatically (place focus on the heading or fire a status message).",
+                contrast: "Skeleton fill uses surface.sunken with a subtle shimmer ramp. Reduced-motion preference disables the shimmer entirely; the placeholder remains visible against surface.base at 3:1+.",
+                touchTarget: "n/a — skeletons are static placeholders.",
+                wcagQuote: "Animation triggered by interaction can be disabled, unless the animation is essential to the functionality or the information being conveyed.",
+                wcagRef: "2.3.3 Animation from Interactions, Level AAA"
+            )
         )
     }
 }
@@ -1059,32 +1055,32 @@ struct BadgeShowcase: View {
                 IntKnobRow(label: "Count", value: $count, range: 0...250)
                 EnumKnobRow(label: "Status", value: $status, values: [.accent, .success, .warning, .danger, .info], optionLabel: { String(describing: $0) })
             },
-            states: {
-                StateCell("Single") { PrismaCountBadge(count: 1) }
-                StateCell("Two-digit") { PrismaCountBadge(count: 12) }
-                StateCell("Cap (99+)") { PrismaCountBadge(count: 250) }
-                StateCell("Success") { PrismaCountBadge(count: 3, status: .success) }
-                StateCell("Warning") { PrismaCountBadge(count: 7, status: .warning) }
-                StateCell("Danger") { PrismaCountBadge(count: 99, status: .danger) }
-                StateCell("Dot") { PrismaDotBadge(status: .accent) }
-            },
             code: {
                 switch shape {
                 case .count: return "PrismaCountBadge(count: \(count), status: .\(String(describing: status)))"
                 case .dot: return "PrismaDotBadge(status: .\(String(describing: status)))"
                 }
             },
-            a11y: {
-                A11yPanel(
-                    role: "Decorative; carrier owns semantics",
-                    minTouchTarget: "n/a (badges are not interactive)",
-                    bullets: [
-                        "Badge alone is meaningless — append \"5 unread\" to the parent's accessibilityLabel.",
-                        "Cap at 99+ visually; announce the actual count if known.",
-                        "Status colour is supportive only; the carrier's label conveys success/danger meaning."
-                    ]
-                )
-            }
+            pagerStates: [
+                AnyPlaygroundState("Single") { PrismaCountBadge(count: 1) },
+                AnyPlaygroundState("Two-digit") { PrismaCountBadge(count: 12) },
+                AnyPlaygroundState("Cap (99+)") { PrismaCountBadge(count: 250) },
+                AnyPlaygroundState("Success") { PrismaCountBadge(count: 3, status: .success) },
+                AnyPlaygroundState("Warning") { PrismaCountBadge(count: 7, status: .warning) },
+                AnyPlaygroundState("Danger") { PrismaCountBadge(count: 99, status: .danger) },
+                AnyPlaygroundState("Dot") { PrismaDotBadge(status: .accent) }
+            ],
+            a11yReport: A11yReport(
+                role: "Decorative — the carrier (icon, button, tab) owns semantics",
+                minTouchTarget: "n/a — badges are not interactive themselves",
+                screenReader: "Badge alone is meaningless to a screen reader. Append the count and meaning to the parent's contentDescription — e.g. \"Inbox, 5 unread messages\". The status colour is read by AT only via the parent label.",
+                voiceControl: "No spoken target. The carrier underneath the badge is the targetable element — Voice Access taps the icon, not the badge.",
+                keyboard: "Badge is not focusable. The carrier owns focus; pressing it should reveal the underlying content (e.g. opening the unread inbox).",
+                contrast: "Status badges meet 3:1 non-text contrast against the carrier (icon button, tab). The numeric text inside meets 4.5:1 against the badge fill in light + dark themes.",
+                touchTarget: "n/a. The carrier underneath must respect 48 × 48 dp / 44 × 44 pt; the badge is purely visual decoration.",
+                wcagQuote: "The visual presentation of the following have a contrast ratio of at least 3:1 against adjacent color(s): User Interface Components: Visual information required to identify user interface components and states.",
+                wcagRef: "1.4.11 Non-text Contrast, Level AA"
+            )
         )
     }
 }
@@ -1118,18 +1114,6 @@ struct EmptyStateShowcase: View {
                 BoolKnobRow(label: "With action", value: $withAction)
                 StringKnobRow(label: "Action label", value: $actionLabel)
             },
-            states: {
-                StateCell("Default") {
-                    PrismaEmptyState(
-                        title: "No projects yet",
-                        description: "When you create a project, it'll show up here.",
-                        action: { PrismaButton("Create project") {} }
-                    )
-                }
-                StateCell("Just a title") {
-                    PrismaEmptyState(title: "Nothing here", action: { EmptyView() })
-                }
-            },
             code: {
                 var s = "PrismaEmptyState(\n    title: \"\(title)\""
                 if !emptyDescription.isEmpty { s += ",\n    description: \"\(emptyDescription)\"" }
@@ -1137,17 +1121,29 @@ struct EmptyStateShowcase: View {
                 s += "\n)"
                 return s
             },
-            a11y: {
-                A11yPanel(
-                    role: "Heading + body + optional action",
-                    minTouchTarget: "Action button 44 × 44 pt",
-                    bullets: [
-                        "Title carries .isHeader trait so VoiceOver users can jump to it.",
-                        "Body description is read after the title; keep it under two short sentences.",
-                        "Action label should be a verb that resolves the empty state (\"Create project\")."
-                    ]
-                )
-            }
+            pagerStates: [
+                AnyPlaygroundState("Default") {
+                    PrismaEmptyState(
+                        title: "No projects yet",
+                        description: "When you create a project, it'll show up here.",
+                        action: { PrismaButton("Create project") {} }
+                    )
+                },
+                AnyPlaygroundState("Just a title") {
+                    PrismaEmptyState(title: "Nothing here", action: { EmptyView() })
+                }
+            ],
+            a11yReport: A11yReport(
+                role: "Heading + body + optional action",
+                minTouchTarget: "Action button 48 × 48 dp / 44 × 44 pt",
+                screenReader: "Title carries heading semantics so screen reader users can jump to it via heading-by-heading navigation. Body description is read after the title. The optional action button retains its own Role.Button.",
+                voiceControl: "Action label is a spoken target (\"Tap Create project\"). The verb-led label is intentional — it tells voice users exactly what saying it will do.",
+                keyboard: "Tab moves directly to the action when present; without an action the empty state is just a static heading + paragraph and is non-focusable.",
+                contrast: "Title uses text.primary (10:1+); description uses text.secondary (5.4:1) — both above the 4.5:1 body floor. The illustration (when present) is decorative only.",
+                touchTarget: "Action button respects component-level 48 × 48 dp / 44 × 44 pt. The empty-state container is a static layout; only the action is interactive.",
+                wcagQuote: "Headings and labels describe topic or purpose.",
+                wcagRef: "2.4.6 Headings and Labels, Level AA"
+            )
         )
     }
 }
@@ -1173,17 +1169,18 @@ struct DrawerShowcase: View {
                 StringKnobRow(label: "Drawer body", value: $drawerBody)
             },
             code: { "// On iOS, side-sheets use NavigationSplitView or .sheet:\n.sheet(isPresented: $open) { /* drawer content */ }" },
-            a11y: {
-                A11yPanel(
-                    role: ".isModal (sheet) on iOS; NavigationSplitView sidebar elsewhere",
-                    minTouchTarget: "Trigger 44 × 44 pt; drawer items 44 pt",
-                    bullets: [
-                        "When open, focus traps inside the drawer; main content goes accessibilityHidden.",
-                        "Swipe-down or scrim dismisses; ESC closes from external keyboards.",
-                        "Use for secondary navigation; primary nav stays in NavigationSplitView."
-                    ]
-                )
-            }
+            // No states pager — drawer is trigger-based; the live preview is enough.
+            a11yReport: A11yReport(
+                role: "Modal sheet (off-canvas navigation)",
+                minTouchTarget: "Trigger 48 × 48 dp / 44 × 44 pt; drawer items 48 / 44 pt",
+                screenReader: "When open, focus traps inside the drawer and the main content goes inert. TalkBack / VoiceOver explore stays inside the drawer until it closes; on close, focus returns to the trigger automatically.",
+                voiceControl: "Each drawer item has its own spoken label. Voice Access supports \"Tap [item label]\" — saying the visible name navigates without precise targeting.",
+                keyboard: "Tab cycles within the drawer when open. ESC closes; swipe / scrim dismiss are the touch equivalents. Tab on the closed state moves over the trigger like any other button.",
+                contrast: "Drawer panel uses surface.raised at 100% opacity. Scrim is surface.inverse @ 64% so background content stays visible while clearly de-emphasized. Drawer item rows respect text.primary 10:1+.",
+                touchTarget: "Trigger respects component-level 48 × 48 / 44 × 44. Drawer rows are also at the same minimum — common nav-row pattern.",
+                wcagQuote: "If keyboard focus can be moved to a component … then focus can be moved away from that component using only a keyboard interface.",
+                wcagRef: "2.1.2 No Keyboard Trap, Level A"
+            )
         )
         .sheet(isPresented: $open) {
             VStack(alignment: .leading, spacing: PrismaSpacing.sp3) {
@@ -1238,26 +1235,26 @@ struct TabsShowcase: View {
                 )
                 IntKnobRow(label: "Selected index", value: $selectedIdx, range: 0...max(safeTabs.count - 1, 0))
             },
-            states: {
-                StateCell("2 tabs") { TabsState(initial: ["Inbox", "Archive"]) }
-                StateCell("4 tabs") { TabsState(initial: ["Overview", "Activity", "Settings", "Billing"]) }
-                StateCell("Last selected") { TabsState(initial: ["One", "Two", "Three"], selected: "Three") }
-            },
             code: {
                 let joined = safeTabs.map { "\"\($0)\"" }.joined(separator: ", ")
                 return "PrismaTabs(\n    tabs: [\(joined)],\n    selected: $selected\n)"
             },
-            a11y: {
-                A11yPanel(
-                    role: ".isButton + .isSelected on chosen tab",
-                    minTouchTarget: "44 pt height per tab",
-                    bullets: [
-                        "Each tab carries .isButton; selected tab adds .isSelected so position is announced.",
-                        "Selection haptic fires only when a different tab is chosen, not on re-tap.",
-                        "Tabs are for switching between peer views — distinct from SegmentedControl filtering."
-                    ]
-                )
-            }
+            pagerStates: [
+                AnyPlaygroundState("2 tabs") { TabsState(initial: ["Inbox", "Archive"]) },
+                AnyPlaygroundState("4 tabs") { TabsState(initial: ["Overview", "Activity", "Settings", "Billing"]) },
+                AnyPlaygroundState("Last selected") { TabsState(initial: ["One", "Two", "Three"], selected: "Three") }
+            ],
+            a11yReport: A11yReport(
+                role: "Tab (inside selectableGroup) — for switching between peer views",
+                minTouchTarget: "48 dp / 44 pt height per tab",
+                screenReader: "Each tab carries Role.Tab; the row is a selectableGroup so screen readers announce \"selected N of M\". Switching tabs immediately reads the new active tab; selection haptic fires only on change, not re-tap.",
+                voiceControl: "Voice Access targets each tab by visible label (\"Tap Settings\"). The row is a single selectable group so tab order is preserved across orientations.",
+                keyboard: "Tab moves into the row, then arrow keys cycle between tabs. Selection follows focus so a screen reader user hears each tab's content as they move. Home / End jump to first / last.",
+                contrast: "Active tab indicator uses accent.default at 4.6:1 against the row background. Active label uses text.primary (10:1+); inactive uses text.secondary (5.4:1) — both above the 4.5:1 body floor.",
+                touchTarget: "Each tab is at least 48 dp / 44 pt tall. On narrow widths, tabs scroll horizontally — they don't compress below the minimum.",
+                wcagQuote: "More than one way is available to locate a Web page within a set of Web pages, except where the Web page is the result of, or a step in, a process.",
+                wcagRef: "2.4.3 Focus Order, Level A"
+            )
         )
     }
 }
@@ -1302,12 +1299,6 @@ struct ChipShowcase: View {
                 BoolKnobRow(label: "Enabled", value: $enabled)
                 BoolKnobRow(label: "With dismiss (×)", value: $withDismiss)
             },
-            states: {
-                StateCell("Filter (toggle)") { ToggleableChipDemo(label: "Android") }
-                StateCell("iOS (toggle)") { ToggleableChipDemo(label: "iOS", initial: false) }
-                StateCell("Suggestion") { PrismaChip(label: "Trending", variant: .suggestion, onTap: {}) }
-                StateCell("Disabled") { PrismaChip(label: "Locked", enabled: false, onTap: {}) }
-            },
             code: {
                 var s = "PrismaChip(\n    label: \"\(label)\",\n    selected: \(selected)"
                 if variant != .filter { s += ",\n    variant: .\(String(describing: variant))" }
@@ -1317,17 +1308,23 @@ struct ChipShowcase: View {
                 s += "\n)"
                 return s
             },
-            a11y: {
-                A11yPanel(
-                    role: ".isButton + .isSelected when on",
-                    minTouchTarget: "44 pt height; × 44 × 44 pt",
-                    bullets: [
-                        "Selected state announced as part of the role; haptic on toggle.",
-                        "Input variant exposes its × as a separate action labelled \"Remove <chip>\".",
-                        "Filter chip groups should be wrapped in a labelled container for grouping context."
-                    ]
-                )
-            }
+            pagerStates: [
+                AnyPlaygroundState("Filter (toggle)") { ToggleableChipDemo(label: "Android") },
+                AnyPlaygroundState("iOS (toggle)") { ToggleableChipDemo(label: "iOS", initial: false) },
+                AnyPlaygroundState("Suggestion") { PrismaChip(label: "Trending", variant: .suggestion, onTap: {}) },
+                AnyPlaygroundState("Disabled") { PrismaChip(label: "Locked", enabled: false, onTap: {}) }
+            ],
+            a11yReport: A11yReport(
+                role: "Button (filter / suggestion) — chip groups in selectableGroup for multi-select",
+                minTouchTarget: "48 dp / 44 pt height; × button independently 48 × 48 dp / 44 × 44 pt",
+                screenReader: "Selected state is announced as part of the role (\"Selected\" / \"Not selected\"). Haptic feedback fires on toggle so the change is felt as well as heard. Input chip's × is a separate action labelled \"Remove <chip>\".",
+                voiceControl: "Voice Access / Voice Control target the chip's visible label. \"Tap iOS\" toggles it; \"Tap Remove iOS\" hits the × on input chips.",
+                keyboard: "Chip is a button — Tab focuses, Space / Enter activates. The × on input chips is independently focusable so Delete on the chip triggers removal directly.",
+                contrast: "Selected fill uses accent.default (4.6:1 against surface); unselected outline uses border.default at 3:1 non-text contrast. Label text meets 4.5:1 body in both states.",
+                touchTarget: "Each chip is 32 dp tall but lives in a 48 dp tap target. The × is independently 48 × 48 / 44 × 44 so removal doesn't accidentally toggle the chip.",
+                wcagQuote: "For all user interface components … the name and role can be programmatically determined; states, properties, and values that can be set by the user can be programmatically set.",
+                wcagRef: "4.1.2 Name, Role, Value, Level A"
+            )
         )
     }
 }
@@ -1377,17 +1374,18 @@ struct CommandPaletteShowcase: View {
                 }
             },
             code: { "PrismaCommandPalette(\n    commands: [\n        PrismaCommand(label: \"Open Typography\", group: \"Foundations\") { /* … */ },\n        PrismaCommand(label: \"Toggle theme\", group: \"Actions\") { /* … */ }\n    ],\n    onDismiss: { open = false }\n)" },
-            a11y: {
-                A11yPanel(
-                    role: "Combobox (input + listbox)",
-                    minTouchTarget: "Each command row 44 pt",
-                    bullets: [
-                        "Filtering announces \"N results\" via accessibilityAnnouncement as the user types.",
-                        "Section headers (\"Foundations\", \"Actions\") use .isHeader so they're skippable.",
-                        "Return activates the focused command; ESC closes the palette and returns focus."
-                    ]
-                )
-            }
+            // No states pager — palette is trigger-based; the live preview is enough.
+            a11yReport: A11yReport(
+                role: "Combobox (input + listbox)",
+                minTouchTarget: "Each command row 48 dp / 44 pt",
+                screenReader: "Filtering announces \"N results\" via a polite live region as the user types. Section headers (\"Foundations\", \"Actions\") use heading semantics so screen reader users can skip between them.",
+                voiceControl: "Voice Access / Voice Control target each command's visible label. \"Tap Toggle theme\" works without the user knowing where the command sits in the list.",
+                keyboard: "Cmd / Ctrl-K opens the palette; arrow keys navigate; Enter activates the focused command; ESC closes the palette and returns focus to the trigger. The full flow is keyboard-only.",
+                contrast: "Active row highlight uses surface.sunken (3:1 against surface.raised). Section headers use text.tertiary (4.5:1+). Match-emphasis on filtered text uses accent.default at 4.6:1.",
+                touchTarget: "Each row is 48 dp / 44 pt tall. Section headers are non-interactive; rows hold the entire row's hit area, not just the label width.",
+                wcagQuote: "All functionality of the content is operable through a keyboard interface without requiring specific timings for individual keystrokes.",
+                wcagRef: "2.1.1 Keyboard, Level A"
+            )
         )
         .sheet(isPresented: $open) {
             PrismaCommandPalette(
@@ -1427,22 +1425,24 @@ struct PaginationShowcase: View {
                 IntKnobRow(label: "Total pages", value: $pageCount, range: 1...50)
                 IntKnobRow(label: "Current page", value: $page, range: 1...safeCount)
             },
-            states: {
-                StateCell("Few pages") { PaginationState(initial: 2, total: 5) }
-                StateCell("Many pages") { PaginationState(initial: 12, total: 30) }
-            },
             code: { "PrismaPagination(page: $page, pageCount: \(safeCount))" },
-            a11y: {
-                A11yPanel(
-                    role: "Navigation (each control is .isButton)",
-                    minTouchTarget: "Each page button 44 × 44 pt",
-                    bullets: [
-                        "Wrap the row in accessibilityElement(children: .contain) labelled \"Pagination\".",
-                        "Current page exposes .isSelected; arrows announce \"Previous / Next page, disabled\" at edges.",
-                        "Ellipsis is decorative — accessibilityHidden so it doesn't get focused."
-                    ]
-                )
-            }
+            pagerStates: [
+                AnyPlaygroundState("Few pages") { PaginationState(initial: 2, total: 5) },
+                AnyPlaygroundState("Many pages") { PaginationState(initial: 12, total: 30) },
+                AnyPlaygroundState("First page") { PaginationState(initial: 1, total: 10) },
+                AnyPlaygroundState("Last page") { PaginationState(initial: 10, total: 10) }
+            ],
+            a11yReport: A11yReport(
+                role: "Navigation (each control is a Button)",
+                minTouchTarget: "Each page button 48 × 48 dp / 44 × 44 pt",
+                screenReader: "Wrap the row in a Role.Navigation labelled \"Pagination\". The current page exposes a selected state; previous / next arrows announce \"disabled\" at the edges so users know they've reached the boundary.",
+                voiceControl: "Each page number and arrow is independently spoken. \"Tap Next page\" or \"Tap 5\" both work — voice users don't need to know which controls are present.",
+                keyboard: "Tab moves through the row in document order. Enter / Space activates a page. Arrow Left / Right (when supported) jumps between adjacent pages without losing focus.",
+                contrast: "Current page indicator uses accent.default (4.6:1). Disabled previous / next arrows use text.tertiary at exactly the 3:1 non-text-contrast floor so the disabled state is communicated visually as well as via role.",
+                touchTarget: "Each button is 48 × 48 dp / 44 × 44 pt. Ellipsis is decorative (invisibleToUser) so it doesn't get focused. Spacing between buttons keeps adjacent taps distinct.",
+                wcagQuote: "More than one way is available to locate a Web page within a set of Web pages, except where the Web page is the result of, or a step in, a process.",
+                wcagRef: "2.4.5 Multiple Ways, Level AA"
+            )
         )
     }
 }
@@ -1476,10 +1476,6 @@ struct BreadcrumbShowcase: View {
                     placeholder: "Home, Section, Page"
                 )
             },
-            states: {
-                StateCell("3 levels") { PrismaBreadcrumb(items: [PrismaBreadcrumbItem(label: "Home", onTap: {}), PrismaBreadcrumbItem(label: "Settings", onTap: {}), PrismaBreadcrumbItem(label: "Profile")]) }
-                StateCell("4 levels") { PrismaBreadcrumb(items: [PrismaBreadcrumbItem(label: "Home", onTap: {}), PrismaBreadcrumbItem(label: "Components", onTap: {}), PrismaBreadcrumbItem(label: "Inputs", onTap: {}), PrismaBreadcrumbItem(label: "Button")]) }
-            },
             code: {
                 let parts = pathCsv.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
                 let pieces = parts.enumerated().map { idx, label in
@@ -1490,17 +1486,21 @@ struct BreadcrumbShowcase: View {
                 let joined = pieces.joined(separator: ",\n")
                 return "PrismaBreadcrumb(items: [\n\(joined)\n])"
             },
-            a11y: {
-                A11yPanel(
-                    role: "Navigation (ordered list of buttons; current page is text)",
-                    minTouchTarget: "44 × 44 pt per crumb",
-                    bullets: [
-                        "Wrap in accessibilityElement(children: .contain) labelled \"Breadcrumb\".",
-                        "The last item is the current page — render as plain text, not a link.",
-                        "Separators (\"/\") are decorative; accessibilityHidden so the path reads cleanly."
-                    ]
-                )
-            }
+            pagerStates: [
+                AnyPlaygroundState("3 levels") { PrismaBreadcrumb(items: [PrismaBreadcrumbItem(label: "Home", onTap: {}), PrismaBreadcrumbItem(label: "Settings", onTap: {}), PrismaBreadcrumbItem(label: "Profile")]) },
+                AnyPlaygroundState("4 levels") { PrismaBreadcrumb(items: [PrismaBreadcrumbItem(label: "Home", onTap: {}), PrismaBreadcrumbItem(label: "Components", onTap: {}), PrismaBreadcrumbItem(label: "Inputs", onTap: {}), PrismaBreadcrumbItem(label: "Button")]) }
+            ],
+            a11yReport: A11yReport(
+                role: "Navigation (ordered list of Buttons; current page is plain text)",
+                minTouchTarget: "48 × 48 dp / 44 × 44 pt per crumb",
+                screenReader: "Wrap in a Role.Navigation labelled \"Breadcrumb\" so screen readers announce the navigation context. The last item is the current page rendered as plain text — not a link — so AT users know they've reached their destination.",
+                voiceControl: "Each crumb is a spoken target by visible label (\"Tap Home\"). Separator slashes are decorative (invisibleToUser) so they don't pollute the spoken path.",
+                keyboard: "Tab moves through the crumbs in document order. The current page is non-focusable; only ancestor links accept focus.",
+                contrast: "Link crumbs use text.link (4.6:1+); the current page uses text.primary (10:1+). Separators are text.tertiary at 4.5:1.",
+                touchTarget: "Each linkable crumb has a 48 × 48 dp / 44 × 44 pt hit area despite the visible text being smaller. Spacing between crumbs prevents accidental taps on the wrong level.",
+                wcagQuote: "Information about the user's location within a set of Web pages is available.",
+                wcagRef: "2.4.8 Location, Level AAA"
+            )
         )
     }
 }
@@ -1531,25 +1531,25 @@ struct WizardShowcase: View {
                 StringKnobRow(label: "Steps (comma separated)", value: $stepsCsv)
                 IntKnobRow(label: "Active step index", value: $step, range: 0...max(s.count - 1, 0))
             },
-            states: {
-                StateCell("3 steps, on 1") { PrismaWizardSteps(steps: ["Account", "Profile", "Done"], activeIndex: 1) }
-                StateCell("Last step") { PrismaWizardSteps(steps: ["A", "B", "C"], activeIndex: 2) }
-            },
             code: {
                 let joined = s.map { "\"\($0)\"" }.joined(separator: ", ")
                 return "PrismaWizardSteps(steps: [\(joined)], activeIndex: \(safeStep))"
             },
-            a11y: {
-                A11yPanel(
-                    role: "Step indicator (progress)",
-                    minTouchTarget: "n/a in catalogue; wired to nav externally",
-                    bullets: [
-                        "Active step exposes accessibilityValue \"current step\".",
-                        "Completed steps announce as \"completed\"; future steps as \"upcoming\".",
-                        "Pair with a heading (\"Step 2 of 4: Profile\") for clearest navigation."
-                    ]
-                )
-            }
+            pagerStates: [
+                AnyPlaygroundState("3 steps, on 1") { PrismaWizardSteps(steps: ["Account", "Profile", "Done"], activeIndex: 1) },
+                AnyPlaygroundState("Last step") { PrismaWizardSteps(steps: ["A", "B", "C"], activeIndex: 2) }
+            ],
+            a11yReport: A11yReport(
+                role: "Step indicator (progress with current/completed/upcoming states)",
+                minTouchTarget: "n/a (non-interactive in catalogue; wired to nav externally)",
+                screenReader: "Active step exposes the equivalent of aria-current=\"step\" so screen readers announce \"current step\". Completed steps announce as \"completed\"; future steps as \"upcoming\". Pair with a heading (\"Step 2 of 4: Profile\") for clearest navigation.",
+                voiceControl: "Step labels are spoken targets when the steps are interactive (e.g. wired to nav). \"Tap Profile\" jumps to that step; current step is non-tappable.",
+                keyboard: "When tied to nav, Tab moves through visited steps in document order. Forward steps are typically disabled until the user satisfies prerequisites — the disabled state is announced.",
+                contrast: "Current-step ring uses accent.default (4.6:1); completed steps use accent.subtle with a check icon (3:1+); upcoming steps use border.default at 3:1 non-text contrast. Labels meet 4.5:1 body.",
+                touchTarget: "When step indicators are tappable, each is 48 × 48 dp / 44 × 44 pt. The connector lines are decorative (invisibleToUser).",
+                wcagQuote: "For Web pages that cause legal commitments or financial transactions for the user to occur … submissions are reversible, checked for input errors and the user is provided with an opportunity to correct them, or confirmed.",
+                wcagRef: "3.3.4 Error Prevention (Legal, Financial, Data), Level AA"
+            )
         )
     }
 }
@@ -1602,29 +1602,6 @@ struct CardShowcase: View {
                 BoolKnobRow(label: "Clickable (whole card)", value: $clickable)
                 BoolKnobRow(label: "With CTA buttons", value: $withCta)
             },
-            states: {
-                StateCell("Elevated") {
-                    PrismaCard(variant: .elevated) {
-                        Text("Casts a shadow over the page. Use for emphasis.")
-                            .font(PrismaTypography.bodySm.font)
-                            .foregroundStyle(PrismaSemanticColors.textSecondary.themed(scheme))
-                    }
-                }
-                StateCell("Outlined") {
-                    PrismaCard(variant: .outlined) {
-                        Text("1pt subtle border. The most-used card.")
-                            .font(PrismaTypography.bodySm.font)
-                            .foregroundStyle(PrismaSemanticColors.textSecondary.themed(scheme))
-                    }
-                }
-                StateCell("Filled") {
-                    PrismaCard(variant: .filled) {
-                        Text("Sunken surface, quieter than elevated.")
-                            .font(PrismaTypography.bodySm.font)
-                            .foregroundStyle(PrismaSemanticColors.textSecondary.themed(scheme))
-                    }
-                }
-            },
             code: {
                 var s = "PrismaCard("
                 if variant != .outlined { s += "variant: .\(String(describing: variant))" }
@@ -1632,17 +1609,40 @@ struct CardShowcase: View {
                 s += ") {\n    VStack { Text(\"\(title)\"); Text(\"\(bodyText.prefix(40))…\") }\n}"
                 return s
             },
-            a11y: {
-                A11yPanel(
-                    role: "Container (interactive cards = .isButton)",
-                    minTouchTarget: "44 × 44 pt when whole-card clickable",
-                    bullets: [
-                        "Interior interactive elements (CTA buttons) keep their own focus and roles.",
-                        "If the whole card is clickable, accessibilityElement(children: .combine) so it's one a11y unit.",
-                        "Don't double-up: either the card OR the inner button is the action, not both."
-                    ]
-                )
-            }
+            pagerStates: [
+                AnyPlaygroundState("Elevated") {
+                    PrismaCard(variant: .elevated) {
+                        Text("Casts a shadow over the page. Use for emphasis.")
+                            .font(PrismaTypography.bodySm.font)
+                            .foregroundStyle(PrismaSemanticColors.textSecondary.themed(.light))
+                    }
+                },
+                AnyPlaygroundState("Outlined") {
+                    PrismaCard(variant: .outlined) {
+                        Text("1pt subtle border. The most-used card.")
+                            .font(PrismaTypography.bodySm.font)
+                            .foregroundStyle(PrismaSemanticColors.textSecondary.themed(.light))
+                    }
+                },
+                AnyPlaygroundState("Filled") {
+                    PrismaCard(variant: .filled) {
+                        Text("Sunken surface, quieter than elevated.")
+                            .font(PrismaTypography.bodySm.font)
+                            .foregroundStyle(PrismaSemanticColors.textSecondary.themed(.light))
+                    }
+                }
+            ],
+            a11yReport: A11yReport(
+                role: "Container (interactive cards = Role.Button)",
+                minTouchTarget: "48 × 48 dp / 44 × 44 pt when whole-card clickable",
+                screenReader: "Static cards are read as a container — TalkBack and VoiceOver explore the content as separate items. Interactive cards merge descendants so the whole card reads as a single \"button\" with the title as the label.",
+                voiceControl: "When the whole card is clickable, the visible title is the spoken target. Inner buttons (e.g. \"Open\") remain their own targets so users can act on either the card or a specific control.",
+                keyboard: "Static cards are not focusable. Interactive cards are a single Tab stop; if the card has inner buttons too, those are separate focusable elements — choose either pattern, not both.",
+                contrast: "Outlined card uses border.subtle at 3:1 non-text contrast against the surface. Elevated cards use a subtle shadow plus surface.raised (no border) — the elevation difference reads in light theme; in dark theme a 1 pt border supplements the shadow.",
+                touchTarget: "Interactive cards are at least 48 × 48 dp / 44 × 44 pt. Inner action buttons retain their own minimums; padding around them keeps adjacent buttons from accidentally registering each other's taps.",
+                wcagQuote: "For all user interface components … the name and role can be programmatically determined; states, properties, and values that can be set by the user can be programmatically set.",
+                wcagRef: "4.1.2 Name, Role, Value, Level A"
+            )
         )
     }
 }
@@ -1708,27 +1708,6 @@ struct ListItemShowcase: View {
                 BoolKnobRow(label: "Clickable", value: $clickable)
                 BoolKnobRow(label: "Selected", value: $selected)
             },
-            states: {
-                StateCell("With avatar (toggle)") { SelectableListItemDemo() }
-                StateCell("Selected") {
-                    PrismaListItem(
-                        primary: "Settings", secondary: "Account & preferences", selected: true, onTap: {},
-                        leading: { AnyView(EmptyView()) },
-                        trailing: { AnyView(EmptyView()) }
-                    )
-                }
-                StateCell("With chevron") {
-                    PrismaListItem(
-                        primary: "Notifications", onTap: {},
-                        leading: { AnyView(EmptyView()) },
-                        trailing: {
-                            AnyView(Image(prisma: .chevronRight).renderingMode(.template).resizable()
-                                .frame(width: 14, height: 14)
-                                .foregroundStyle(PrismaSemanticColors.textTertiary.themed(scheme)))
-                        }
-                    )
-                }
-            },
             code: {
                 var s = "PrismaListItem(\n    primary: \"\(primary)\""
                 if !secondary.isEmpty { s += ",\n    secondary: \"\(secondary)\"" }
@@ -1737,17 +1716,38 @@ struct ListItemShowcase: View {
                 s += "\n)"
                 return s
             },
-            a11y: {
-                A11yPanel(
-                    role: "ListItem (.isButton when onTap provided)",
-                    minTouchTarget: "44 pt height (default) / 56 pt / 72 pt",
-                    bullets: [
-                        ".accessibilityElement(children: .combine) groups primary + secondary + leading + trailing into one a11y unit.",
-                        "Selected state exposed via .accessibilityAddTraits(.isSelected) when on.",
-                        "Trailing actions (switch, badge) keep their own roles when independently activatable."
-                    ]
-                )
-            }
+            pagerStates: [
+                AnyPlaygroundState("With avatar (toggle)") { SelectableListItemDemo() },
+                AnyPlaygroundState("Selected") {
+                    PrismaListItem(
+                        primary: "Settings", secondary: "Account & preferences", selected: true, onTap: {},
+                        leading: { AnyView(EmptyView()) },
+                        trailing: { AnyView(EmptyView()) }
+                    )
+                },
+                AnyPlaygroundState("With chevron") {
+                    PrismaListItem(
+                        primary: "Notifications", onTap: {},
+                        leading: { AnyView(EmptyView()) },
+                        trailing: {
+                            AnyView(Image(prisma: .chevronRight).renderingMode(.template).resizable()
+                                .frame(width: 14, height: 14)
+                                .foregroundStyle(PrismaSemanticColors.textTertiary.themed(.light)))
+                        }
+                    )
+                }
+            ],
+            a11yReport: A11yReport(
+                role: "ListItem (Role.Button when onClick provided)",
+                minTouchTarget: "48 dp / 44 pt height (default); 56 dp / 72 dp variants for two-line / three-line",
+                screenReader: "mergeDescendants groups primary + secondary + leading + trailing into one a11y unit so the row reads as a single \"button\" labelled with the primary text. Selected state is exposed via the selected property; trailing controls (switch, badge) keep their own roles when independently activatable.",
+                voiceControl: "Voice Access targets the visible primary text (\"Tap Settings\"). Trailing controls retain their own labels — \"Tap Toggle\" hits the trailing switch directly without activating the row.",
+                keyboard: "Tab focuses the row when clickable. Space / Enter activates it. Trailing controls are independently focusable so a switch can be toggled without entering the row's destination.",
+                contrast: "Primary text uses text.primary (10:1+); secondary uses text.secondary (5.4:1) — both well above 4.5:1 body. Selected background uses surface.sunken (3:1 against base).",
+                touchTarget: "Whole row is 48 / 56 / 72 dp tall depending on density. Trailing controls (switch, button) keep their own 48 × 48 dp / 44 × 44 pt minimums.",
+                wcagQuote: "The size of the target for pointer inputs is at least 24 by 24 CSS pixels, except where the target is exempted.",
+                wcagRef: "2.5.8 Target Size (Minimum), Level AA (WCAG 2.2)"
+            )
         )
     }
 }
@@ -1782,20 +1782,6 @@ struct AvatarShowcase: View {
                     optionLabel: { String(describing: $0) }
                 )
             },
-            states: {
-                StateCell("Sizes") {
-                    HStack(spacing: PrismaSpacing.sp3) {
-                        PrismaAvatar(seed: "Maya Chen", size: .xs)
-                        PrismaAvatar(seed: "Maya Chen", size: .sm)
-                        PrismaAvatar(seed: "Maya Chen", size: .default)
-                        PrismaAvatar(seed: "Maya Chen", size: .lg)
-                    }
-                }
-                StateCell("Online") { PrismaAvatar(seed: "Aanya Patel", status: .online) }
-                StateCell("Away") { PrismaAvatar(seed: "Bilal Khan", status: .away) }
-                StateCell("Busy") { PrismaAvatar(seed: "Cara Liu", status: .busy) }
-                StateCell("Offline") { PrismaAvatar(seed: "Dev Iyer", status: .offline) }
-            },
             code: {
                 var s = "PrismaAvatar(seed: \"\(seed)\""
                 if size != .default { s += ", size: .\(String(describing: size))" }
@@ -1803,17 +1789,31 @@ struct AvatarShowcase: View {
                 s += ")"
                 return s
             },
-            a11y: {
-                A11yPanel(
-                    role: "Image / decorative",
-                    minTouchTarget: "n/a (decorative); wraps interactive when used in lists",
-                    bullets: [
-                        "accessibilityLabel is the seed name plus status — \"Maya Chen, online\".",
-                        "Initials are derived from the seed; the status dot is not announced separately.",
-                        "When used inside a clickable row, the row's onTap takes precedence; avatar becomes decorative."
-                    ]
-                )
-            }
+            pagerStates: [
+                AnyPlaygroundState("Sizes") {
+                    HStack(spacing: PrismaSpacing.sp3) {
+                        PrismaAvatar(seed: "Maya Chen", size: .xs)
+                        PrismaAvatar(seed: "Maya Chen", size: .sm)
+                        PrismaAvatar(seed: "Maya Chen", size: .default)
+                        PrismaAvatar(seed: "Maya Chen", size: .lg)
+                    }
+                },
+                AnyPlaygroundState("Online") { PrismaAvatar(seed: "Aanya Patel", status: .online) },
+                AnyPlaygroundState("Away") { PrismaAvatar(seed: "Bilal Khan", status: .away) },
+                AnyPlaygroundState("Busy") { PrismaAvatar(seed: "Cara Liu", status: .busy) },
+                AnyPlaygroundState("Offline") { PrismaAvatar(seed: "Dev Iyer", status: .offline) }
+            ],
+            a11yReport: A11yReport(
+                role: "Image (with text alternative)",
+                minTouchTarget: "n/a — decorative on its own; 48 × 48 / 44 × 44 when wrapped in a Button",
+                screenReader: "contentDescription is the seed name plus status — \"Maya Chen, online\". Initials are derived from the seed; the status dot is rolled into the same announcement so users get name + presence in one read.",
+                voiceControl: "Voice Access / Voice Control target the avatar by its accessible label when interactive. When the avatar sits inside a clickable row, the row's label wins.",
+                keyboard: "Avatar itself is not focusable. When interactive (e.g. a button-wrapped avatar that opens a profile), Tab focuses, Space / Enter activates.",
+                contrast: "Initials text on the seed-derived background colour is calibrated to meet 4.5:1 across all 12 generated palettes. Status dots use status.* colours at 3:1 non-text contrast against the avatar fill.",
+                touchTarget: "Avatar in a Button: 48 × 48 dp / 44 × 44 pt minimum. Decorative use has no minimum but the visible size scales by token (Xs / Sm / Md / Lg).",
+                wcagQuote: "All non-text content that is presented to the user has a text alternative that serves the equivalent purpose.",
+                wcagRef: "1.1.1 Non-text Content, Level A"
+            )
         )
     }
 }
@@ -1835,10 +1835,6 @@ struct AvatarGroupShowcase: View {
                 IntKnobRow(label: "Max visible", value: $maxVisible, range: 1...8)
                 EnumKnobRow(label: "Size", value: $size, values: [.xs, .sm, .default, .lg, .xl], optionLabel: { String(describing: $0) })
             },
-            states: {
-                StateCell("Few") { PrismaAvatarGroup(seeds: ["Maya", "Aanya"]) }
-                StateCell("Many (overflow)") { PrismaAvatarGroup(seeds: (1...8).map { "User \($0)" }, max: 4) }
-            },
             code: {
                 let joined = seeds.map { "\"\($0)\"" }.joined(separator: ", ")
                 var s = "PrismaAvatarGroup(\n    seeds: [\(joined)]"
@@ -1847,17 +1843,21 @@ struct AvatarGroupShowcase: View {
                 s += "\n)"
                 return s
             },
-            a11y: {
-                A11yPanel(
-                    role: "Group (decorative or labelled)",
-                    minTouchTarget: "n/a unless wrapped in a Button",
-                    bullets: [
-                        "Provide a single accessibilityLabel summarising members — \"6 collaborators including Maya, Aanya, Bilal, and 3 others\".",
-                        "Don't expose individual avatars — the group is one focus stop.",
-                        "When clickable, wrap the entire group in a single labelled .isButton."
-                    ]
-                )
-            }
+            pagerStates: [
+                AnyPlaygroundState("Few") { PrismaAvatarGroup(seeds: ["Maya", "Aanya"]) },
+                AnyPlaygroundState("Many (overflow)") { PrismaAvatarGroup(seeds: (1...8).map { "User \($0)" }, max: 4) }
+            ],
+            a11yReport: A11yReport(
+                role: "Group (with summarising text alternative)",
+                minTouchTarget: "n/a — decorative on its own; 48 × 48 / 44 × 44 when wrapped in a Button",
+                screenReader: "Provide a single contentDescription summarising members — \"6 collaborators including Maya, Aanya, Bilal, and 3 others\". Don't expose individual avatars to a11y; the group reads as one unit.",
+                voiceControl: "When the group is interactive (opens a member list / picker), the spoken target is the summary label, not the individual avatars.",
+                keyboard: "Group itself is not focusable. When interactive (e.g. \"View all collaborators\"), it's a single Tab stop with the summary as its accessible name.",
+                contrast: "The +N overflow chip uses surface.sunken with text.primary (10:1+). Each avatar's overlap ring matches the surrounding surface colour (3:1) so the stack reads as discrete circles, not a smear.",
+                touchTarget: "When clickable, the entire group is a single 48 × 48 dp / 44 × 44 pt button — even though the visible avatar overlap is narrower than that.",
+                wcagQuote: "All non-text content that is presented to the user has a text alternative that serves the equivalent purpose.",
+                wcagRef: "1.1.1 Non-text Content, Level A"
+            )
         )
     }
 }
@@ -1873,12 +1873,6 @@ struct DividerShowcase: View {
                 EnumKnobRow(label: "Weight", value: $weight, values: [.subtle, .defaultWeight, .strong], optionLabel: { String(describing: $0) })
                 IntKnobRow(label: "Inset (pt)", value: $inset, range: 0...96, step: 8)
             },
-            states: {
-                StateCell("Subtle") { PrismaHorizontalDivider(weight: .subtle) }
-                StateCell("Default") { PrismaHorizontalDivider(weight: .defaultWeight) }
-                StateCell("Strong") { PrismaHorizontalDivider(weight: .strong) }
-                StateCell("Inset (56pt)") { PrismaHorizontalDivider(inset: 56) }
-            },
             code: {
                 var s = "PrismaHorizontalDivider("
                 var parts: [String] = []
@@ -1887,17 +1881,23 @@ struct DividerShowcase: View {
                 s += parts.joined(separator: ", ") + ")"
                 return s
             },
-            a11y: {
-                A11yPanel(
-                    role: "Decorative (.accessibilityHidden(true))",
-                    minTouchTarget: "n/a",
-                    bullets: [
-                        "Dividers are purely visual; do not expose them to VoiceOver.",
-                        "Use .isHeader on the section title above instead — that's the structural cue AT users navigate.",
-                        "Inset variants reinforce hierarchy visually; semantics are the same."
-                    ]
-                )
-            }
+            pagerStates: [
+                AnyPlaygroundState("Subtle") { PrismaHorizontalDivider(weight: .subtle) },
+                AnyPlaygroundState("Default") { PrismaHorizontalDivider(weight: .defaultWeight) },
+                AnyPlaygroundState("Strong") { PrismaHorizontalDivider(weight: .strong) },
+                AnyPlaygroundState("Inset (56pt)") { PrismaHorizontalDivider(inset: 56) }
+            ],
+            a11yReport: A11yReport(
+                role: "Decorative — hidden from a11y tree",
+                minTouchTarget: "n/a — dividers are non-interactive",
+                screenReader: "Dividers are purely visual; not exposed to screen readers. Use a heading() on the section above instead — that's the structural cue AT users navigate by.",
+                voiceControl: "No spoken target. Voice users navigate the headings above and below the divider; the divider itself is invisible to voice control.",
+                keyboard: "Not focusable. Tab order skips dividers entirely.",
+                contrast: "Default weight uses border.subtle at 3:1 against the surrounding surface — meets the non-text-contrast minimum even though the divider is decorative. Subtle and Strong variants give designers a calibrated range without dropping below the floor.",
+                touchTarget: "n/a. Dividers occupy the row but consume no tap area.",
+                wcagQuote: "Information, structure, and relationships conveyed through presentation can be programmatically determined or are available in text.",
+                wcagRef: "1.3.1 Info and Relationships, Level A"
+            )
         )
     }
 }

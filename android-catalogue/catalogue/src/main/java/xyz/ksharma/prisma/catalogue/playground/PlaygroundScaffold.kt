@@ -36,18 +36,14 @@ import xyz.ksharma.prisma.tokens.PrismaSpacing
 import xyz.ksharma.prisma.tokens.PrismaTypography
 
 /**
- * Storybook-style scaffold for an interactive component showcase.
+ * Storybook-style scaffold shared by every legacy showcase. Three pills sit
+ * directly under the preview — Edit / A11y / Code — each opening its own
+ * bottom sheet. State galleries (legacy) and structured A11yReports (new)
+ * are both supported so showcases can adopt the new pattern progressively.
  *
- * Pre-existing showcases call this with a `knobs` block, an optional
- * `states` block (which renders inside a flow gallery), a `code`
- * generator, and an optional `a11y` block. Knobs and a11y are now both
- * surfaced behind bottom sheets — opened by Edit / A11y action pills
- * directly under the preview — so the live preview never scrolls off
- * screen behind a long edit panel.
- *
- * The richer ButtonShowcase uses [PlaygroundScreen] (with a structured
- * [A11yReport] and a horizontal states pager) directly, bypassing this
- * scaffold. Both APIs coexist during the per-component rollout.
+ * `pagerStates` (preferred) renders a horizontal pager of canonical states.
+ * `a11yReport` (preferred) opens A11ySheetContent on the A11y pill. The
+ * legacy `states` and `a11y` slots remain for incomplete migrations.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,10 +54,15 @@ public fun PlaygroundScaffold(
     code: (() -> String)? = null,
     a11y: (@Composable () -> Unit)? = null,
     spec: (@Composable () -> Unit)? = null,
+    pagerStates: List<PlaygroundState>? = null,
+    a11yReport: A11yReport? = null,
     modifier: Modifier = Modifier,
 ) {
     var knobsOpen by rememberSaveable { mutableStateOf(false) }
     var a11yOpen by rememberSaveable { mutableStateOf(false) }
+    var codeOpen by rememberSaveable { mutableStateOf(false) }
+
+    val hasA11y = a11yReport != null || a11y != null
 
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -69,7 +70,7 @@ public fun PlaygroundScaffold(
     ) {
         PreviewSurface(modifier = Modifier.heightIn(min = 200.dp)) { preview() }
 
-        if (knobs != null || a11y != null) {
+        if (knobs != null || hasA11y || code != null) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(PrismaSpacing.Sp3),
@@ -82,7 +83,7 @@ public fun PlaygroundScaffold(
                         onClick = { knobsOpen = true },
                     )
                 }
-                if (a11y != null) {
+                if (hasA11y) {
                     ActionPill(
                         iconRes = PrismaIcons.Eye,
                         label = "A11y",
@@ -90,18 +91,29 @@ public fun PlaygroundScaffold(
                         onClick = { a11yOpen = true },
                     )
                 }
+                if (code != null) {
+                    ActionPill(
+                        iconRes = PrismaIcons.Doc,
+                        label = "Code",
+                        modifier = Modifier.weight(1f),
+                        onClick = { codeOpen = true },
+                    )
+                }
             }
         }
 
-        if (states != null) {
-            PlaygroundSection(label = "States") {
-                StatesGallery { states() }
+        // Pager wins over legacy gallery — the swipeable layout is the new
+        // default per the playground rollout brief.
+        when {
+            pagerStates != null && pagerStates.isNotEmpty() -> {
+                PlaygroundSection(label = "States — swipe to compare") {
+                    StatesPager(states = pagerStates)
+                }
             }
-        }
-
-        if (code != null) {
-            PlaygroundSection(label = "Usage") {
-                CodeBlock(code = code())
+            states != null -> {
+                PlaygroundSection(label = "States") {
+                    StatesGallery { states() }
+                }
             }
         }
 
@@ -139,14 +151,43 @@ public fun PlaygroundScaffold(
         }
     }
 
-    if (a11yOpen && a11y != null) {
+    if (a11yOpen && hasA11y) {
         ModalBottomSheet(
             onDismissRequest = { a11yOpen = false },
             sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false),
             containerColor = PrismaSemanticColors.SurfaceBase.themed(),
         ) {
-            Column(modifier = Modifier.fillMaxWidth()) {
-                a11y()
+            if (a11yReport != null) {
+                A11ySheetContent(report = a11yReport)
+            } else if (a11y != null) {
+                Column(modifier = Modifier.fillMaxWidth()) { a11y() }
+            }
+        }
+    }
+
+    if (codeOpen && code != null) {
+        ModalBottomSheet(
+            onDismissRequest = { codeOpen = false },
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false),
+            containerColor = PrismaSemanticColors.SurfaceBase.themed(),
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = PrismaSpacing.Sp5, vertical = PrismaSpacing.Sp4),
+                verticalArrangement = Arrangement.spacedBy(PrismaSpacing.Sp4),
+            ) {
+                Text(
+                    text = "Usage",
+                    style = PrismaTypography.HeadlineSm,
+                    color = PrismaSemanticColors.TextPrimary.themed(),
+                )
+                Text(
+                    text = "Drop this in to render the component as it appears above. Only knobs that differ from defaults are shown.",
+                    style = PrismaTypography.BodySm,
+                    color = PrismaSemanticColors.TextSecondary.themed(),
+                )
+                CodeBlock(code = code())
             }
         }
     }

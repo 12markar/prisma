@@ -61,6 +61,7 @@ public fun PlaygroundScreen(
 ) {
     var knobsOpen by rememberSaveable { mutableStateOf(false) }
     var a11yOpen by rememberSaveable { mutableStateOf(false) }
+    var codeOpen by rememberSaveable { mutableStateOf(false) }
 
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -68,6 +69,8 @@ public fun PlaygroundScreen(
     ) {
         PreviewSurface(modifier = Modifier.heightIn(min = previewMinHeight)) { preview() }
 
+        // Three action pills — Edit, A11y, Code — each opening their own
+        // bottom sheet so the playground stays focused on the live preview.
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(PrismaSpacing.Sp3),
@@ -84,15 +87,18 @@ public fun PlaygroundScreen(
                 modifier = Modifier.weight(1f),
                 onClick = { a11yOpen = true },
             )
+            ActionPill(
+                iconRes = PrismaIcons.Doc,
+                label = "Code",
+                modifier = Modifier.weight(1f),
+                onClick = { codeOpen = true },
+            )
         }
 
         if (states.isNotEmpty()) {
             SectionLabel("States — swipe to compare")
             StatesPager(states = states)
         }
-
-        SectionLabel("Usage")
-        CodeBlock(code = code())
 
         if (footer != null) footer()
     }
@@ -131,6 +137,33 @@ public fun PlaygroundScreen(
             containerColor = PrismaSemanticColors.SurfaceBase.themed(),
         ) {
             A11ySheetContent(report = a11y)
+        }
+    }
+
+    if (codeOpen) {
+        ModalBottomSheet(
+            onDismissRequest = { codeOpen = false },
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false),
+            containerColor = PrismaSemanticColors.SurfaceBase.themed(),
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = PrismaSpacing.Sp5, vertical = PrismaSpacing.Sp4),
+                verticalArrangement = Arrangement.spacedBy(PrismaSpacing.Sp4),
+            ) {
+                Text(
+                    text = "Usage",
+                    style = PrismaTypography.HeadlineSm,
+                    color = PrismaSemanticColors.TextPrimary.themed(),
+                )
+                Text(
+                    text = "Drop this in to render the component as it appears above. Only knobs that differ from defaults are shown.",
+                    style = PrismaTypography.BodySm,
+                    color = PrismaSemanticColors.TextSecondary.themed(),
+                )
+                CodeBlock(code = code())
+            }
         }
     }
 }

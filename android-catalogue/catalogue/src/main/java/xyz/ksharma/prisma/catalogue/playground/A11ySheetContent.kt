@@ -5,6 +5,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -43,6 +45,7 @@ public data class A11yReport(
     val wcagRef: String,
 )
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 public fun A11ySheetContent(report: A11yReport) {
     Column(
@@ -65,8 +68,13 @@ public fun A11ySheetContent(report: A11yReport) {
             )
         }
 
-        // Quick facts
-        Row(horizontalArrangement = Arrangement.spacedBy(PrismaSpacing.Sp3)) {
+        // Quick facts — wrap because role and min-target strings are
+        // sometimes long enough that two pills don't fit on a single phone
+        // row. FlowRow lets the second pill drop to a new line cleanly.
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(PrismaSpacing.Sp3),
+            verticalArrangement = Arrangement.spacedBy(PrismaSpacing.Sp3),
+        ) {
             QuickFact(label = "Role", value = report.role)
             QuickFact(label = "Min target", value = report.minTouchTarget)
         }

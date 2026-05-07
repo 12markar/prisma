@@ -4,6 +4,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -75,16 +77,21 @@ private fun SectionHeader(text: String) {
     )
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun PrimitiveRamp(name: String, swatches: List<Pair<String, Color>>) {
+    // 11 swatches × ~44dp each is ~484dp + spacing — easily wider than a
+    // phone column. FlowRow wraps onto the next line so the ramp never
+    // clips horizontally.
     Column(verticalArrangement = Arrangement.spacedBy(PrismaSpacing.Sp2)) {
         Text(
             text = name,
             style = PrismaTypography.LabelMd,
             color = PrismaSemanticColors.TextSecondary.themed(),
         )
-        Row(
+        FlowRow(
             horizontalArrangement = Arrangement.spacedBy(PrismaSpacing.Sp1),
+            verticalArrangement = Arrangement.spacedBy(PrismaSpacing.Sp2),
             modifier = Modifier.fillMaxWidth(),
         ) {
             swatches.forEach { (stop, color) ->

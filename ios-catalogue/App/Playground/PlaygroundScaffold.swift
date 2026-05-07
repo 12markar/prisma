@@ -2,18 +2,16 @@ import SwiftUI
 import CoreUI
 import Components
 
-/// Storybook-style scaffold for an interactive component showcase.
+/// Storybook-style scaffold shared by every legacy showcase. Three pills
+/// sit directly under the preview — Edit / A11y / Code — each opening its
+/// own bottom sheet. State galleries (legacy) and structured A11yReports
+/// (new) are both supported so showcases can adopt the new pattern
+/// progressively.
 ///
-/// Pre-existing showcases call this with a `knobs` block, an optional
-/// `states` block (rendered as a flow gallery), a `code` generator, and
-/// an optional `a11y` block. Knobs and a11y are now both surfaced behind
-/// bottom sheets — opened by Edit / A11y action pills directly under the
-/// preview — so the live preview never scrolls off screen behind a long
-/// edit panel.
-///
-/// The richer ButtonShowcase uses [PlaygroundScreen] (with a structured
-/// [A11yReport] and a horizontal states pager) directly, bypassing this
-/// scaffold. Both APIs coexist during the per-component rollout.
+/// `pagerStates` (preferred) renders a horizontal pager of canonical
+/// states. `a11yReport` (preferred) opens A11ySheetContent on the A11y
+/// pill. The legacy `states` and `a11y` slots remain for incomplete
+/// migrations.
 struct PlaygroundScaffold<Preview: View, Knobs: View, States: View, A11y: View>: View {
     @Environment(\.colorScheme) private var scheme
     private let preview: () -> Preview
@@ -21,33 +19,41 @@ struct PlaygroundScaffold<Preview: View, Knobs: View, States: View, A11y: View>:
     private let states: () -> States
     private let code: (() -> String)?
     private let a11y: () -> A11y
+    private let pagerStates: [AnyPlaygroundState]?
+    private let a11yReport: A11yReport?
 
     init(
         @ViewBuilder preview: @escaping () -> Preview,
         @ViewBuilder knobs: @escaping () -> Knobs = { EmptyView() },
         @ViewBuilder states: @escaping () -> States = { EmptyView() },
         code: (() -> String)? = nil,
-        @ViewBuilder a11y: @escaping () -> A11y = { EmptyView() }
+        @ViewBuilder a11y: @escaping () -> A11y = { EmptyView() },
+        pagerStates: [AnyPlaygroundState]? = nil,
+        a11yReport: A11yReport? = nil
     ) {
         self.preview = preview
         self.knobs = knobs
         self.states = states
         self.code = code
         self.a11y = a11y
+        self.pagerStates = pagerStates
+        self.a11yReport = a11yReport
     }
 
     @State private var knobsOpen = false
     @State private var a11yOpen = false
+    @State private var codeOpen = false
 
     private var hasKnobs: Bool { Knobs.self != EmptyView.self }
-    private var hasA11y: Bool { A11y.self != EmptyView.self }
+    private var hasA11y: Bool { a11yReport != nil || A11y.self != EmptyView.self }
+    private var hasCode: Bool { code != nil }
 
     var body: some View {
         VStack(alignment: .leading, spacing: PrismaSpacing.sp5) {
             PreviewSurface { preview() }
                 .frame(minHeight: 200)
 
-            if hasKnobs || hasA11y {
+            if hasKnobs || hasA11y || hasCode {
                 HStack(spacing: PrismaSpacing.sp3) {
                     if hasKnobs {
                         actionPill(icon: .edit, label: "Edit") { knobsOpen = true }
@@ -55,18 +61,21 @@ struct PlaygroundScaffold<Preview: View, Knobs: View, States: View, A11y: View>:
                     if hasA11y {
                         actionPill(icon: .eye, label: "A11y") { a11yOpen = true }
                     }
+                    if hasCode {
+                        actionPill(icon: .doc, label: "Code") { codeOpen = true }
+                    }
                 }
             }
 
-            if States.self != EmptyView.self {
+            // Pager wins over legacy gallery — the swipeable layout is the
+            // new default per the playground rollout brief.
+            if let pagerStates, !pagerStates.isEmpty {
+                section(label: "States — swipe to compare") {
+                    StatesPager(states: pagerStates)
+                }
+            } else if States.self != EmptyView.self {
                 section(label: "States") {
                     StatesGallery { states() }
-                }
-            }
-
-            if let code {
-                section(label: "Usage") {
-                    CodeBlock(code: code())
                 }
             }
         }
@@ -87,14 +96,45 @@ struct PlaygroundScaffold<Preview: View, Knobs: View, States: View, A11y: View>:
             .presentationDragIndicator(.visible)
         }
         .sheet(isPresented: $a11yOpen) {
+            // A11ySheetContent already wraps its body in a ScrollView with
+            // its own padding, so render it directly. Nesting it inside
+            // another ScrollView caused odd horizontal padding on the
+            // QuickFacts row and section bodies. Only the legacy a11y()
+            // ViewBuilder needs the outer scroll + padding.
+            Group {
+                if let a11yReport {
+                    A11ySheetContent(report: a11yReport)
+                } else {
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: PrismaSpacing.sp4) {
+                            a11y()
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, PrismaSpacing.sp5)
+                        .padding(.vertical, PrismaSpacing.sp4)
+                    }
+                }
+            }
+            .presentationDetents([.large])
+            .presentationDragIndicator(.visible)
+        }
+        .sheet(isPresented: $codeOpen) {
             ScrollView {
                 VStack(alignment: .leading, spacing: PrismaSpacing.sp4) {
-                    a11y()
+                    Text("Usage")
+                        .font(PrismaTypography.headlineSm.font)
+                        .foregroundStyle(PrismaSemanticColors.textPrimary.themed(scheme))
+                    Text("Drop this in to render the component as it appears above. Only knobs that differ from defaults are shown.")
+                        .font(PrismaTypography.bodySm.font)
+                        .foregroundStyle(PrismaSemanticColors.textSecondary.themed(scheme))
+                    if let code {
+                        CodeBlock(code: code())
+                    }
                 }
                 .padding(.horizontal, PrismaSpacing.sp5)
                 .padding(.vertical, PrismaSpacing.sp4)
             }
-            .presentationDetents([.large])
+            .presentationDetents([.medium, .large])
             .presentationDragIndicator(.visible)
         }
     }

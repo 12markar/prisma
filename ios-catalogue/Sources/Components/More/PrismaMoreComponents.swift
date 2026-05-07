@@ -199,7 +199,11 @@ public struct PrismaBreadcrumb: View {
     public init(items: [PrismaBreadcrumbItem]) { self.items = items }
 
     public var body: some View {
-        HStack(spacing: PrismaSpacing.sp2) {
+        // ComponentsFlowLayout so longer paths (4+ levels) wrap onto a
+        // second line on narrow widths instead of clipping. Each crumb +
+        // chevron pair flows together; the chevron breaks to the next line
+        // if the crumb fits but the chevron doesn't.
+        ComponentsFlowLayout(spacing: PrismaSpacing.sp2, lineSpacing: PrismaSpacing.sp1) {
             ForEach(Array(items.enumerated()), id: \.offset) { i, item in
                 let isLast = i == items.count - 1
                 let color = isLast ? PrismaSemanticColors.textPrimary : PrismaSemanticColors.textSecondary
@@ -239,7 +243,7 @@ public struct PrismaWizardSteps: View {
     public init(steps: [String], activeIndex: Int) { self.steps = steps; self.activeIndex = activeIndex }
 
     public var body: some View {
-        WizardFlowLayout(spacing: PrismaSpacing.sp3, lineSpacing: PrismaSpacing.sp4) {
+        ComponentsFlowLayout(spacing: PrismaSpacing.sp3, lineSpacing: PrismaSpacing.sp4) {
             ForEach(Array(steps.enumerated()), id: \.offset) { i, step in
                 let state: StepState = i < activeIndex ? .done : i == activeIndex ? .active : .future
                 HStack(spacing: PrismaSpacing.sp2) {
@@ -278,10 +282,11 @@ public struct PrismaWizardSteps: View {
     private enum StepState { case done, active, future }
 }
 
-/// Lightweight flow layout used by [PrismaWizardSteps]. Distinct from the
-/// app-side `FlowLayout` in App/Playground so the component module stays
-/// independent of the catalogue.
-private struct WizardFlowLayout: Layout {
+/// Lightweight flow layout shared by `PrismaWizardSteps` and
+/// `PrismaBreadcrumb`. Distinct from the app-side `FlowLayout` in
+/// App/Playground so the component module stays independent of the
+/// catalogue.
+private struct ComponentsFlowLayout: Layout {
     let spacing: CGFloat
     let lineSpacing: CGFloat
 

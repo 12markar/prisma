@@ -45,12 +45,14 @@ struct ColorShowcase: View {
 
     @ViewBuilder
     private func primitiveRamp(name: String, swatches: [(String, Color)]) -> some View {
+        // 11 swatches × ~38pt each is wider than a phone column. FlowLayout
+        // wraps onto the next line so the ramp never clips horizontally.
         VStack(alignment: .leading, spacing: PrismaSpacing.sp2) {
             Text(name)
                 .font(.system(size: 13, weight: .medium))
                 .foregroundStyle(PrismaSemanticColors.textSecondary.themed(scheme))
 
-            HStack(spacing: PrismaSpacing.sp1) {
+            FlowLayout(spacing: PrismaSpacing.sp1) {
                 ForEach(swatches.indices, id: \.self) { idx in
                     let (stop, color) = swatches[idx]
                     VStack(spacing: PrismaSpacing.sp1) {

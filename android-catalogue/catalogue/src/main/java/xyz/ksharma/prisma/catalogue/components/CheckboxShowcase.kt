@@ -10,10 +10,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.state.ToggleableState
-import xyz.ksharma.prisma.catalogue.playground.A11yPanel
+import xyz.ksharma.prisma.catalogue.playground.A11yReport
 import xyz.ksharma.prisma.catalogue.playground.BoolKnobRow
 import xyz.ksharma.prisma.catalogue.playground.PlaygroundScaffold
-import xyz.ksharma.prisma.catalogue.playground.StateCell
+import xyz.ksharma.prisma.catalogue.playground.PlaygroundState
 import xyz.ksharma.prisma.catalogue.playground.StringKnobRow
 import xyz.ksharma.prisma.components.checkbox.PrismaCheckbox
 import xyz.ksharma.prisma.components.checkbox.PrismaTriStateCheckbox
@@ -56,13 +56,12 @@ public fun CheckboxShowcase() {
                 append(")")
             }
         },
-        states = {
-            StateCell("Unchecked") { PrismaCheckbox(checked = false, onCheckedChange = {}, label = "Default unchecked") }
-            StateCell("Checked") { PrismaCheckbox(checked = true, onCheckedChange = {}, label = "Default checked") }
-            StateCell("Indeterminate") { PrismaTriStateCheckbox(state = ToggleableState.Indeterminate, onClick = {}, label = "Indeterminate") }
-            StateCell("Disabled checked") { PrismaCheckbox(checked = true, onCheckedChange = null, label = "Locked on", enabled = false) }
-            StateCell("Disabled unchecked") { PrismaCheckbox(checked = false, onCheckedChange = null, label = "Locked off", enabled = false) }
-            StateCell("Error") {
+        pagerStates = listOf(
+            PlaygroundState("Unchecked") { PrismaCheckbox(checked = false, onCheckedChange = {}, label = "Default unchecked") },
+            PlaygroundState("Checked") { PrismaCheckbox(checked = true, onCheckedChange = {}, label = "Default checked") },
+            PlaygroundState("Indeterminate") { PrismaTriStateCheckbox(state = ToggleableState.Indeterminate, onClick = {}, label = "Indeterminate") },
+            PlaygroundState("Disabled checked") { PrismaCheckbox(checked = true, onCheckedChange = null, label = "Locked on", enabled = false) },
+            PlaygroundState("Error") {
                 PrismaCheckbox(
                     checked = false,
                     onCheckedChange = {},
@@ -70,21 +69,20 @@ public fun CheckboxShowcase() {
                     helperText = "This field is required.",
                     isError = true,
                 )
-            }
-            StateCell("Group + parent") { GroupExample() }
-        },
-        a11y = {
-            A11yPanel(
-                role = "Checkbox / TriStateCheckbox",
-                minTouchTarget = "48 × 48 dp",
-                bullets = listOf(
-                    "State (checked / unchecked / indeterminate) is announced; the label is read in the same pass.",
-                    "Indeterminate is for parent groups — children remain individual booleans.",
-                    "Error state appends \"required\" or the error message via stateDescription.",
-                    "Disabled is conveyed via the role; the visual dimming alone is not sufficient.",
-                ),
-            )
-        },
+            },
+            PlaygroundState("Group + parent") { GroupExample() },
+        ),
+        a11yReport = A11yReport(
+            role = "Checkbox / TriStateCheckbox (parent-child group)",
+            minTouchTarget = "48 × 48 dp / 44 × 44 pt — full row is the tap target",
+            screenReader = "TalkBack and VoiceOver announce the role (\"Checkbox\"), the label, then the state (\"Checked\" / \"Not checked\" / \"Partially checked\"). The label is read in the same pass — no re-focus needed. Indeterminate is reserved for parent rows whose children disagree.",
+            voiceControl = "Voice Access targets the visible label (\"Tap Mentions\"). Saying the label toggles the box without precise targeting. The full row is clickable, not just the box itself.",
+            keyboard = "Tab focuses, Space toggles. Enter does not toggle (matches platform convention). Disabled boxes are skipped from Tab order via the role; visual dimming is supporting, not primary.",
+            contrast = "Unchecked outline uses border.strong (3:1 non-text contrast); checked fill uses accent.default at 4.6:1; the check glyph itself meets 4.5:1 against the fill. Error border uses status.danger at 4.7:1.",
+            touchTarget = "Whole row is the tap target — at least 48 × 48 dp / 44 × 44 pt — even when the visible box is 20 dp. Spacing between adjacent checkboxes prevents fat-finger toggles on the wrong row.",
+            wcagQuote = "For all user interface components … the name and role can be programmatically determined; states, properties, and values that can be set by the user can be programmatically set.",
+            wcagRef = "4.1.2 Name, Role, Value, Level A",
+        ),
     )
 }
 

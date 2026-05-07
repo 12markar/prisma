@@ -44,6 +44,10 @@ struct A11ySheetContent: View {
 
     var body: some View {
         ScrollView {
+            // The outer VStack claims full sheet width so the horizontal
+            // padding sits flush against the sheet edges instead of
+            // collapsing around shorter content (the bug ListItem and
+            // similar short reports were exposing).
             VStack(alignment: .leading, spacing: PrismaSpacing.sp6) {
                 VStack(alignment: .leading, spacing: PrismaSpacing.sp1) {
                     Text("Accessibility")
@@ -54,7 +58,11 @@ struct A11ySheetContent: View {
                         .foregroundStyle(PrismaSemanticColors.textSecondary.themed(scheme))
                 }
 
-                HStack(spacing: PrismaSpacing.sp3) {
+                // FlowLayout — role and min-target strings are sometimes
+                // long enough that two pills don't fit on a single phone
+                // row. FlowLayout lets the second pill drop to a new line
+                // cleanly instead of clipping or squishing.
+                FlowLayout(spacing: PrismaSpacing.sp3) {
                     quickFact(label: "Role", value: report.role)
                     quickFact(label: "Min target", value: report.minTouchTarget)
                 }
@@ -100,6 +108,7 @@ struct A11ySheetContent: View {
                 .background(PrismaSemanticColors.accentSubtle.themed(scheme))
                 .clipShape(RoundedRectangle(cornerRadius: PrismaRadius.md))
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, PrismaSpacing.sp5)
             .padding(.vertical, PrismaSpacing.sp5)
         }
@@ -123,6 +132,8 @@ struct A11ySheetContent: View {
 
     @ViewBuilder
     private func section(icon: PrismaIcon, title: String, subtitle: String, body: String) -> some View {
+        // Section row also claims full width so the body text wraps
+        // edge-to-edge instead of leaving a ragged right-side gap.
         HStack(alignment: .top, spacing: PrismaSpacing.sp4) {
             Image(prisma: icon)
                 .renderingMode(.template)
@@ -146,8 +157,10 @@ struct A11ySheetContent: View {
                 Text(body)
                     .font(PrismaTypography.bodyMd.font)
                     .foregroundStyle(PrismaSemanticColors.textSecondary.themed(scheme))
+                    .fixedSize(horizontal: false, vertical: true)
                     .padding(.top, PrismaSpacing.sp1)
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 }
