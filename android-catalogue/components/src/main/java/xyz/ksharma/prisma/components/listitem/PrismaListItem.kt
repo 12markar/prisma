@@ -52,17 +52,21 @@ public fun PrismaListItem(
     val secondaryColor = if (enabled) PrismaSemanticColors.TextSecondary.resolve(isDark)
                         else PrismaSemanticColors.TextDisabled.resolve(isDark)
 
+    // Modifier order: background → clickable → padding. clickable BEFORE
+    // padding so the ripple covers the entire row including the visual
+    // padding around content; padding AFTER so the children sit inside the
+    // ripple area without being squashed.
     var rowModifier: Modifier = modifier
         .fillMaxWidth()
-        .background(bg)
         .defaultMinSize(minHeight = size.minHeight)
-        .padding(horizontal = PrismaSpacing.Sp4, vertical = size.verticalPadding)
+        .background(bg)
         .semantics(mergeDescendants = true) {
             this.selected = selected
         }
     if (onClick != null && enabled) {
         rowModifier = rowModifier.clickable(role = Role.Button, onClick = onClick)
     }
+    rowModifier = rowModifier.padding(horizontal = PrismaSpacing.Sp4, vertical = size.verticalPadding)
 
     Row(
         modifier = rowModifier,
