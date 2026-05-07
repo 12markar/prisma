@@ -517,24 +517,37 @@ public struct PrismaLinearLoading: View {
 public struct PrismaSkeletonBlock: View {
     private let cornerRadius: CGFloat
     @Environment(\.colorScheme) private var scheme
-    @State private var phase: Double = 0
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     public init(cornerRadius: CGFloat = 4) { self.cornerRadius = cornerRadius }
 
     public var body: some View {
-        skeletonShape.clipShape(RoundedRectangle(cornerRadius: cornerRadius))
-    }
-
-    private var skeletonShape: some View {
         let base = PrismaSemanticColors.surfaceSunken.themed(scheme)
         let highlight = PrismaSemanticColors.borderSubtle.themed(scheme)
-        return Rectangle()
-            .fill(LinearGradient(colors: [base, highlight, base], startPoint: .leading, endPoint: .trailing))
-            .onAppear {
-                withAnimation(.linear(duration: 1.5).repeatForever(autoreverses: false)) {
-                    phase = 1
+        let shape = RoundedRectangle(cornerRadius: cornerRadius)
+
+        // The original implementation animated a @State Double but never read it
+        // anywhere that affected the rendered view, so the gradient stayed static.
+        // TimelineView re-renders every frame, so a phase derived from the wall
+        // clock guarantees the shimmer always paints.
+        Group {
+            if reduceMotion {
+                shape.fill(base)
+            } else {
+                TimelineView(.animation) { timeline in
+                    let cycle: Double = 1.5
+                    let t = timeline.date.timeIntervalSinceReferenceDate
+                    let phase = (t.truncatingRemainder(dividingBy: cycle)) / cycle
+                    shape.fill(
+                        LinearGradient(
+                            colors: [base, highlight, base],
+                            startPoint: UnitPoint(x: phase - 0.6, y: 0.5),
+                            endPoint:   UnitPoint(x: phase + 0.6, y: 0.5)
+                        )
+                    )
                 }
             }
+        }
     }
 }
 

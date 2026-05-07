@@ -383,8 +383,12 @@ public struct PrismaTimePicker: View {
     public init(date: Binding<Date>) { self._date = date }
 
     public var body: some View {
-        DatePicker("", selection: $date, displayedComponents: [.hourAndMinute])
+        // .labelsHidden() collapses the empty label slot so the compact pill
+        // sizes to its own content; without it the pill anchors trailing inside
+        // a flex row and a wrapping HStack/Spacer can't centre it.
+        DatePicker("Time", selection: $date, displayedComponents: [.hourAndMinute])
             .datePickerStyle(.compact)
+            .labelsHidden()
             .tint(PrismaSemanticColors.accentDefault.themed(scheme))
     }
 }
