@@ -1,9 +1,12 @@
 import SwiftUI
 import CoreUI
 
-/// Container that surrounds the live-preview component.
-/// Themed surface, subtle border, generous padding so taller components
-/// can spread without the surface flicking between heights.
+/// Container the live-preview component renders inside.
+///
+/// Stripped to just top + bottom hairline dividers (no card chrome, no
+/// rounded box) so wide components — Wizard, Pagination, Breadcrumb,
+/// TimePicker — can use the full available width. Content is centered
+/// horizontally and vertically inside the slot.
 struct PreviewSurface<Content: View>: View {
     @Environment(\.colorScheme) private var scheme
     private let content: () -> Content
@@ -13,14 +16,20 @@ struct PreviewSurface<Content: View>: View {
     }
 
     var body: some View {
-        content()
-            .frame(maxWidth: .infinity, minHeight: 200)
-            .padding(PrismaSpacing.sp7)
-            .background(PrismaSemanticColors.surfaceRaised.themed(scheme))
-            .clipShape(RoundedRectangle(cornerRadius: PrismaRadius.lg))
-            .overlay(
-                RoundedRectangle(cornerRadius: PrismaRadius.lg)
-                    .strokeBorder(PrismaSemanticColors.borderSubtle.themed(scheme), lineWidth: 1)
-            )
+        VStack(spacing: 0) {
+            Rectangle()
+                .fill(PrismaSemanticColors.borderSubtle.themed(scheme))
+                .frame(height: 1)
+
+            content()
+                .frame(maxWidth: .infinity, alignment: .center)
+                .frame(minHeight: 200)
+                .padding(.vertical, PrismaSpacing.sp7)
+
+            Rectangle()
+                .fill(PrismaSemanticColors.borderSubtle.themed(scheme))
+                .frame(height: 1)
+        }
+        .frame(maxWidth: .infinity)
     }
 }

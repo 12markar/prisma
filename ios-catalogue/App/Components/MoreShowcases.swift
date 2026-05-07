@@ -482,7 +482,16 @@ struct TimePickerShowcase: View {
     @State private var date = Date()
     var body: some View {
         PlaygroundScaffold(
-            preview: { PrismaTimePicker(date: $date) },
+            // .compact DatePicker anchors trailing by default. Wrap in
+            // HStack with bracketing Spacers so it centres in the slot
+            // instead of hugging the right edge.
+            preview: {
+                HStack {
+                    Spacer()
+                    PrismaTimePicker(date: $date)
+                    Spacer()
+                }
+            },
             states: {
                 StateCell("Default", minWidth: 280) { TimePickerState() }
             },
@@ -714,7 +723,7 @@ struct ModalShowcase: View {
     var body: some View {
         PlaygroundScaffold(
             preview: {
-                VStack(alignment: .leading, spacing: PrismaSpacing.sp3) {
+                VStack(alignment: .center, spacing: PrismaSpacing.sp3) {
                     PrismaButton("Open modal") { open = true }
                     Text("Last choice: \(lastChoice)")
                         .font(PrismaTypography.bodySm.font)
