@@ -74,6 +74,7 @@ import xyz.ksharma.prisma.tokens.PrismaTypography
 public fun Sidebar(
     selectedKey: String?,
     onSelect: (CatalogueEntry) -> Unit,
+    listScrollState: androidx.compose.foundation.lazy.LazyListState,
     modifier: Modifier = Modifier,
 ) {
     // Explicit saveable keys so state survives pane swaps in
@@ -122,15 +123,12 @@ public fun Sidebar(
             )
         }
 
-        // Hoist scroll state via rememberSaveable, keyed explicitly so it
-        // survives detail-pane swaps in NavigableListDetailPaneScaffold AND
-        // process death. Without an explicit key, the default
-        // rememberLazyListState was being dropped when the list pane was
-        // recomposed after back-nav, scrolling the user back to top.
-        val listScrollState = rememberSaveable(
-            saver = LazyListState.Saver,
-            key = "prisma.sidebar.scroll",
-        ) { LazyListState() }
+        // listScrollState is hoisted from CatalogueShell — it lives outside
+        // the AnimatedPane that gets destroyed on detail-pane swaps, so the
+        // scroll position survives back-nav cleanly. Doing it inside this
+        // composable via rememberSaveable was unreliable: material3-adaptive
+        // doesn't fully preserve saveable scope across compact-width pane
+        // destructions.
         // Each section is one rounded surface-raised card, mirroring iOS's
         // inset-grouped sidebar style — rather than the previous flat
         // header-then-rows layout that looked unstructured next to iOS.

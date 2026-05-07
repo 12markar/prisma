@@ -34,6 +34,7 @@ import xyz.ksharma.prisma.tokens.PrismaTypography
 @Composable
 public fun DetailPane(
     entry: CatalogueEntry?,
+    scrollOffsets: androidx.compose.runtime.snapshots.SnapshotStateMap<String, Int>,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -41,7 +42,7 @@ public fun DetailPane(
             .fillMaxSize()
             .background(PrismaSemanticColors.SurfaceBase.themed()),
     ) {
-        if (entry == null) EmptyDetail() else EntryDetail(entry = entry)
+        if (entry == null) EmptyDetail() else EntryDetail(entry = entry, scrollOffsets = scrollOffsets)
     }
 }
 
@@ -111,16 +112,19 @@ private fun Stat(label: String, value: String) {
 }
 
 @Composable
-private fun EntryDetail(entry: CatalogueEntry) {
-    // Scroll state is keyed by entry.key + saved across pane swaps. Without
-    // this, navigating to a long playground (knobs, states, code), tapping
-    // a different component in the sidebar, then coming back lost the scroll
-    // position. The key resets state when switching to a different entry,
-    // which is the desired behaviour — same entry restores scroll.
-    val scrollState = androidx.compose.runtime.saveable.rememberSaveable(
-        entry.key,
-        saver = androidx.compose.foundation.ScrollState.Saver,
-    ) { androidx.compose.foundation.ScrollState(0) }
+private fun EntryDetail(
+    entry: CatalogueEntry,
+    scrollOffsets: androidx.compose.runtime.snapshots.SnapshotStateMap<String, Int>,
+) {
+    // Scroll state per-entry, owned by CatalogueShell so it survives the
+    // AnimatedPane destruction on back-nav. Reads the stored pixel offset
+    // for this entry on first composition, syncs back on every change.
+    val scrollState = androidx.compose.runtime.remember(entry.key) {
+        androidx.compose.foundation.ScrollState(scrollOffsets[entry.key] ?: 0)
+    }
+    androidx.compose.runtime.LaunchedEffect(entry.key, scrollState.value) {
+        scrollOffsets[entry.key] = scrollState.value
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
