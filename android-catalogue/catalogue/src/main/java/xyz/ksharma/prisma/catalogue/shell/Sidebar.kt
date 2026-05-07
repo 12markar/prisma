@@ -25,6 +25,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -90,15 +95,20 @@ public fun Sidebar(
     val results by remember(query) { derivedStateOf { CatalogueRegistry.search(query) } }
     val isSearching = query.isNotBlank()
 
+    // statusBarsPadding pushes the chrome row clear of the transparent
+    // status bar; navigationBarsPadding is applied to the LazyColumn's
+    // contentPadding below so list rows can scroll under the nav bar
+    // while the bottom padding keeps the last row reachable.
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(PrismaSemanticColors.SurfaceSunken.themed()),
+            .background(PrismaSemanticColors.SurfaceSunken.themed())
+            .statusBarsPadding(),
     ) {
         ChromeRow(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = PrismaSpacing.Sp5, end = PrismaSpacing.Sp4, top = PrismaSpacing.Sp5, bottom = PrismaSpacing.Sp3),
+                .padding(start = PrismaSpacing.Sp5, end = PrismaSpacing.Sp4, top = PrismaSpacing.Sp3, bottom = PrismaSpacing.Sp3),
         )
 
         SearchField(
@@ -120,6 +130,10 @@ public fun Sidebar(
         // header-then-rows layout that looked unstructured next to iOS.
         // Card edges and inter-row dividers are subtle so the eye still
         // groups items by section quickly.
+        // Nav-bar inset added to bottom contentPadding so the last row stays
+        // reachable above the (transparent) navigation bar — content can
+        // scroll under it but rest position keeps the last row clear.
+        val navBarBottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
         LazyColumn(
             state = listScrollState,
             modifier = Modifier.fillMaxSize(),
@@ -127,7 +141,7 @@ public fun Sidebar(
                 start = PrismaSpacing.Sp4,
                 end = PrismaSpacing.Sp4,
                 top = PrismaSpacing.Sp3,
-                bottom = PrismaSpacing.Sp7,
+                bottom = PrismaSpacing.Sp7 + navBarBottom,
             ),
         ) {
             val visibleSections = CatalogueRegistry.sections.mapIndexed { idx, section ->

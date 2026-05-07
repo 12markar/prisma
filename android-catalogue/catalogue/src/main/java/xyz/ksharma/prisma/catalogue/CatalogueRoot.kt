@@ -7,10 +7,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
@@ -112,18 +109,18 @@ public fun CatalogueRoot() {
                 animationSpec = tween(durationMillis = 300),
                 label = "rootSurface",
             )
+            // No system-bar padding at the root — content extends edge-to-edge
+            // behind the (now transparent) status and navigation bars. The
+            // Sidebar / DetailPane / OnboardingOverlay each apply their own
+            // statusBarsPadding / navigationBarsPadding so the inset is
+            // applied where it makes layout sense (chrome row, content top
+            // padding) rather than chopping the painted surface.
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(animatedSurface),
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .windowInsetsPadding(WindowInsets.systemBars),
-                ) {
-                    CatalogueShell()
-                }
+                CatalogueShell()
                 OnboardingOverlay(
                     visible = showOnboarding,
                     onDismiss = {

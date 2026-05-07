@@ -7,7 +7,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.height
@@ -125,11 +129,21 @@ private fun EntryDetail(
     androidx.compose.runtime.LaunchedEffect(entry.key, scrollState.value) {
         scrollOffsets[entry.key] = scrollState.value
     }
+    // Edge-to-edge: status bar at top + nav bar at bottom both added to
+    // the content padding so component content stays clear of the
+    // transparent system bars.
+    val statusBarTop = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+    val navBarBottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
-            .padding(horizontal = PrismaSpacing.Sp8, vertical = PrismaSpacing.Sp7),
+            .padding(
+                start = PrismaSpacing.Sp8,
+                end = PrismaSpacing.Sp8,
+                top = PrismaSpacing.Sp7 + statusBarTop,
+                bottom = PrismaSpacing.Sp7 + navBarBottom,
+            ),
         verticalArrangement = Arrangement.spacedBy(PrismaSpacing.Sp4),
     ) {
         // Section breadcrumb pill.
