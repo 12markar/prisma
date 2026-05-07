@@ -109,16 +109,25 @@ public struct PrismaPagination: View {
 
     public init(page: Binding<Int>, pageCount: Int) { self._page = page; self.pageCount = pageCount }
 
+    /// Arrows are pinned to the left / right edges; the page-number row
+    /// scrolls horizontally between them when there isn't enough width. This
+    /// fixes the "right arrow disappears at certain pages" feedback —
+    /// previously the whole HStack could overflow on narrow screens.
     public var body: some View {
         HStack(spacing: PrismaSpacing.sp1) {
             arrow(prisma: .chevronLeft, enabled: page > 1) { page -= 1 }
-            ForEach(pagesToShow(), id: \.self) { p in
-                if p == -1 {
-                    Text("…").frame(width: 36, height: 36)
-                        .foregroundStyle(PrismaSemanticColors.textTertiary.themed(scheme))
-                } else {
-                    pageButton(p)
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: PrismaSpacing.sp1) {
+                    ForEach(pagesToShow(), id: \.self) { p in
+                        if p == -1 {
+                            Text("…").frame(width: 36, height: 36)
+                                .foregroundStyle(PrismaSemanticColors.textTertiary.themed(scheme))
+                        } else {
+                            pageButton(p)
+                        }
+                    }
                 }
+                .frame(maxWidth: .infinity)
             }
             arrow(prisma: .chevronRight, enabled: page < pageCount) { page += 1 }
         }
@@ -215,6 +224,13 @@ public struct PrismaBreadcrumb: View {
 
 // MARK: - Wizard
 
+/// Step indicator with `done / active / future` states.
+///
+/// Layout: each step is a fixed-width cell that wraps to the next visual
+/// line when the screen is too narrow — implemented via the SwiftUI
+/// `FlowLayout` shipped in the catalogue's playground module. Connector
+/// lines render between steps that land on the same row; wrapped rows
+/// drop the connector by design.
 public struct PrismaWizardSteps: View {
     private let steps: [String]
     private let activeIndex: Int
@@ -223,40 +239,96 @@ public struct PrismaWizardSteps: View {
     public init(steps: [String], activeIndex: Int) { self.steps = steps; self.activeIndex = activeIndex }
 
     public var body: some View {
-        HStack(spacing: 0) {
+        WizardFlowLayout(spacing: PrismaSpacing.sp3, lineSpacing: PrismaSpacing.sp4) {
             ForEach(Array(steps.enumerated()), id: \.offset) { i, step in
                 let state: StepState = i < activeIndex ? .done : i == activeIndex ? .active : .future
-                VStack(spacing: PrismaSpacing.sp2) {
-                    ZStack {
-                        Circle().fill(state == .future ? PrismaSemanticColors.surfaceSunken.themed(scheme)
-                                                          : PrismaSemanticColors.accentDefault.themed(scheme))
-                            .frame(width: 28, height: 28)
-                        if state == .done {
-                            Image(prisma: .check).renderingMode(.template).resizable()
-                                .frame(width: 16, height: 16)
-                                .foregroundStyle(PrismaSemanticColors.textOnAccent.themed(scheme))
-                        } else {
-                            Text("\(i + 1)").font(PrismaTypography.labelMd.font)
-                                .foregroundStyle(state == .active ? PrismaSemanticColors.textOnAccent.themed(scheme)
-                                                                    : PrismaSemanticColors.textTertiary.themed(scheme))
+                HStack(spacing: PrismaSpacing.sp2) {
+                    VStack(spacing: PrismaSpacing.sp2) {
+                        ZStack {
+                            Circle().fill(state == .future ? PrismaSemanticColors.surfaceSunken.themed(scheme)
+                                                              : PrismaSemanticColors.accentDefault.themed(scheme))
+                                .frame(width: 28, height: 28)
+                            if state == .done {
+                                Image(prisma: .check).renderingMode(.template).resizable()
+                                    .frame(width: 16, height: 16)
+                                    .foregroundStyle(PrismaSemanticColors.textOnAccent.themed(scheme))
+                            } else {
+                                Text("\(i + 1)").font(PrismaTypography.labelMd.font)
+                                    .foregroundStyle(state == .active ? PrismaSemanticColors.textOnAccent.themed(scheme)
+                                                                        : PrismaSemanticColors.textTertiary.themed(scheme))
+                            }
                         }
+                        Text(step).font(PrismaTypography.labelSm.font)
+                            .foregroundStyle(state == .future ? PrismaSemanticColors.textTertiary.themed(scheme)
+                                                                : PrismaSemanticColors.textPrimary.themed(scheme))
+                            .multilineTextAlignment(.center)
                     }
-                    Text(step).font(PrismaTypography.labelSm.font)
-                        .foregroundStyle(state == .future ? PrismaSemanticColors.textTertiary.themed(scheme)
-                                                            : PrismaSemanticColors.textPrimary.themed(scheme))
-                }
-                .frame(maxWidth: .infinity)
-                if i < steps.count - 1 {
-                    Rectangle()
-                        .fill(i < activeIndex ? PrismaSemanticColors.accentDefault.themed(scheme)
-                                                : PrismaSemanticColors.borderSubtle.themed(scheme))
-                        .frame(height: 2).frame(maxWidth: .infinity)
+                    .frame(minWidth: 88, idealWidth: 110, maxWidth: 140)
+                    if i < steps.count - 1 {
+                        Rectangle()
+                            .fill(i < activeIndex ? PrismaSemanticColors.accentDefault.themed(scheme)
+                                                    : PrismaSemanticColors.borderSubtle.themed(scheme))
+                            .frame(width: 24, height: 2)
+                    }
                 }
             }
         }
     }
 
     private enum StepState { case done, active, future }
+}
+
+/// Lightweight flow layout used by [PrismaWizardSteps]. Distinct from the
+/// app-side `FlowLayout` in App/Playground so the component module stays
+/// independent of the catalogue.
+private struct WizardFlowLayout: Layout {
+    let spacing: CGFloat
+    let lineSpacing: CGFloat
+
+    init(spacing: CGFloat = 8, lineSpacing: CGFloat = 12) {
+        self.spacing = spacing
+        self.lineSpacing = lineSpacing
+    }
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let maxWidth = proposal.width ?? .infinity
+        var lineWidth: CGFloat = 0
+        var lineHeight: CGFloat = 0
+        var totalHeight: CGFloat = 0
+        var totalWidth: CGFloat = 0
+        for subview in subviews {
+            let s = subview.sizeThatFits(.unspecified)
+            if lineWidth + s.width > maxWidth, lineWidth > 0 {
+                totalHeight += lineHeight + lineSpacing
+                totalWidth = max(totalWidth, lineWidth - spacing)
+                lineWidth = s.width + spacing
+                lineHeight = s.height
+            } else {
+                lineWidth += s.width + spacing
+                lineHeight = max(lineHeight, s.height)
+            }
+        }
+        totalHeight += lineHeight
+        totalWidth = max(totalWidth, lineWidth - spacing)
+        return CGSize(width: totalWidth, height: totalHeight)
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        var x = bounds.minX
+        var y = bounds.minY
+        var lineHeight: CGFloat = 0
+        for subview in subviews {
+            let s = subview.sizeThatFits(.unspecified)
+            if x + s.width > bounds.maxX, x > bounds.minX {
+                x = bounds.minX
+                y += lineHeight + lineSpacing
+                lineHeight = 0
+            }
+            subview.place(at: CGPoint(x: x, y: y), proposal: ProposedViewSize(s))
+            x += s.width + spacing
+            lineHeight = max(lineHeight, s.height)
+        }
+    }
 }
 
 // MARK: - Toast

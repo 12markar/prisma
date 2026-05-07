@@ -102,6 +102,30 @@ public fun A11ySheetContent(report: A11yReport) {
             body = report.touchTarget,
         )
 
+        // Platform note — same on every component so it lives at the
+        // sheet level rather than the per-component A11yReport.
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(PrismaRadius.Md))
+                .background(PrismaSemanticColors.SurfaceSunken.themed())
+                .padding(PrismaSpacing.Sp4),
+            horizontalArrangement = Arrangement.spacedBy(PrismaSpacing.Sp3),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                painter = painterResource(PrismaIcons.Info),
+                contentDescription = null,
+                tint = PrismaSemanticColors.TextTertiary.themed(),
+                modifier = Modifier.size(16.dp),
+            )
+            Text(
+                text = "Text scales with the system font-size setting — Android \"Display size & text\" / iOS \"Larger Text\". Layouts hold up to 200%; no in-app override.",
+                style = PrismaTypography.BodySm,
+                color = PrismaSemanticColors.TextSecondary.themed(),
+            )
+        }
+
         // WCAG anchor quote
         Column(
             modifier = Modifier

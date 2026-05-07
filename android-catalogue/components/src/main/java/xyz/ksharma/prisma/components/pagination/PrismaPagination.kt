@@ -3,9 +3,11 @@ package xyz.ksharma.prisma.components.pagination
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -30,15 +32,28 @@ public fun PrismaPagination(
     onPageChange: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    // The arrows are pinned to the left / right edges; the page-number row
+    // scrolls horizontally between them when there isn't enough width. This
+    // is the fix for the "right arrow disappears at certain pages" feedback —
+    // previously the whole Row could overflow on narrow screens, dropping
+    // the trailing arrow off the right edge.
+    val scrollState = androidx.compose.foundation.rememberScrollState()
     Row(
-        modifier = modifier,
+        modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(PrismaSpacing.Sp1),
     ) {
         ArrowButton(iconRes = PrismaIcons.ChevronLeft, enabled = page > 1) { onPageChange(page - 1) }
-        // Compact: shows current/total. Sophisticated number list deferred.
-        for (p in pagesToShow(page, pageCount)) {
-            if (p == null) Ellipsis() else PageButton(p, p == page) { onPageChange(p) }
+        Row(
+            modifier = androidx.compose.ui.Modifier
+                .weight(1f)
+                .horizontalScroll(scrollState),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(PrismaSpacing.Sp1, Alignment.CenterHorizontally),
+        ) {
+            for (p in pagesToShow(page, pageCount)) {
+                if (p == null) Ellipsis() else PageButton(p, p == page) { onPageChange(p) }
+            }
         }
         ArrowButton(iconRes = PrismaIcons.ChevronRight, enabled = page < pageCount) { onPageChange(page + 1) }
     }

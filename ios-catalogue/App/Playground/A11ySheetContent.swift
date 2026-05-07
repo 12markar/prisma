@@ -65,6 +65,21 @@ struct A11ySheetContent: View {
                 section(icon: .eye, title: "Color contrast", subtitle: "WCAG AA · 4.5:1 body, 3:1 large text", body: report.contrast)
                 section(icon: .scan, title: "Touch target", subtitle: "48 × 48 dp Android · 44 × 44 pt iOS", body: report.touchTarget)
 
+                HStack(alignment: .top, spacing: PrismaSpacing.sp3) {
+                    Image(prisma: .info)
+                        .renderingMode(.template)
+                        .resizable()
+                        .frame(width: 16, height: 16)
+                        .foregroundStyle(PrismaSemanticColors.textTertiary.themed(scheme))
+                    Text("Text scales with the system font-size setting — Android \"Display size & text\" / iOS \"Larger Text\". Layouts hold up to 200%; no in-app override.")
+                        .font(PrismaTypography.bodySm.font)
+                        .foregroundStyle(PrismaSemanticColors.textSecondary.themed(scheme))
+                }
+                .padding(PrismaSpacing.sp4)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(PrismaSemanticColors.surfaceSunken.themed(scheme))
+                .clipShape(RoundedRectangle(cornerRadius: PrismaRadius.md))
+
                 VStack(alignment: .leading, spacing: PrismaSpacing.sp2) {
                     HStack(spacing: PrismaSpacing.sp2) {
                         Image(prisma: .doc)
