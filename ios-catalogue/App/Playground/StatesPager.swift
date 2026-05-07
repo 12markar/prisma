@@ -28,9 +28,11 @@ struct StatesPager: View {
                         Text(state.label.uppercased())
                             .font(PrismaTypography.labelSm.font)
                             .foregroundStyle(PrismaSemanticColors.textTertiary.themed(scheme))
+                        // Centered horizontally + vertically so a small
+                        // component doesn't sit in the top-left corner of
+                        // a tall cell — the component is the focal point.
                         state.content
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        Spacer(minLength: 0)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                     }
                     .padding(PrismaSpacing.sp5)
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
@@ -40,7 +42,6 @@ struct StatesPager: View {
                         RoundedRectangle(cornerRadius: PrismaRadius.md)
                             .strokeBorder(PrismaSemanticColors.borderSubtle.themed(scheme), lineWidth: 1)
                     )
-                    .padding(.horizontal, PrismaSpacing.sp4)
                     .tag(idx)
                 }
             }

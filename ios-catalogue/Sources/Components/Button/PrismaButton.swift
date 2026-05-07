@@ -66,7 +66,11 @@ public struct PrismaButton: View {
         let palette = colorPalette
 
         Button(action: handleTap) {
-            HStack(spacing: PrismaSpacing.sp2) {
+            // Centered HStack so wrapping the button in `.frame(maxWidth:
+            // .infinity)` actually centers the label rather than parking
+            // it on the leading edge of a wide pill. Without an explicit
+            // alignment, SwiftUI's HStack hugs its content.
+            HStack(alignment: .center, spacing: PrismaSpacing.sp2) {
                 if loading {
                     ProgressView()
                         .controlSize(.small)

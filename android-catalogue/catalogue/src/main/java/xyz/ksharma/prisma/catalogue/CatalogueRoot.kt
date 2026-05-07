@@ -1,6 +1,7 @@
 package xyz.ksharma.prisma.catalogue
 
 import android.app.Activity
+import android.content.Context
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -20,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 import xyz.ksharma.prisma.catalogue.shell.CatalogueShell
@@ -61,9 +63,15 @@ public fun CatalogueRoot() {
     val systemDark = isSystemInDarkTheme()
     // null = follow system; non-null = user-forced light (false) or dark (true).
     var userOverride by rememberSaveable { mutableStateOf<Boolean?>(null) }
-    var showOnboarding by rememberSaveable { mutableStateOf(true) }
-    // Inspector visibility is intentionally NOT saveable — it's a transient
-    // debug aid; coming back from background should land cleanly closed.
+
+    // Onboarding dismissal is persisted in SharedPreferences so it actually
+    // survives process death — `rememberSaveable` only restores when the
+    // OS hands us a saved Bundle, not on a fresh cold start. Without this
+    // the welcome screen reappeared on every launch.
+    val context = LocalContext.current
+    val prefs = remember(context) { context.getSharedPreferences("prisma_prefs", Context.MODE_PRIVATE) }
+    var showOnboarding by remember { mutableStateOf(!prefs.getBoolean("onboardingDone", false)) }
+
     // Inspector + a11y overlay implementations remain available for future
     // reintroduction (e.g. behind a long-press chrome action), but they're
     // not surfaced today — kept the daily chrome to a single theme toggle
@@ -118,7 +126,14 @@ public fun CatalogueRoot() {
                 }
                 OnboardingOverlay(
                     visible = showOnboarding,
-                    onDismiss = { showOnboarding = false },
+                    onDismiss = {
+                        // Write to disk first, THEN flip local state. Crashing
+                        // mid-edit() would otherwise leave the overlay closed
+                        // for the rest of the session but reopening on next
+                        // launch — surprising and worth avoiding.
+                        prefs.edit().putBoolean("onboardingDone", true).apply()
+                        showOnboarding = false
+                    },
                 )
             }
         }

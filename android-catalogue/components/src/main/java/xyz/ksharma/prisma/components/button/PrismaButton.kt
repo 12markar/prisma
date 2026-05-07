@@ -120,7 +120,10 @@ public fun PrismaButton(
                 }
             },
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(PrismaSpacing.Sp2),
+        // Centered when the caller stretches the button via fillMaxWidth —
+        // otherwise content sits at the start, which looks like a tiny label
+        // hugging the leading edge of a wide pill.
+        horizontalArrangement = Arrangement.spacedBy(PrismaSpacing.Sp2, Alignment.CenterHorizontally),
     ) {
         CompositionLocalProvider(LocalContentColor provides labelColor) {
             // Loading spinner replaces leading icon when loading.

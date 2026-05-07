@@ -11,9 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
@@ -86,10 +84,11 @@ public fun ButtonShowcase() {
     var knobsOpen by rememberSaveable { mutableStateOf(false) }
     var a11yOpen by rememberSaveable { mutableStateOf(false) }
 
+    // No verticalScroll here — DetailPane already wraps the showcase in a
+    // verticalScroll, and nesting two scrollables (each with infinite max
+    // height) crashes Compose at measure-time.
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .verticalScroll(rememberScrollState()),
+        modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(PrismaSpacing.Sp5),
     ) {
         // 1. Live preview — taller and centered for breathing room.

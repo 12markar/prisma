@@ -121,11 +121,15 @@ public fun Sidebar(
             )
         }
 
-        // Hoist scroll state via rememberSaveable so it survives detail-pane
-        // swaps in NavigableListDetailPaneScaffold. Without an explicit key,
-        // the default rememberLazyListState was being dropped when the list
-        // pane was recomposed after back-nav, scrolling the user back to top.
-        val listScrollState = rememberSaveable(saver = LazyListState.Saver) { LazyListState() }
+        // Hoist scroll state via rememberSaveable, keyed explicitly so it
+        // survives detail-pane swaps in NavigableListDetailPaneScaffold AND
+        // process death. Without an explicit key, the default
+        // rememberLazyListState was being dropped when the list pane was
+        // recomposed after back-nav, scrolling the user back to top.
+        val listScrollState = rememberSaveable(
+            saver = LazyListState.Saver,
+            key = "prisma.sidebar.scroll",
+        ) { LazyListState() }
         LazyColumn(
             state = listScrollState,
             modifier = Modifier.fillMaxSize(),

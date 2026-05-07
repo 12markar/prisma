@@ -112,10 +112,19 @@ private fun Stat(label: String, value: String) {
 
 @Composable
 private fun EntryDetail(entry: CatalogueEntry) {
+    // Scroll state is keyed by entry.key + saved across pane swaps. Without
+    // this, navigating to a long playground (knobs, states, code), tapping
+    // a different component in the sidebar, then coming back lost the scroll
+    // position. The key resets state when switching to a different entry,
+    // which is the desired behaviour — same entry restores scroll.
+    val scrollState = androidx.compose.runtime.saveable.rememberSaveable(
+        entry.key,
+        saver = androidx.compose.foundation.ScrollState.Saver,
+    ) { androidx.compose.foundation.ScrollState(0) }
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
+            .verticalScroll(scrollState)
             .padding(horizontal = PrismaSpacing.Sp8, vertical = PrismaSpacing.Sp7),
         verticalArrangement = Arrangement.spacedBy(PrismaSpacing.Sp4),
     ) {

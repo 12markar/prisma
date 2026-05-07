@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -49,13 +50,14 @@ public fun StatesPager(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(PrismaSpacing.Sp3),
     ) {
+        // No contentPadding so each page is exactly the container's width —
+        // matches the preview surface above so the two cards line up
+        // edge-for-edge instead of looking like irregular shapes.
         HorizontalPager(
             state = pagerState,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(pageHeight),
-            contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = PrismaSpacing.Sp4),
-            pageSpacing = PrismaSpacing.Sp3,
         ) { index ->
             val state = states[index]
             Column(
@@ -77,9 +79,12 @@ public fun StatesPager(
                     style = PrismaTypography.LabelSm,
                     color = PrismaSemanticColors.TextTertiary.themed(),
                 )
+                // Centered horizontally + vertically so a small button or
+                // chip doesn't sit in the top-left corner of a 220dp cell —
+                // the component is the focal point, not the label.
                 Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.CenterStart,
+                    modifier = Modifier.fillMaxWidth().weight(1f),
+                    contentAlignment = Alignment.Center,
                 ) {
                     state.content()
                 }
