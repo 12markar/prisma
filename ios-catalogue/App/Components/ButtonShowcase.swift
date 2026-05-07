@@ -21,7 +21,7 @@ struct ButtonShowcase: View {
                 PrismaButton(
                     "",
                     variant: .icon,
-                    leadingIcon: { AnyView(Image(systemName: "heart.fill")) },
+                    leadingIcon: { AnyView(Image(prisma: .heart).renderingMode(.template)) },
                     accessibilityLabel: "Like"
                 ) {}
             }
@@ -37,11 +37,11 @@ struct ButtonShowcase: View {
             HStack(spacing: PrismaSpacing.sp3) {
                 PrismaButton(
                     "Add",
-                    leadingIcon: { AnyView(Image(systemName: "plus")) }
+                    leadingIcon: { AnyView(Image(prisma: .plus).renderingMode(.template)) }
                 ) {}
                 PrismaButton(
                     "Continue",
-                    trailingIcon: { AnyView(Image(systemName: "arrow.right")) }
+                    trailingIcon: { AnyView(Image(prisma: .arrowRight).renderingMode(.template)) }
                 ) {}
             }
 

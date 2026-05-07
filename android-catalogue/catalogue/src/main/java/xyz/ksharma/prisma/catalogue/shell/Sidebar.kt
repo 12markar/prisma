@@ -25,17 +25,17 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-// TODO: Replace Material icons with design-system-supplied icon set once
-//   Foundation/Icons showcase lands (Phase 1). Tracked in docs/TODO.md.
+// Theme toggle uses Material moon/sun (no equivalent in Prisma 64-icon set).
+// All other chrome icons come from PrismaIcons.
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.LightMode
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Text
+import androidx.compose.ui.res.painterResource
+import xyz.ksharma.prisma.components.icons.PrismaIcons
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -219,7 +219,7 @@ private fun SearchField(
         },
         leadingIcon = {
             Icon(
-                imageVector = Icons.Default.Search,
+                painter = painterResource(PrismaIcons.Search),
                 contentDescription = null,
                 tint = PrismaSemanticColors.TextTertiary.themed(),
                 modifier = Modifier.size(18.dp),
@@ -291,7 +291,7 @@ private fun SectionHeader(
             )
         }
         Icon(
-            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+            painter = painterResource(PrismaIcons.ChevronRight),
             contentDescription = null,
             tint = PrismaSemanticColors.TextTertiary.themed(),
             modifier = Modifier

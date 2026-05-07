@@ -4,12 +4,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.ui.res.painterResource
+import xyz.ksharma.prisma.components.icons.PrismaIcons
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -45,7 +43,7 @@ public fun ButtonShowcase() {
                 variant = PrismaButtonVariant.Icon,
                 onClick = {},
                 contentDescription = "Like",
-                leadingIcon = { Icon(Icons.Default.Favorite, contentDescription = null) },
+                leadingIcon = { Icon(painterResource(PrismaIcons.Heart), contentDescription = null) },
             )
         }
 
@@ -64,12 +62,12 @@ public fun ButtonShowcase() {
             PrismaButton(
                 text = "Add",
                 onClick = {},
-                leadingIcon = { Icon(Icons.Default.Add, contentDescription = null) },
+                leadingIcon = { Icon(painterResource(PrismaIcons.Plus), contentDescription = null) },
             )
             PrismaButton(
                 text = "Continue",
                 onClick = {},
-                trailingIcon = { Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null) },
+                trailingIcon = { Icon(painterResource(PrismaIcons.ArrowRight), contentDescription = null) },
             )
         }
 
