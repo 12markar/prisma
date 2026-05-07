@@ -1,17 +1,19 @@
 import SwiftUI
 import CoreUI
+import Components
 
 /// Storybook-style scaffold for an interactive component showcase.
 ///
-///  ┌─────────────────────────┐
-///  │  Live preview surface   │
-///  ├─────────────────────────┤
-///  │  CONTROLS               │
-///  │   knob rows…            │
-///  ├─────────────────────────┤
-///  │  STATES                 │
-///  │   state-cell grid…      │
-///  └─────────────────────────┘
+/// Pre-existing showcases call this with a `knobs` block, an optional
+/// `states` block (rendered as a flow gallery), a `code` generator, and
+/// an optional `a11y` block. Knobs and a11y are now both surfaced behind
+/// bottom sheets — opened by Edit / A11y action pills directly under the
+/// preview — so the live preview never scrolls off screen behind a long
+/// edit panel.
+///
+/// The richer ButtonShowcase uses [PlaygroundScreen] (with a structured
+/// [A11yReport] and a horizontal states pager) directly, bypassing this
+/// scaffold. Both APIs coexist during the per-component rollout.
 struct PlaygroundScaffold<Preview: View, Knobs: View, States: View, A11y: View>: View {
     @Environment(\.colorScheme) private var scheme
     private let preview: () -> Preview
@@ -34,14 +36,24 @@ struct PlaygroundScaffold<Preview: View, Knobs: View, States: View, A11y: View>:
         self.a11y = a11y
     }
 
-    var body: some View {
-        VStack(alignment: .leading, spacing: PrismaSpacing.sp7) {
-            PreviewSurface { preview() }
+    @State private var knobsOpen = false
+    @State private var a11yOpen = false
 
-            if Knobs.self != EmptyView.self {
-                section(label: "Controls") {
-                    VStack(alignment: .leading, spacing: PrismaSpacing.sp4) {
-                        knobs()
+    private var hasKnobs: Bool { Knobs.self != EmptyView.self }
+    private var hasA11y: Bool { A11y.self != EmptyView.self }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: PrismaSpacing.sp5) {
+            PreviewSurface { preview() }
+                .frame(minHeight: 200)
+
+            if hasKnobs || hasA11y {
+                HStack(spacing: PrismaSpacing.sp3) {
+                    if hasKnobs {
+                        actionPill(icon: .edit, label: "Edit") { knobsOpen = true }
+                    }
+                    if hasA11y {
+                        actionPill(icon: .eye, label: "A11y") { a11yOpen = true }
                     }
                 }
             }
@@ -57,12 +69,33 @@ struct PlaygroundScaffold<Preview: View, Knobs: View, States: View, A11y: View>:
                     CodeBlock(code: code())
                 }
             }
-
-            if A11y.self != EmptyView.self {
-                section(label: "Accessibility") {
+        }
+        .sheet(isPresented: $knobsOpen) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: PrismaSpacing.sp4) {
+                    Text("Edit")
+                        .font(PrismaTypography.headlineSm.font)
+                        .foregroundStyle(PrismaSemanticColors.textPrimary.themed(scheme))
+                    knobs()
+                    PrismaButton("Done") { knobsOpen = false }
+                        .frame(maxWidth: .infinity)
+                }
+                .padding(.horizontal, PrismaSpacing.sp5)
+                .padding(.vertical, PrismaSpacing.sp4)
+            }
+            .presentationDetents([.medium, .large])
+            .presentationDragIndicator(.visible)
+        }
+        .sheet(isPresented: $a11yOpen) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: PrismaSpacing.sp4) {
                     a11y()
                 }
+                .padding(.horizontal, PrismaSpacing.sp5)
+                .padding(.vertical, PrismaSpacing.sp4)
             }
+            .presentationDetents([.large])
+            .presentationDragIndicator(.visible)
         }
     }
 
@@ -74,5 +107,31 @@ struct PlaygroundScaffold<Preview: View, Knobs: View, States: View, A11y: View>:
                 .foregroundStyle(PrismaSemanticColors.textTertiary.themed(scheme))
             content()
         }
+    }
+
+    @ViewBuilder
+    private func actionPill(icon: PrismaIcon, label: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: PrismaSpacing.sp2) {
+                Image(prisma: icon)
+                    .renderingMode(.template)
+                    .resizable()
+                    .frame(width: 16, height: 16)
+                    .foregroundStyle(PrismaSemanticColors.textSecondary.themed(scheme))
+                Text(label)
+                    .font(PrismaTypography.labelMd.font)
+                    .foregroundStyle(PrismaSemanticColors.textPrimary.themed(scheme))
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, PrismaSpacing.sp4)
+            .padding(.vertical, PrismaSpacing.sp3)
+            .background(PrismaSemanticColors.surfaceRaised.themed(scheme))
+            .overlay(
+                RoundedRectangle(cornerRadius: PrismaRadius.md)
+                    .strokeBorder(PrismaSemanticColors.borderSubtle.themed(scheme), lineWidth: 1)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: PrismaRadius.md))
+        }
+        .buttonStyle(.plain)
     }
 }
