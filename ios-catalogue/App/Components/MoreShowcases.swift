@@ -1651,7 +1651,7 @@ private enum ListItemTrailingKind: String, CaseIterable, Hashable {
 }
 
 struct ListItemShowcase: View {
-    @State private var primary: String = "Karan Sharma"
+    @State private var primary: String = "Maya Chen"
     @State private var secondary: String = "karan@example.com"
     @State private var leadingKind: ListItemLeadingKind = .avatar
     @State private var trailingKind: ListItemTrailingKind = .chevron
@@ -1744,7 +1744,7 @@ struct ListItemShowcase: View {
 }
 
 struct AvatarShowcase: View {
-    @State private var seed: String = "Karan Sharma"
+    @State private var seed: String = "Maya Chen"
     @State private var size: PrismaAvatarSize = .lg
     @State private var status: PrismaAvatarStatus = .online
 
@@ -1776,10 +1776,10 @@ struct AvatarShowcase: View {
             states: {
                 StateCell("Sizes") {
                     HStack(spacing: PrismaSpacing.sp3) {
-                        PrismaAvatar(seed: "Karan Sharma", size: .xs)
-                        PrismaAvatar(seed: "Karan Sharma", size: .sm)
-                        PrismaAvatar(seed: "Karan Sharma", size: .default)
-                        PrismaAvatar(seed: "Karan Sharma", size: .lg)
+                        PrismaAvatar(seed: "Maya Chen", size: .xs)
+                        PrismaAvatar(seed: "Maya Chen", size: .sm)
+                        PrismaAvatar(seed: "Maya Chen", size: .default)
+                        PrismaAvatar(seed: "Maya Chen", size: .lg)
                     }
                 }
                 StateCell("Online") { PrismaAvatar(seed: "Aanya Patel", status: .online) }
@@ -1799,7 +1799,7 @@ struct AvatarShowcase: View {
                     role: "Image / decorative",
                     minTouchTarget: "n/a (decorative); wraps interactive when used in lists",
                     bullets: [
-                        "accessibilityLabel is the seed name plus status — \"Karan Sharma, online\".",
+                        "accessibilityLabel is the seed name plus status — \"Maya Chen, online\".",
                         "Initials are derived from the seed; the status dot is not announced separately.",
                         "When used inside a clickable row, the row's onTap takes precedence; avatar becomes decorative."
                     ]
@@ -1810,7 +1810,7 @@ struct AvatarShowcase: View {
 }
 
 struct AvatarGroupShowcase: View {
-    @State private var seedsCsv: String = "Karan Sharma, Aanya Patel, Bilal Khan, Cara Liu, Dev Iyer, Eva Park"
+    @State private var seedsCsv: String = "Maya Chen, Aanya Patel, Bilal Khan, Cara Liu, Dev Iyer, Eva Park"
     @State private var maxVisible: Int = 4
     @State private var size: PrismaAvatarSize = .default
 
@@ -1827,7 +1827,7 @@ struct AvatarGroupShowcase: View {
                 EnumKnobRow(label: "Size", value: $size, values: [.xs, .sm, .default, .lg, .xl], optionLabel: { String(describing: $0) })
             },
             states: {
-                StateCell("Few") { PrismaAvatarGroup(seeds: ["Karan", "Aanya"]) }
+                StateCell("Few") { PrismaAvatarGroup(seeds: ["Maya", "Aanya"]) }
                 StateCell("Many (overflow)") { PrismaAvatarGroup(seeds: (1...8).map { "User \($0)" }, max: 4) }
             },
             code: {
@@ -1843,7 +1843,7 @@ struct AvatarGroupShowcase: View {
                     role: "Group (decorative or labelled)",
                     minTouchTarget: "n/a unless wrapped in a Button",
                     bullets: [
-                        "Provide a single accessibilityLabel summarising members — \"6 collaborators including Karan, Aanya, Bilal, and 3 others\".",
+                        "Provide a single accessibilityLabel summarising members — \"6 collaborators including Maya, Aanya, Bilal, and 3 others\".",
                         "Don't expose individual avatars — the group is one focus stop.",
                         "When clickable, wrap the entire group in a single labelled .isButton."
                     ]

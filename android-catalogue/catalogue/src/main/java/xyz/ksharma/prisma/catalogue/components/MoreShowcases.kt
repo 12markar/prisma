@@ -1584,7 +1584,7 @@ private enum class ListItemLeading { None, Avatar, Icon }
 private enum class ListItemTrailing { None, Chevron, Badge, Switch }
 
 @Composable public fun ListItemShowcase() {
-    var primary by rememberSaveable { mutableStateOf("Karan Sharma") }
+    var primary by rememberSaveable { mutableStateOf("Maya Chen") }
     var secondary by rememberSaveable { mutableStateOf("karan@example.com") }
     var leading by rememberSaveable { mutableStateOf(ListItemLeading.Avatar) }
     var trailing by rememberSaveable { mutableStateOf(ListItemTrailing.Chevron) }
@@ -1670,7 +1670,7 @@ private enum class ListItemTrailing { None, Chevron, Badge, Switch }
 }
 
 @Composable public fun AvatarShowcase() {
-    var seed by rememberSaveable { mutableStateOf("Karan Sharma") }
+    var seed by rememberSaveable { mutableStateOf("Maya Chen") }
     var size by rememberSaveable { mutableStateOf(PrismaAvatarSize.Lg) }
     var status by rememberSaveable { mutableStateOf(PrismaAvatarStatus.Online) }
 
@@ -1698,10 +1698,10 @@ private enum class ListItemTrailing { None, Chevron, Badge, Switch }
         states = {
             StateCell("Sizes") {
                 Row(horizontalArrangement = Arrangement.spacedBy(PrismaSpacing.Sp3)) {
-                    PrismaAvatar(seed = "Karan Sharma", size = PrismaAvatarSize.Xs)
-                    PrismaAvatar(seed = "Karan Sharma", size = PrismaAvatarSize.Sm)
-                    PrismaAvatar(seed = "Karan Sharma", size = PrismaAvatarSize.Default)
-                    PrismaAvatar(seed = "Karan Sharma", size = PrismaAvatarSize.Lg)
+                    PrismaAvatar(seed = "Maya Chen", size = PrismaAvatarSize.Xs)
+                    PrismaAvatar(seed = "Maya Chen", size = PrismaAvatarSize.Sm)
+                    PrismaAvatar(seed = "Maya Chen", size = PrismaAvatarSize.Default)
+                    PrismaAvatar(seed = "Maya Chen", size = PrismaAvatarSize.Lg)
                 }
             }
             StateCell("Online") { PrismaAvatar(seed = "Aanya Patel", status = PrismaAvatarStatus.Online) }
@@ -1714,7 +1714,7 @@ private enum class ListItemTrailing { None, Chevron, Badge, Switch }
                 role = "Image / decorative",
                 minTouchTarget = "n/a (decorative); wraps interactive when used in lists",
                 bullets = listOf(
-                    "contentDescription is the seed name plus status — \"Karan Sharma, online\".",
+                    "contentDescription is the seed name plus status — \"Maya Chen, online\".",
                     "Initials are derived from the seed; the status dot is not announced separately.",
                     "When used inside a clickable row, the row's onClick takes precedence; avatar becomes decorative.",
                 ),
@@ -1724,7 +1724,7 @@ private enum class ListItemTrailing { None, Chevron, Badge, Switch }
 }
 
 @Composable public fun AvatarGroupShowcase() {
-    var seedsCsv by rememberSaveable { mutableStateOf("Karan Sharma, Aanya Patel, Bilal Khan, Cara Liu, Dev Iyer, Eva Park") }
+    var seedsCsv by rememberSaveable { mutableStateOf("Maya Chen, Aanya Patel, Bilal Khan, Cara Liu, Dev Iyer, Eva Park") }
     var maxVisible by rememberSaveable { mutableStateOf(4) }
     var size by rememberSaveable { mutableStateOf(PrismaAvatarSize.Default) }
     val seeds: ImmutableList<String> = remember(seedsCsv) {
@@ -1744,7 +1744,7 @@ private enum class ListItemTrailing { None, Chevron, Badge, Switch }
                 ")"
         },
         states = {
-            StateCell("Few") { PrismaAvatarGroup(seeds = persistentListOf("Karan", "Aanya")) }
+            StateCell("Few") { PrismaAvatarGroup(seeds = persistentListOf("Maya", "Aanya")) }
             StateCell("Many (overflow)") { PrismaAvatarGroup(seeds = (1..8).map { "User $it" }.toImmutableList(), max = 4) }
         },
         a11y = {
@@ -1752,7 +1752,7 @@ private enum class ListItemTrailing { None, Chevron, Badge, Switch }
                 role = "Group (decorative or labelled)",
                 minTouchTarget = "n/a unless wrapped in a Button",
                 bullets = listOf(
-                    "Provide a single contentDescription summarising members — \"6 collaborators including Karan, Aanya, Bilal, and 3 others\".",
+                    "Provide a single contentDescription summarising members — \"6 collaborators including Maya, Aanya, Bilal, and 3 others\".",
                     "Don't expose individual avatars to a11y; the group is one focus stop.",
                     "When clickable, wrap the entire group in a single labelled Role.Button.",
                 ),
