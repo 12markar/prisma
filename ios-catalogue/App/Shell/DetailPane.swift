@@ -108,7 +108,7 @@ struct DetailPane: View {
         switch entry.key {
         case "foundation.typography", "foundation.colors", "foundation.spacing",
              "foundation.radius", "foundation.elevation", "foundation.motion",
-             "input.button":
+             "foundation.icons", "input.button":
             return true
         default:
             return false
@@ -155,6 +155,7 @@ struct DetailPane: View {
         case "foundation.radius":     RadiusShowcase()
         case "foundation.elevation":  ElevationShowcase()
         case "foundation.motion":     MotionShowcase()
+        case "foundation.icons":      IconsShowcase()
         case "input.button":          ButtonShowcase()
         default:
             Text("Phase 0 placeholder — implementation lands per-phase per docs/TODO.md.")

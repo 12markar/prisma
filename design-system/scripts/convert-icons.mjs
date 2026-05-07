@@ -164,6 +164,14 @@ import xyz.ksharma.prisma.components.R
 
 public object PrismaIcons {
 ${entries.map((e) => `    @DrawableRes public val ${e.kotlin}: Int = R.drawable.${e.drawable}`).join('\n')}
+
+    /**
+     * Every icon in the set as (name, drawableRes) pairs.
+     * Iteration order mirrors alphabetical filename order.
+     */
+    public val all: List<Pair<String, Int>> = listOf(
+${entries.map((e) => `        "${e.asset}" to ${e.kotlin}`).join(',\n')},
+    )
 }
 `;
 

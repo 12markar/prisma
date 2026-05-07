@@ -7,6 +7,7 @@ import kotlinx.collections.immutable.toImmutableList
 import xyz.ksharma.prisma.catalogue.components.ButtonShowcase
 import xyz.ksharma.prisma.catalogue.foundations.ColorShowcase
 import xyz.ksharma.prisma.catalogue.foundations.ElevationShowcase
+import xyz.ksharma.prisma.catalogue.foundations.IconsShowcase
 import xyz.ksharma.prisma.catalogue.foundations.MotionShowcase
 import xyz.ksharma.prisma.catalogue.foundations.RadiusShowcase
 import xyz.ksharma.prisma.catalogue.foundations.SpacingShowcase
@@ -43,7 +44,7 @@ public object CatalogueRegistry {
         // Foundations — bespoke showcase pages (Phase 1)
         entry("foundation.typography", "Typography", CatalogueSection.Foundations, listOf("type", "specimen"))     { TypographyShowcase() },
         entry("foundation.colors",     "Colors",     CatalogueSection.Foundations, listOf("color", "palette"))     { ColorShowcase() },
-        entry("foundation.icons",      "Icons",      CatalogueSection.Foundations, listOf("icon", "symbols")),
+        entry("foundation.icons",      "Icons",      CatalogueSection.Foundations, listOf("icon", "symbols"))    { IconsShowcase() },
         entry("foundation.spacing",    "Spacing",    CatalogueSection.Foundations, listOf("spacing", "layout"))    { SpacingShowcase() },
         entry("foundation.elevation",  "Elevation",  CatalogueSection.Foundations, listOf("shadow", "depth"))      { ElevationShowcase() },
         entry("foundation.motion",     "Motion",     CatalogueSection.Foundations, listOf("animation", "duration")) { MotionShowcase() },
