@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -130,54 +131,90 @@ public fun Sidebar(
             saver = LazyListState.Saver,
             key = "prisma.sidebar.scroll",
         ) { LazyListState() }
+        // Each section is one rounded surface-raised card, mirroring iOS's
+        // inset-grouped sidebar style — rather than the previous flat
+        // header-then-rows layout that looked unstructured next to iOS.
+        // Card edges and inter-row dividers are subtle so the eye still
+        // groups items by section quickly.
         LazyColumn(
             state = listScrollState,
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(top = PrismaSpacing.Sp3, bottom = PrismaSpacing.Sp7),
+            contentPadding = PaddingValues(
+                start = PrismaSpacing.Sp4,
+                end = PrismaSpacing.Sp4,
+                top = PrismaSpacing.Sp3,
+                bottom = PrismaSpacing.Sp7,
+            ),
         ) {
-            CatalogueRegistry.sections.forEachIndexed { index, section ->
-                val sectionEntries = if (isSearching) {
+            val visibleSections = CatalogueRegistry.sections.mapIndexed { idx, section ->
+                Triple(idx, section, if (isSearching) {
                     results.filter { it.section == section }
                 } else {
                     CatalogueRegistry.bySection(section)
-                }
-                if (sectionEntries.isEmpty()) return@forEachIndexed
+                })
+            }.filter { it.third.isNotEmpty() }
 
+            visibleSections.forEach { (index, section, sectionEntries) ->
                 val isExpanded = isSearching || section.name in expanded
-                // Sections enter ~120ms after search field, then stagger 50ms each
-                // so the eye walks down the list naturally.
                 val sectionDelayMs = 120 + index * 50
 
-                item(key = "header_${section.name}") {
+                item(key = "section_${section.name}") {
                     EntranceWrapper(visible = entered, delayMs = sectionDelayMs) {
-                        SectionHeader(
-                            title = section.title,
-                            count = sectionEntries.size,
-                            expanded = isExpanded,
-                            enabled = !isSearching,
-                            onToggle = {
-                                expanded = if (section.name in expanded) {
-                                    expanded - section.name
-                                } else {
-                                    expanded + section.name
-                                }
-                            },
-                        )
-                    }
-                }
-
-                if (isExpanded) {
-                    items(items = sectionEntries, key = { it.key }) { entry ->
-                        AnimatedVisibility(
-                            visible = true,
-                            enter = fadeIn() + expandVertically(),
-                            exit = fadeOut() + shrinkVertically(),
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = PrismaSpacing.Sp1)
+                                .clip(RoundedCornerShape(PrismaRadius.Lg))
+                                .background(PrismaSemanticColors.SurfaceRaised.themed())
+                                .border(
+                                    1.dp,
+                                    PrismaSemanticColors.BorderSubtle.themed(),
+                                    RoundedCornerShape(PrismaRadius.Lg),
+                                ),
                         ) {
-                            SidebarRow(
-                                entry = entry,
-                                selected = entry.key == selectedKey,
-                                onSelect = { onSelect(entry) },
+                            SectionHeader(
+                                title = section.title,
+                                count = sectionEntries.size,
+                                expanded = isExpanded,
+                                enabled = !isSearching,
+                                onToggle = {
+                                    expanded = if (section.name in expanded) {
+                                        expanded - section.name
+                                    } else {
+                                        expanded + section.name
+                                    }
+                                },
                             )
+                            AnimatedVisibility(
+                                visible = isExpanded,
+                                enter = fadeIn() + expandVertically(),
+                                exit = fadeOut() + shrinkVertically(),
+                            ) {
+                                Column {
+                                    androidx.compose.foundation.layout.Spacer(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(1.dp)
+                                            .background(PrismaSemanticColors.BorderSubtle.themed()),
+                                    )
+                                    sectionEntries.forEachIndexed { rowIdx, entry ->
+                                        SidebarRow(
+                                            entry = entry,
+                                            selected = entry.key == selectedKey,
+                                            onSelect = { onSelect(entry) },
+                                        )
+                                        if (rowIdx < sectionEntries.lastIndex) {
+                                            androidx.compose.foundation.layout.Spacer(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(start = PrismaSpacing.Sp4)
+                                                    .height(0.5.dp)
+                                                    .background(PrismaSemanticColors.BorderSubtle.themed()),
+                                            )
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -327,18 +364,18 @@ private fun SectionHeader(
         animationSpec = tween(durationMillis = PrismaMotion.Duration.Default),
         label = "chevron",
     )
+    // Min 56dp tap target — taller than M3 default 48dp so the section
+    // header is forgiving to thumb taps near the edge of the chevron.
     val rowModifier = if (enabled) {
-        Modifier.fillMaxWidth().clickable(onClick = onToggle)
+        Modifier
+            .fillMaxWidth()
+            .heightIn(min = 56.dp)
+            .clickable(role = androidx.compose.ui.semantics.Role.Button, onClick = onToggle)
     } else {
-        Modifier.fillMaxWidth()
+        Modifier.fillMaxWidth().heightIn(min = 56.dp)
     }
     Row(
-        modifier = rowModifier.padding(
-            start = PrismaSpacing.Sp4,
-            end = PrismaSpacing.Sp4,
-            top = PrismaSpacing.Sp5,
-            bottom = PrismaSpacing.Sp2,
-        ),
+        modifier = rowModifier.padding(horizontal = PrismaSpacing.Sp4, vertical = PrismaSpacing.Sp3),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(PrismaSpacing.Sp3),
     ) {
@@ -382,21 +419,17 @@ private fun SidebarRow(
     selected: Boolean,
     onSelect: () -> Unit,
 ) {
-    val background = if (selected) {
-        PrismaSemanticColors.AccentSubtle.themed()
-    } else {
-        PrismaSemanticColors.SurfaceSunken.themed()
-    }
-    val color = if (selected) {
-        PrismaSemanticColors.AccentDefault.themed()
-    } else {
-        PrismaSemanticColors.TextPrimary.themed()
-    }
+    // Lives inside a surface.raised section card now, so the row has no
+    // own background — selected state uses an accent.subtle tint that sits
+    // visibly on the card surface. Min 48dp tap target.
+    val background = if (selected) PrismaSemanticColors.AccentSubtle.themed()
+                     else androidx.compose.ui.graphics.Color.Transparent
+    val color = if (selected) PrismaSemanticColors.AccentDefault.themed()
+                else PrismaSemanticColors.TextPrimary.themed()
     Row(
         modifier = Modifier
-            .padding(horizontal = PrismaSpacing.Sp3, vertical = PrismaSpacing.Sp1)
             .fillMaxWidth()
-            .clip(RoundedCornerShape(PrismaRadius.Md))
+            .heightIn(min = 48.dp)
             .background(background)
             .clickable(onClick = onSelect),
         verticalAlignment = Alignment.CenterVertically,
@@ -406,7 +439,7 @@ private fun SidebarRow(
             modifier = Modifier
                 .padding(vertical = PrismaSpacing.Sp1)
                 .width(3.dp)
-                .height(16.dp)
+                .height(20.dp)
                 .background(
                     if (selected) PrismaSemanticColors.AccentDefault.themed()
                     else androidx.compose.ui.graphics.Color.Transparent,
