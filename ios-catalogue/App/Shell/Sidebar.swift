@@ -20,7 +20,14 @@ struct Sidebar: View {
     }
 
     var body: some View {
-        List(selection: $selectedKey) {
+        // Switched from List(selection:) + tag-based selection to an
+        // explicit NavigationLink(value:) per row. The previous setup
+        // intermittently "stuck" on row taps (selection updated but detail
+        // didn't push on compact widths) and the Section + Button-as-header
+        // pattern mixed gesture types in a way that interfered with hit
+        // testing. NavigationLink(value:) is the documented stable path
+        // for split-view navigation in iOS 17+.
+        List {
             ForEach(CatalogueSection.allCases) { section in
                 let entries = entriesFor(section)
                 if !entries.isEmpty {
@@ -31,17 +38,14 @@ struct Sidebar: View {
         .listStyle(.sidebar)
         .scrollContentBackground(.hidden)
         .background(PrismaSemanticColors.surfaceSunken.themed(scheme))
-        .searchable(
-            text: $query,
-            placement: .navigationBarDrawer(displayMode: .always),
-            prompt: "Search components"
-        )
+        // Default placement (no .navigationBarDrawer) — the always-visible
+        // drawer placement was contributing to the keyboard-delay on tap
+        // because the system was animating the drawer in alongside the
+        // keyboard. Default placement opens cleanly.
+        .searchable(text: $query, prompt: "Search components")
         .toolbar {
             ToolbarItem(placement: .principal) {
                 HStack(spacing: PrismaSpacing.sp3) {
-                    // Brand gradient mark — squircle filled with the official
-                    // Prisma violet→magenta prism gradient. Full SVG render
-                    // queued for asset-pipeline integration in next session.
                     RoundedRectangle(cornerRadius: 8)
                         .fill(
                             LinearGradient(
@@ -62,10 +66,6 @@ struct Sidebar: View {
                 }
             }
             ToolbarItem(placement: .topBarTrailing) {
-                // Single chrome action: theme toggle. The earlier multi-icon
-                // chrome (contrast badge + inspector + a11y grid) added noise
-                // to the daily user surface — those are engineer-targeted and
-                // can return as a debug menu later.
                 Button(action: cycleTheme) {
                     Image(systemName: themeIconName)
                 }
@@ -90,7 +90,7 @@ struct Sidebar: View {
         switch isDarkOverrideRaw {
         case "dark":  "moon.fill"
         case "light": "sun.max.fill"
-        default:      "circle.lefthalf.filled"   // follow system
+        default:      "circle.lefthalf.filled"
         }
     }
 
@@ -111,30 +111,31 @@ struct Sidebar: View {
 
     @ViewBuilder
     private func sectionView(_ section: CatalogueSection, entries: [CatalogueEntry]) -> some View {
-        // When searching, all sections are forced-expanded; otherwise honour user state.
         let isExpanded = isSearching || expandedSet.contains(section.rawValue)
 
-        // Use Section + Button-as-header so taps on the header *only* toggle
-        // expansion. Previously DisclosureGroup inside List(selection:)
-        // could fire a row-selection on label tap, mis-feeling like nav.
         Section {
             if isExpanded {
                 ForEach(entries) { entry in
-                    rowView(entry)
+                    NavigationLink(value: entry.key) {
+                        Text(entry.title)
+                            .font(PrismaTypography.bodyMd.font)
+                            .foregroundStyle(PrismaSemanticColors.textPrimary.themed(scheme))
+                    }
                 }
             }
         } header: {
-            Button(action: { if !isSearching { onToggleSection(section) } }) {
-                sectionLabel(section: section, count: entries.count, expanded: isExpanded)
-            }
-            .buttonStyle(.plain)
-            .disabled(isSearching)
+            sectionLabel(section: section, count: entries.count, expanded: isExpanded)
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    if !isSearching { onToggleSection(section) }
+                }
         }
     }
 
     /// Section header — prominent (title.md / text.primary) instead of the
     /// default subtle uppercase. Trailing count chip shows how many items
-    /// the section contains.
+    /// the section contains. Plain HStack now (was a Button before, which
+    /// fought List's gesture handling); tap is via .onTapGesture.
     @ViewBuilder
     private func sectionLabel(section: CatalogueSection, count: Int, expanded: Bool) -> some View {
         HStack(spacing: PrismaSpacing.sp3) {
@@ -157,16 +158,7 @@ struct Sidebar: View {
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(PrismaSemanticColors.textTertiary.themed(scheme))
         }
-        .contentShape(Rectangle())   // Whole row is the hit target.
+        .frame(minHeight: 44)
         .textCase(nil)
-        .padding(.vertical, 4)
-    }
-
-    @ViewBuilder
-    private func rowView(_ entry: CatalogueEntry) -> some View {
-        Text(entry.title)
-            .font(PrismaTypography.bodyMd.font)
-            .foregroundStyle(PrismaSemanticColors.textPrimary.themed(scheme))
-            .tag(entry.key)
     }
 }

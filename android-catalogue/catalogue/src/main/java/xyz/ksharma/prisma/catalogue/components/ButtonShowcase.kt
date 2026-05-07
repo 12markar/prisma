@@ -19,7 +19,6 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -76,10 +75,9 @@ public fun ButtonShowcase() {
     var leadingIcon by rememberSaveable { mutableStateOf<Int?>(null) }
     var trailingIcon by rememberSaveable { mutableStateOf<Int?>(null) }
     var tapCount by rememberSaveable { mutableStateOf(0) }
-
-    LaunchedEffect(loading) {
-        if (loading) { delay(2000); loading = false }
-    }
+    // Loading is purely driven by the knob toggle now. Previously a tap also
+    // forced loading=true for 2s, which made the button feel "always
+    // loading" — the loading state should follow the user's explicit choice.
 
     var knobsOpen by rememberSaveable { mutableStateOf(false) }
     var a11yOpen by rememberSaveable { mutableStateOf(false) }
@@ -100,10 +98,7 @@ public fun ButtonShowcase() {
                 enabled = enabled,
                 loading = loading,
                 onClick = {
-                    if (enabled && !loading) {
-                        tapCount++
-                        loading = true
-                    }
+                    if (enabled && !loading) tapCount++
                 },
                 leadingIcon = leadingIcon?.let { res ->
                     { Icon(painterResource(res), contentDescription = null) }
@@ -148,7 +143,7 @@ public fun ButtonShowcase() {
 
         // Tap counter footer — small affordance to confirm interactivity.
         Text(
-            text = "Live preview taps: $tapCount  ·  loading auto-resolves in 2s",
+            text = "Live preview taps: $tapCount",
             style = PrismaTypography.BodySm,
             color = PrismaSemanticColors.TextTertiary.themed(),
             modifier = Modifier.padding(top = PrismaSpacing.Sp2),
@@ -198,7 +193,7 @@ public fun ButtonShowcase() {
                     label = "Loading",
                     value = loading,
                     onChange = { loading = it },
-                    helper = "Auto-resolves after 2s in this preview.",
+                    helper = "Toggle on to render the spinner state.",
                 )
                 IconKnobRow(
                     label = "Leading icon",

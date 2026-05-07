@@ -51,10 +51,12 @@ struct ButtonShowcase: View {
                     },
                     accessibilityLabel: variant == .icon ? (text.isEmpty ? "Action" : text) : nil
                 ) {
+                    // Loading is purely driven by the knob toggle now —
+                    // tap only increments the tap counter. Previously a tap
+                    // also forced loading=true for 2s, which made the
+                    // button feel "always loading" on the first tap.
                     guard enabled, !loading else { return }
                     tapCount += 1
-                    loading = true
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) { loading = false }
                 }
             }
             .frame(minHeight: 240)
@@ -75,7 +77,7 @@ struct ButtonShowcase: View {
             sectionLabel("Usage")
             CodeBlock(code: snippet)
 
-            Text("Live preview taps: \(tapCount)  ·  loading auto-resolves in 2s")
+            Text("Live preview taps: \(tapCount)")
                 .font(PrismaTypography.bodySm.font)
                 .foregroundStyle(PrismaSemanticColors.textTertiary.themed(scheme))
                 .padding(.top, PrismaSpacing.sp2)
@@ -112,7 +114,7 @@ struct ButtonShowcase: View {
                     optionLabel: { String(describing: $0) }
                 )
                 BoolKnobRow(label: "Enabled", value: $enabled, helper: "Off renders the component in its disabled state.")
-                BoolKnobRow(label: "Loading", value: $loading, helper: "Auto-resolves after 2s in this preview.")
+                BoolKnobRow(label: "Loading", value: $loading, helper: "Toggle on to render the spinner state.")
                 IconKnobRow(label: "Leading icon", value: $leadingIcon, options: iconOptions)
                 IconKnobRow(label: "Trailing icon", value: $trailingIcon, options: iconOptions)
                 PrismaButton("Done") { knobsOpen = false }

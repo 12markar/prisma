@@ -33,6 +33,12 @@ struct CatalogueShell: View {
     }
 
     var body: some View {
+        // NavigationLink(value:) in the sidebar drives this navigationDestination;
+        // updating `selectedKey` in onAppear of each destination keeps the rest
+        // of the app (DetailPane queries, scroll preservation maps) in sync
+        // with what's actually showing. This pairs with the sidebar's switch
+        // away from List(selection:) to NavigationLink-based routing —
+        // resolves the "tap a row, nothing happens" stickiness on iPhone.
         NavigationSplitView {
             Sidebar(
                 selectedKey: $selectedKey,
@@ -40,10 +46,15 @@ struct CatalogueShell: View {
                 expandedSet: expandedSet,
                 onToggleSection: toggleExpanded
             )
-            // Title is rendered by Sidebar's principal toolbar item (brand mark
-            // + wordmark) — keep this empty so we don't double up.
             .navigationTitle("")
+            .navigationDestination(for: String.self) { key in
+                DetailPane(entry: CatalogueRegistry.byKey(key))
+                    .onAppear { selectedKey = key }
+            }
         } detail: {
+            // Initial detail content for tablet width before any selection
+            // — once a row is tapped the navigationDestination above takes
+            // over.
             DetailPane(entry: CatalogueRegistry.byKey(selectedKey))
         }
     }
