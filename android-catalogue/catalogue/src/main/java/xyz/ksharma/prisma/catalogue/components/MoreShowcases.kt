@@ -1585,7 +1585,7 @@ private enum class ListItemTrailing { None, Chevron, Badge, Switch }
 
 @Composable public fun ListItemShowcase() {
     var primary by rememberSaveable { mutableStateOf("Maya Chen") }
-    var secondary by rememberSaveable { mutableStateOf("karan@example.com") }
+    var secondary by rememberSaveable { mutableStateOf("maya@example.com") }
     var leading by rememberSaveable { mutableStateOf(ListItemLeading.Avatar) }
     var trailing by rememberSaveable { mutableStateOf(ListItemTrailing.Chevron) }
     var selected by rememberSaveable { mutableStateOf(false) }

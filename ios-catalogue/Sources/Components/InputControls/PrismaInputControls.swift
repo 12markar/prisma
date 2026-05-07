@@ -115,7 +115,9 @@ public struct PrismaRadio: View {
                 }
                 Spacer(minLength: 0)
             }
-            .frame(minHeight: 44, alignment: .topLeading)
+            .frame(maxWidth: .infinity, minHeight: 44, alignment: .topLeading)
+            .padding(.vertical, PrismaSpacing.sp2)
+            .contentShape(Rectangle())   // Whole row is the hit target.
         }
         .buttonStyle(.plain)
         .disabled(!enabled)

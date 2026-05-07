@@ -110,16 +110,16 @@ struct TextFieldShowcase: View {
                     PrismaTextField(text: .constant(""), label: "Email", placeholder: "you@example.com")
                 }
                 StateCell("Filled") {
-                    PrismaTextField(text: .constant("karan@example.com"), label: "Email")
+                    PrismaTextField(text: .constant("maya@example.com"), label: "Email")
                 }
                 StateCell("Error") {
                     PrismaTextField(text: .constant("j@"), label: "Email", errorText: "Enter a valid email address.")
                 }
                 StateCell("Disabled") {
-                    PrismaTextField(text: .constant("karan@example.com"), label: "Email", enabled: false)
+                    PrismaTextField(text: .constant("maya@example.com"), label: "Email", enabled: false)
                 }
                 StateCell("Read only") {
-                    PrismaTextField(text: .constant("karan@example.com"), label: "Email", readOnly: true)
+                    PrismaTextField(text: .constant("maya@example.com"), label: "Email", readOnly: true)
                 }
                 StateCell("Counter (live)") {
                     CounterExample()

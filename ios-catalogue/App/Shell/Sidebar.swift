@@ -6,8 +6,6 @@ struct Sidebar: View {
     @Binding var query: String
     let expandedSet: Set<String>
     let onToggleSection: (CatalogueSection) -> Void
-    @Binding var inspectorOpen: Bool
-    @Binding var a11yOverlayEnabled: Bool
 
     @Environment(\.colorScheme) private var scheme
 
@@ -15,9 +13,11 @@ struct Sidebar: View {
     /// "" = follow system, "light" = forced light, "dark" = forced dark.
     @AppStorage("prisma.isDarkOverride") private var isDarkOverrideRaw: String = ""
 
-    /// One-shot flag flipped on first appearance — drives the staggered
-    /// fade+slide entrance of each section header.
-    @State private var entered: Bool = false
+    /// One-shot flag flipped on first appearance. Backed by SceneStorage so
+    /// it survives detail-pane navigation pushes/pops and the entrance
+    /// animation only ever runs the first time the sidebar mounts in this
+    /// scene — re-firing on every back-nav was the "jerk" UX feedback.
+    @SceneStorage("prisma.sidebar.entered") private var entered: Bool = false
 
     private var isSearching: Bool { !query.trimmingCharacters(in: .whitespaces).isEmpty }
 
@@ -43,8 +43,10 @@ struct Sidebar: View {
         }
         .listStyle(.sidebar)
         .onAppear {
-            // Tiny delay so the first frame paints with sections invisible,
-            // then the staggered animation runs visibly.
+            // Run the entrance animation only the very first time the sidebar
+            // mounts in this scene. Skipping when `entered` is already true
+            // avoids re-firing on every detail-pane back-nav.
+            guard !entered else { return }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.02) { entered = true }
         }
         .scrollContentBackground(.hidden)
@@ -80,37 +82,14 @@ struct Sidebar: View {
                 }
             }
             ToolbarItem(placement: .topBarTrailing) {
-                HStack(spacing: PrismaSpacing.sp2) {
-                    ContrastBadge()
-                    Button(action: { a11yOverlayEnabled.toggle() }) {
-                        Image(prisma: .grid)
-                            .renderingMode(.template)
-                            .resizable()
-                            .frame(width: 16, height: 16)
-                            .foregroundStyle(
-                                a11yOverlayEnabled
-                                    ? PrismaSemanticColors.accentDefault.themed(scheme)
-                                    : PrismaSemanticColors.textSecondary.themed(scheme)
-                            )
-                    }
-                    .accessibilityLabel(a11yOverlayEnabled ? "Hide 44pt touch-target grid" : "Show 44pt touch-target grid")
-                    Button(action: { inspectorOpen.toggle() }) {
-                        Image(prisma: .layers)
-                            .renderingMode(.template)
-                            .resizable()
-                            .frame(width: 16, height: 16)
-                            .foregroundStyle(
-                                inspectorOpen
-                                    ? PrismaSemanticColors.accentDefault.themed(scheme)
-                                    : PrismaSemanticColors.textSecondary.themed(scheme)
-                            )
-                    }
-                    .accessibilityLabel(inspectorOpen ? "Close inspector" : "Open token inspector")
-                    Button(action: cycleTheme) {
-                        Image(systemName: themeIconName)
-                    }
-                    .accessibilityLabel(themeAccessibilityLabel)
+                // Single chrome action: theme toggle. The earlier multi-icon
+                // chrome (contrast badge + inspector + a11y grid) added noise
+                // to the daily user surface — those are engineer-targeted and
+                // can return as a debug menu later.
+                Button(action: cycleTheme) {
+                    Image(systemName: themeIconName)
                 }
+                .accessibilityLabel(themeAccessibilityLabel)
             }
         }
         .toolbarTitleDisplayMode(.inline)

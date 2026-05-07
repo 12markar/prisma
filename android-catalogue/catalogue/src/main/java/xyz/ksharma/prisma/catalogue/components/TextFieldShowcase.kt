@@ -166,16 +166,16 @@ public fun TextFieldShowcase() {
                 PrismaTextField(value = "", onValueChange = {}, label = "Email", placeholder = "you@example.com")
             }
             StateCell("Filled") {
-                PrismaTextField(value = "karan@example.com", onValueChange = {}, label = "Email")
+                PrismaTextField(value = "maya@example.com", onValueChange = {}, label = "Email")
             }
             StateCell("Error") {
                 PrismaTextField(value = "j@", onValueChange = {}, label = "Email", errorText = "Enter a valid email address.")
             }
             StateCell("Disabled") {
-                PrismaTextField(value = "karan@example.com", onValueChange = {}, label = "Email", enabled = false)
+                PrismaTextField(value = "maya@example.com", onValueChange = {}, label = "Email", enabled = false)
             }
             StateCell("Read only") {
-                PrismaTextField(value = "karan@example.com", onValueChange = {}, label = "Email", readOnly = true)
+                PrismaTextField(value = "maya@example.com", onValueChange = {}, label = "Email", readOnly = true)
             }
             StateCell("Filled variant") {
                 PrismaTextField(

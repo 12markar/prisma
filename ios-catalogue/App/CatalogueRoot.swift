@@ -8,18 +8,9 @@ struct CatalogueRoot: View {
     @State private var onboardingVisible: Bool = false
     /// Inspector visibility is intentionally NOT @AppStorage — it's a
     /// transient debug aid; coming back from background lands cleanly closed.
-    @State private var inspectorOpen: Bool = false
-    @State private var a11yOverlayEnabled: Bool = false
-
     var body: some View {
         ZStack {
-            A11yOverlayLayer(enabled: a11yOverlayEnabled) {
-                CatalogueShell(
-                    inspectorOpen: $inspectorOpen,
-                    a11yOverlayEnabled: $a11yOverlayEnabled
-                )
-            }
-            InspectorOverlay(open: $inspectorOpen)
+            CatalogueShell()
             OnboardingOverlay(visible: $onboardingVisible)
         }
         // Cross-fade the entire tree on theme swap so the change reads

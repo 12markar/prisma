@@ -1652,7 +1652,7 @@ private enum ListItemTrailingKind: String, CaseIterable, Hashable {
 
 struct ListItemShowcase: View {
     @State private var primary: String = "Maya Chen"
-    @State private var secondary: String = "karan@example.com"
+    @State private var secondary: String = "maya@example.com"
     @State private var leadingKind: ListItemLeadingKind = .avatar
     @State private var trailingKind: ListItemTrailingKind = .chevron
     @State private var selected: Bool = false

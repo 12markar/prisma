@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.selectable
@@ -61,21 +62,23 @@ public fun PrismaRadio(
         PrismaSemanticColors.AccentDefault.resolve(isDark)
     }
 
+    // The whole row is the touch target — clickable across the full width
+    // so a long label doesn't shrink the hit area to just the ring.
     val rowModifier = if (onClick != null) {
-        modifier.selectable(
+        modifier.fillMaxWidth().selectable(
             selected = selected,
             onClick = onClick,
             enabled = enabled,
             role = Role.RadioButton,
         )
     } else {
-        modifier
+        modifier.fillMaxWidth()
     }
 
     Row(
         modifier = rowModifier
-            .defaultMinSize(minHeight = 44.dp)
-            .padding(vertical = PrismaSpacing.Sp1),
+            .defaultMinSize(minHeight = 48.dp)
+            .padding(vertical = PrismaSpacing.Sp2, horizontal = PrismaSpacing.Sp1),
         verticalAlignment = Alignment.Top,
         horizontalArrangement = Arrangement.spacedBy(PrismaSpacing.Sp3),
     ) {

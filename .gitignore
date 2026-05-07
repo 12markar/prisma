@@ -13,6 +13,7 @@ android-catalogue/.idea/
 android-catalogue/captures/
 android-catalogue/.cxx/
 android-catalogue/app/release/
+android-catalogue/.kotlin/
 *.iml
 *.hprof
 

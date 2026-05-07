@@ -26,7 +26,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 // Theme toggle uses Material moon/sun (no equivalent in Prisma 64-icon set).
@@ -83,12 +85,15 @@ public fun Sidebar(
         mutableStateOf(CatalogueRegistry.sections.map { it.name })
     }
 
-    // Subtle staggered entrance: chrome → search → each section header fades
-    // up over ~250ms total. Only fires once per Sidebar composition (i.e. on
-    // first launch and after process death; not on each detail-pane swap
-    // because the saveable keys persist).
+    // Subtle staggered entrance — only the *very first* time the sidebar
+    // mounts in this process. The saveable flag persists across
+    // configuration changes and (critically) across detail-pane swaps in
+    // NavigableListDetailPaneScaffold, which would otherwise re-run the
+    // animation on every back nav and feel like a jerk.
     var entered by rememberSaveable(key = "prisma.sidebar.entered") { mutableStateOf(false) }
-    LaunchedEffect(Unit) { entered = true }
+    if (!entered) {
+        LaunchedEffect(Unit) { entered = true }
+    }
 
     val results by remember(query) { derivedStateOf { CatalogueRegistry.search(query) } }
     val isSearching = query.isNotBlank()
@@ -116,7 +121,13 @@ public fun Sidebar(
             )
         }
 
+        // Hoist scroll state via rememberSaveable so it survives detail-pane
+        // swaps in NavigableListDetailPaneScaffold. Without an explicit key,
+        // the default rememberLazyListState was being dropped when the list
+        // pane was recomposed after back-nav, scrolling the user back to top.
+        val listScrollState = rememberSaveable(saver = LazyListState.Saver) { LazyListState() }
         LazyColumn(
+            state = listScrollState,
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(top = PrismaSpacing.Sp3, bottom = PrismaSpacing.Sp7),
         ) {
@@ -200,8 +211,6 @@ private fun EntranceWrapper(
 @Composable
 private fun ChromeRow(modifier: Modifier = Modifier) {
     val controller = LocalThemeController.current
-    val inspector = LocalInspectorController.current
-    val a11yOverlay = LocalA11yOverlayController.current
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
@@ -235,71 +244,29 @@ private fun ChromeRow(modifier: Modifier = Modifier) {
             )
         }
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(PrismaSpacing.Sp2),
+        // Single chrome action: theme toggle. Tap cycles light/dark; long-press
+        // returns to "follow system". Stripped back from the earlier multi-icon
+        // chrome (contrast badge + inspector + a11y grid) — those were
+        // engineer-targeted and added noise to the daily user surface.
+        Box(
+            modifier = Modifier
+                .size(36.dp)
+                .clip(CircleShape)
+                .background(PrismaSemanticColors.SurfaceRaised.themed())
+                .border(1.dp, PrismaSemanticColors.BorderSubtle.themed(), CircleShape)
+                .combinedClickable(
+                    onClick = controller.toggle,
+                    onLongClick = controller.followSystem,
+                ),
+            contentAlignment = Alignment.Center,
         ) {
-            ContrastBadge()
-            Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(CircleShape)
-                    .background(
-                        if (a11yOverlay.enabled) PrismaSemanticColors.AccentSubtle.themed()
-                        else PrismaSemanticColors.SurfaceRaised.themed(),
-                    )
-                    .border(1.dp, PrismaSemanticColors.BorderSubtle.themed(), CircleShape)
-                    .clickable(role = androidx.compose.ui.semantics.Role.Button, onClick = a11yOverlay.toggle),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    painter = painterResource(PrismaIcons.Grid),
-                    contentDescription = if (a11yOverlay.enabled) "Hide 48dp touch-target grid" else "Show 48dp touch-target grid",
-                    tint = if (a11yOverlay.enabled) PrismaSemanticColors.AccentDefault.themed()
-                           else PrismaSemanticColors.TextSecondary.themed(),
-                    modifier = Modifier.size(16.dp),
-                )
-            }
-            Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(CircleShape)
-                    .background(
-                        if (inspector.isOpen) PrismaSemanticColors.AccentSubtle.themed()
-                        else PrismaSemanticColors.SurfaceRaised.themed(),
-                    )
-                    .border(1.dp, PrismaSemanticColors.BorderSubtle.themed(), CircleShape)
-                    .clickable(role = androidx.compose.ui.semantics.Role.Button, onClick = inspector.toggle),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    painter = painterResource(PrismaIcons.Layers),
-                    contentDescription = if (inspector.isOpen) "Close inspector" else "Open token inspector",
-                    tint = if (inspector.isOpen) PrismaSemanticColors.AccentDefault.themed()
-                           else PrismaSemanticColors.TextSecondary.themed(),
-                    modifier = Modifier.size(16.dp),
-                )
-            }
-            Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(CircleShape)
-                    .background(PrismaSemanticColors.SurfaceRaised.themed())
-                    .border(1.dp, PrismaSemanticColors.BorderSubtle.themed(), CircleShape)
-                    .combinedClickable(
-                        onClick = controller.toggle,
-                        onLongClick = controller.followSystem,
-                    ),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    imageVector = if (controller.isDark) Icons.Default.LightMode else Icons.Default.DarkMode,
-                    contentDescription = if (controller.isDark) "Tap: switch to light. Long-press: follow system."
-                                         else "Tap: switch to dark. Long-press: follow system.",
-                    tint = PrismaSemanticColors.TextSecondary.themed(),
-                    modifier = Modifier.size(16.dp),
-                )
-            }
+            Icon(
+                imageVector = if (controller.isDark) Icons.Default.LightMode else Icons.Default.DarkMode,
+                contentDescription = if (controller.isDark) "Tap: switch to light. Long-press: follow system."
+                                     else "Tap: switch to dark. Long-press: follow system.",
+                tint = PrismaSemanticColors.TextSecondary.themed(),
+                modifier = Modifier.size(16.dp),
+            )
         }
     }
 }
