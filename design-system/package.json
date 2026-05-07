@@ -5,6 +5,7 @@
   "description": "Token build pipeline. Source of truth lives in tokens/. Style Dictionary generates Tokens.kt (Compose) and Tokens.swift (SwiftUI) into each catalogue app's source tree.",
   "scripts": {
     "build-tokens": "node ./scripts/build.mjs",
+    "build-icons": "node ./scripts/convert-icons.mjs",
     "lint-tokens": "node ./scripts/lint.mjs",
     "check-contrast": "node ./scripts/check-contrast.mjs",
     "copy-fonts": "node ./scripts/copy-fonts.mjs",

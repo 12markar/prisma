@@ -57,6 +57,13 @@ public object CatalogueRegistry {
         entry("input.switch",            "Switch",            CatalogueSection.Inputs, listOf("input", "form", "toggle")),
         entry("input.slider",            "Slider",            CatalogueSection.Inputs, listOf("input", "range", "value")),
         entry("input.segmentedControl",  "Segmented control", CatalogueSection.Inputs, listOf("input", "selection", "tabs")),
+        entry("input.searchBar",         "Search bar",        CatalogueSection.Inputs, listOf("input", "search")),
+        entry("input.autocomplete",      "Autocomplete",      CatalogueSection.Inputs, listOf("input", "search", "combobox")),
+        entry("input.stepper",           "Stepper",           CatalogueSection.Inputs, listOf("input", "number")),
+        entry("input.tagInput",          "Tag input",         CatalogueSection.Inputs, listOf("input", "chip", "multi")),
+        entry("input.datePicker",        "Date picker",       CatalogueSection.Inputs, listOf("input", "date", "calendar")),
+        entry("input.timePicker",        "Time picker",       CatalogueSection.Inputs, listOf("input", "time", "clock")),
+        entry("input.colorPicker",       "Color picker",      CatalogueSection.Inputs, listOf("input", "color", "swatch")),
 
         // Feedback
         entry("feedback.toast",       "Toast",        CatalogueSection.Feedback, listOf("feedback", "notification")),
@@ -69,17 +76,22 @@ public object CatalogueRegistry {
         entry("feedback.skeleton",    "Skeleton",     CatalogueSection.Feedback, listOf("feedback", "placeholder", "loading")),
         entry("feedback.badge",       "Badge",        CatalogueSection.Feedback, listOf("feedback", "indicator")),
         entry("feedback.emptyState",  "Empty state",  CatalogueSection.Feedback, listOf("feedback", "empty")),
+        entry("feedback.drawer",      "Drawer",       CatalogueSection.Feedback, listOf("feedback", "side", "sheet")),
 
         // Navigation
         entry("navigation.tabs",            "Tabs",            CatalogueSection.Navigation, listOf("navigation")),
         entry("navigation.chip",            "Chip",            CatalogueSection.Navigation, listOf("selection", "filter")),
         entry("navigation.commandPalette",  "Command palette", CatalogueSection.Navigation, listOf("search", "shortcut", "overlay")),
+        entry("navigation.pagination",      "Pagination",      CatalogueSection.Navigation, listOf("pages", "navigation")),
+        entry("navigation.breadcrumb",      "Breadcrumb",      CatalogueSection.Navigation, listOf("navigation", "path")),
+        entry("navigation.wizard",          "Wizard",          CatalogueSection.Navigation, listOf("multi-step", "flow")),
 
         // Data display
-        entry("data.card",     "Card",      CatalogueSection.DataDisplay, listOf("container", "surface")),
-        entry("data.listItem", "List item", CatalogueSection.DataDisplay, listOf("row", "list")),
-        entry("data.avatar",   "Avatar",    CatalogueSection.DataDisplay, listOf("user", "image")),
-        entry("data.divider",  "Divider",   CatalogueSection.DataDisplay, listOf("separator", "rule")),
+        entry("data.card",        "Card",         CatalogueSection.DataDisplay, listOf("container", "surface")),
+        entry("data.listItem",    "List item",    CatalogueSection.DataDisplay, listOf("row", "list")),
+        entry("data.avatar",      "Avatar",       CatalogueSection.DataDisplay, listOf("user", "image")),
+        entry("data.avatarGroup", "Avatar group", CatalogueSection.DataDisplay, listOf("user", "stack")),
+        entry("data.divider",     "Divider",      CatalogueSection.DataDisplay, listOf("separator", "rule")),
     )
 
     public val sections: ImmutableList<CatalogueSection> =

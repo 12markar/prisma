@@ -38,6 +38,13 @@ public enum CatalogueRegistry {
         CatalogueEntry(key: "input.switch", title: "Switch", section: .inputs, tags: ["input", "form", "toggle"]),
         CatalogueEntry(key: "input.slider", title: "Slider", section: .inputs, tags: ["input", "range", "value"]),
         CatalogueEntry(key: "input.segmentedControl", title: "Segmented control", section: .inputs, tags: ["input", "selection", "tabs"]),
+        CatalogueEntry(key: "input.searchBar", title: "Search bar", section: .inputs, tags: ["input", "search"]),
+        CatalogueEntry(key: "input.autocomplete", title: "Autocomplete", section: .inputs, tags: ["input", "search", "combobox"]),
+        CatalogueEntry(key: "input.stepper", title: "Stepper", section: .inputs, tags: ["input", "number"]),
+        CatalogueEntry(key: "input.tagInput", title: "Tag input", section: .inputs, tags: ["input", "chip", "multi"]),
+        CatalogueEntry(key: "input.datePicker", title: "Date picker", section: .inputs, tags: ["input", "date", "calendar"]),
+        CatalogueEntry(key: "input.timePicker", title: "Time picker", section: .inputs, tags: ["input", "time", "clock"]),
+        CatalogueEntry(key: "input.colorPicker", title: "Color picker", section: .inputs, tags: ["input", "color", "swatch"]),
 
         // Feedback
         CatalogueEntry(key: "feedback.toast", title: "Toast", section: .feedback, tags: ["feedback", "notification"]),
@@ -50,16 +57,21 @@ public enum CatalogueRegistry {
         CatalogueEntry(key: "feedback.skeleton", title: "Skeleton", section: .feedback, tags: ["feedback", "placeholder", "loading"]),
         CatalogueEntry(key: "feedback.badge", title: "Badge", section: .feedback, tags: ["feedback", "indicator"]),
         CatalogueEntry(key: "feedback.emptyState", title: "Empty state", section: .feedback, tags: ["feedback", "empty"]),
+        CatalogueEntry(key: "feedback.drawer", title: "Drawer", section: .feedback, tags: ["feedback", "side", "sheet"]),
 
         // Navigation
         CatalogueEntry(key: "navigation.tabs", title: "Tabs", section: .navigation, tags: ["navigation"]),
         CatalogueEntry(key: "navigation.chip", title: "Chip", section: .navigation, tags: ["selection", "filter"]),
         CatalogueEntry(key: "navigation.commandPalette", title: "Command palette", section: .navigation, tags: ["search", "shortcut", "overlay"]),
+        CatalogueEntry(key: "navigation.pagination", title: "Pagination", section: .navigation, tags: ["pages", "navigation"]),
+        CatalogueEntry(key: "navigation.breadcrumb", title: "Breadcrumb", section: .navigation, tags: ["navigation", "path"]),
+        CatalogueEntry(key: "navigation.wizard", title: "Wizard", section: .navigation, tags: ["multi-step", "flow"]),
 
         // Data display
         CatalogueEntry(key: "data.card", title: "Card", section: .dataDisplay, tags: ["container", "surface"]),
         CatalogueEntry(key: "data.listItem", title: "List item", section: .dataDisplay, tags: ["row", "list"]),
         CatalogueEntry(key: "data.avatar", title: "Avatar", section: .dataDisplay, tags: ["user", "image"]),
+        CatalogueEntry(key: "data.avatarGroup", title: "Avatar group", section: .dataDisplay, tags: ["user", "stack"]),
         CatalogueEntry(key: "data.divider", title: "Divider", section: .dataDisplay, tags: ["separator", "rule"]),
     ]
 

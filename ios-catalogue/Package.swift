@@ -16,7 +16,10 @@ let package = Package(
         .target(
             name: "Components",
             dependencies: ["CoreUI"],
-            path: "Sources/Components"
+            path: "Sources/Components",
+            resources: [
+                .process("Resources/PrismaIcons.xcassets"),
+            ]
         ),
         .testTarget(
             name: "ComponentsTests",
