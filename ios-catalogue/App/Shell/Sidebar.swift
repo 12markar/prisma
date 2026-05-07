@@ -13,12 +13,6 @@ struct Sidebar: View {
     /// "" = follow system, "light" = forced light, "dark" = forced dark.
     @AppStorage("prisma.isDarkOverride") private var isDarkOverrideRaw: String = ""
 
-    /// One-shot flag flipped on first appearance. Backed by SceneStorage so
-    /// it survives detail-pane navigation pushes/pops and the entrance
-    /// animation only ever runs the first time the sidebar mounts in this
-    /// scene — re-firing on every back-nav was the "jerk" UX feedback.
-    @SceneStorage("prisma.sidebar.entered") private var entered: Bool = false
-
     private var isSearching: Bool { !query.trimmingCharacters(in: .whitespaces).isEmpty }
 
     private var filteredEntries: [CatalogueEntry] {
@@ -27,28 +21,14 @@ struct Sidebar: View {
 
     var body: some View {
         List(selection: $selectedKey) {
-            ForEach(Array(CatalogueSection.allCases.enumerated()), id: \.element.id) { index, section in
+            ForEach(CatalogueSection.allCases) { section in
                 let entries = entriesFor(section)
                 if !entries.isEmpty {
                     sectionView(section, entries: entries)
-                        .opacity(entered ? 1 : 0)
-                        .offset(y: entered ? 0 : 6)
-                        .animation(
-                            .easeOut(duration: 0.28)
-                                .delay(0.05 * Double(index)),
-                            value: entered
-                        )
                 }
             }
         }
         .listStyle(.sidebar)
-        .onAppear {
-            // Run the entrance animation only the very first time the sidebar
-            // mounts in this scene. Skipping when `entered` is already true
-            // avoids re-firing on every detail-pane back-nav.
-            guard !entered else { return }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.02) { entered = true }
-        }
         .scrollContentBackground(.hidden)
         .background(PrismaSemanticColors.surfaceSunken.themed(scheme))
         .searchable(

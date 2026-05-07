@@ -44,7 +44,6 @@ public fun CatalogueShell() {
     ) { LazyListState() }
     val detailScrollOffsets = remember { mutableStateMapOf<String, Int>() }
 
-    var sidebarEntered by rememberSaveable(key = "prisma.sidebar.entered") { mutableStateOf(false) }
     var sidebarQuery by rememberSaveable(key = "prisma.sidebar.query") { mutableStateOf("") }
     var sidebarExpanded by rememberSaveable(key = "prisma.sidebar.expanded") {
         mutableStateOf(CatalogueRegistry.sections.map { it.name })
@@ -61,8 +60,6 @@ public fun CatalogueShell() {
                         navigator.navigateTo(ListDetailPaneScaffoldRole.Detail)
                     },
                     listScrollState = sidebarScrollState,
-                    entered = sidebarEntered,
-                    onEnteredChange = { sidebarEntered = it },
                     query = sidebarQuery,
                     onQueryChange = { sidebarQuery = it },
                     expanded = sidebarExpanded,

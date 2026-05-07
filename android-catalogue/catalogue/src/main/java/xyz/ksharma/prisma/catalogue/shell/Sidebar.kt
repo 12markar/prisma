@@ -75,8 +75,6 @@ public fun Sidebar(
     selectedKey: String?,
     onSelect: (CatalogueEntry) -> Unit,
     listScrollState: androidx.compose.foundation.lazy.LazyListState,
-    entered: Boolean,
-    onEnteredChange: (Boolean) -> Unit,
     query: String,
     onQueryChange: (String) -> Unit,
     expanded: List<String>,
@@ -86,9 +84,10 @@ public fun Sidebar(
     // All state hoisted to CatalogueShell — Sidebar is now a pure
     // presentation layer. Pane destruction during list/detail swaps no
     // longer wipes state, because nothing here is owned by the pane.
-    if (!entered) {
-        LaunchedEffect(Unit) { onEnteredChange(true) }
-    }
+    // The previous staggered fade-up entrance was removed: the user
+    // didn't value it, and the AnimatedVisibility wrappers it required
+    // around every section were destabilising the LazyColumn's measure
+    // pass on pane re-mount, sometimes preventing scroll restoration.
 
     val results by remember(query) { derivedStateOf { CatalogueRegistry.search(query) } }
     val isSearching = query.isNotBlank()
@@ -98,23 +97,19 @@ public fun Sidebar(
             .fillMaxSize()
             .background(PrismaSemanticColors.SurfaceSunken.themed()),
     ) {
-        EntranceWrapper(visible = entered, delayMs = 0) {
-            ChromeRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = PrismaSpacing.Sp5, end = PrismaSpacing.Sp4, top = PrismaSpacing.Sp5, bottom = PrismaSpacing.Sp3),
-            )
-        }
+        ChromeRow(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = PrismaSpacing.Sp5, end = PrismaSpacing.Sp4, top = PrismaSpacing.Sp5, bottom = PrismaSpacing.Sp3),
+        )
 
-        EntranceWrapper(visible = entered, delayMs = 60) {
-            SearchField(
-                query = query,
-                onQueryChange = onQueryChange,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = PrismaSpacing.Sp4, vertical = PrismaSpacing.Sp1),
-            )
-        }
+        SearchField(
+            query = query,
+            onQueryChange = onQueryChange,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = PrismaSpacing.Sp4, vertical = PrismaSpacing.Sp1),
+        )
 
         // listScrollState is hoisted from CatalogueShell — it lives outside
         // the AnimatedPane that gets destroyed on detail-pane swaps, so the
@@ -150,8 +145,7 @@ public fun Sidebar(
                 val sectionDelayMs = 120 + index * 50
 
                 item(key = "section_${section.name}") {
-                    EntranceWrapper(visible = entered, delayMs = sectionDelayMs) {
-                        Column(
+                    Column(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(vertical = PrismaSpacing.Sp1)
@@ -206,35 +200,9 @@ public fun Sidebar(
                                 }
                             }
                         }
-                    }
                 }
             }
         }
-    }
-}
-
-/**
- * Wraps a single sidebar slot with a one-time fade + 8dp slide-up entrance
- * keyed off [visible]. The combined ~250ms duration with per-slot stagger
- * gives the sidebar a deliberate-but-quick entrance without feeling slow.
- */
-@Composable
-private fun EntranceWrapper(
-    visible: Boolean,
-    delayMs: Int,
-    content: @Composable () -> Unit,
-) {
-    AnimatedVisibility(
-        visible = visible,
-        enter = fadeIn(
-            animationSpec = tween(durationMillis = 240, delayMillis = delayMs, easing = FastOutSlowInEasing),
-        ) + slideInVertically(
-            animationSpec = tween(durationMillis = 280, delayMillis = delayMs, easing = FastOutSlowInEasing),
-            initialOffsetY = { offset -> offset / 6 },
-        ),
-        exit = fadeOut(),
-    ) {
-        content()
     }
 }
 
