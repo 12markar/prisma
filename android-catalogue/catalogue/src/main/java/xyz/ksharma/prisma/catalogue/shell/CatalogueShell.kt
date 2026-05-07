@@ -45,9 +45,6 @@ public fun CatalogueShell() {
     val detailScrollOffsets = remember { mutableStateMapOf<String, Int>() }
 
     var sidebarQuery by rememberSaveable(key = "prisma.sidebar.query") { mutableStateOf("") }
-    var sidebarExpanded by rememberSaveable(key = "prisma.sidebar.expanded") {
-        mutableStateOf(CatalogueRegistry.sections.map { it.name })
-    }
 
     NavigableListDetailPaneScaffold(
         navigator = navigator,
@@ -62,8 +59,6 @@ public fun CatalogueShell() {
                     listScrollState = sidebarScrollState,
                     query = sidebarQuery,
                     onQueryChange = { sidebarQuery = it },
-                    expanded = sidebarExpanded,
-                    onExpandedChange = { sidebarExpanded = it },
                 )
             }
         },

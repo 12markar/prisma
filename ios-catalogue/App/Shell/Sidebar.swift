@@ -4,8 +4,6 @@ import CoreUI
 struct Sidebar: View {
     @Binding var selectedKey: String?
     @Binding var query: String
-    let expandedSet: Set<String>
-    let onToggleSection: (CatalogueSection) -> Void
 
     @Environment(\.colorScheme) private var scheme
 
@@ -109,56 +107,37 @@ struct Sidebar: View {
         return CatalogueRegistry.bySection(section)
     }
 
+    /// All sections stay expanded — no toggle. The previous expand/collapse
+    /// behavior added a per-tap state flip that interfered with List's
+    /// gesture handling and contributed to the "first row tap takes time"
+    /// stickiness. Flat-rendering all rows is simpler, faster, and the
+    /// section header just labels its group.
     @ViewBuilder
     private func sectionView(_ section: CatalogueSection, entries: [CatalogueEntry]) -> some View {
-        let isExpanded = isSearching || expandedSet.contains(section.rawValue)
-
         Section {
-            if isExpanded {
-                ForEach(entries) { entry in
-                    NavigationLink(value: entry.key) {
-                        Text(entry.title)
-                            .font(PrismaTypography.bodyMd.font)
-                            .foregroundStyle(PrismaSemanticColors.textPrimary.themed(scheme))
-                    }
+            ForEach(entries) { entry in
+                NavigationLink(value: entry.key) {
+                    Text(entry.title)
+                        .font(PrismaTypography.bodyMd.font)
+                        .foregroundStyle(PrismaSemanticColors.textPrimary.themed(scheme))
                 }
             }
         } header: {
-            sectionLabel(section: section, count: entries.count, expanded: isExpanded)
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    if !isSearching { onToggleSection(section) }
-                }
+            HStack(spacing: PrismaSpacing.sp3) {
+                Text(section.rawValue)
+                    .font(PrismaTypography.titleMd.font)
+                    .foregroundStyle(PrismaSemanticColors.textPrimary.themed(scheme))
+                Spacer()
+                Text("\(entries.count)")
+                    .font(.system(size: 11, weight: .medium, design: .monospaced))
+                    .foregroundStyle(PrismaSemanticColors.textSecondary.themed(scheme))
+                    .padding(.horizontal, PrismaSpacing.sp2)
+                    .padding(.vertical, 2)
+                    .background(PrismaSemanticColors.surfaceRaised.themed(scheme))
+                    .clipShape(Capsule())
+            }
+            .frame(minHeight: 32)
+            .textCase(nil)
         }
-    }
-
-    /// Section header — prominent (title.md / text.primary) instead of the
-    /// default subtle uppercase. Trailing count chip shows how many items
-    /// the section contains. Plain HStack now (was a Button before, which
-    /// fought List's gesture handling); tap is via .onTapGesture.
-    @ViewBuilder
-    private func sectionLabel(section: CatalogueSection, count: Int, expanded: Bool) -> some View {
-        HStack(spacing: PrismaSpacing.sp3) {
-            Text(section.rawValue)
-                .font(PrismaTypography.titleMd.font)
-                .foregroundStyle(PrismaSemanticColors.textPrimary.themed(scheme))
-            Spacer()
-            Text("\(count)")
-                .font(.system(size: 11, weight: .medium, design: .monospaced))
-                .foregroundStyle(PrismaSemanticColors.textSecondary.themed(scheme))
-                .padding(.horizontal, PrismaSpacing.sp2)
-                .padding(.vertical, 2)
-                .background(
-                    expanded
-                        ? PrismaSemanticColors.surfaceSunken.themed(scheme)
-                        : PrismaSemanticColors.surfaceRaised.themed(scheme)
-                )
-                .clipShape(Capsule())
-            Image(systemName: expanded ? "chevron.down" : "chevron.right")
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(PrismaSemanticColors.textTertiary.themed(scheme))
-        }
-        .frame(minHeight: 44)
-        .textCase(nil)
     }
 }

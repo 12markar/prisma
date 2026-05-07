@@ -77,17 +77,15 @@ public fun Sidebar(
     listScrollState: androidx.compose.foundation.lazy.LazyListState,
     query: String,
     onQueryChange: (String) -> Unit,
-    expanded: List<String>,
-    onExpandedChange: (List<String>) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    // All state hoisted to CatalogueShell — Sidebar is now a pure
-    // presentation layer. Pane destruction during list/detail swaps no
-    // longer wipes state, because nothing here is owned by the pane.
-    // The previous staggered fade-up entrance was removed: the user
-    // didn't value it, and the AnimatedVisibility wrappers it required
-    // around every section were destabilising the LazyColumn's measure
-    // pass on pane re-mount, sometimes preventing scroll restoration.
+    // All state hoisted to CatalogueShell — Sidebar is pure presentation.
+    // Pane destruction during list/detail swaps no longer wipes state.
+    //
+    // All sections are always expanded — no toggle. The previous
+    // expand/collapse logic added an AnimatedVisibility around each
+    // section's row list which destabilised LazyColumn's measure pass
+    // and contributed to the "first row tap takes time to load" sluggishness.
 
     val results by remember(query) { derivedStateOf { CatalogueRegistry.search(query) } }
     val isSearching = query.isNotBlank()
@@ -140,66 +138,44 @@ public fun Sidebar(
                 })
             }.filter { it.third.isNotEmpty() }
 
-            visibleSections.forEach { (index, section, sectionEntries) ->
-                val isExpanded = isSearching || section.name in expanded
-                val sectionDelayMs = 120 + index * 50
-
+            visibleSections.forEach { (_, section, sectionEntries) ->
                 item(key = "section_${section.name}") {
                     Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = PrismaSpacing.Sp1)
+                            .clip(RoundedCornerShape(PrismaRadius.Lg))
+                            .background(PrismaSemanticColors.SurfaceRaised.themed())
+                            .border(
+                                1.dp,
+                                PrismaSemanticColors.BorderSubtle.themed(),
+                                RoundedCornerShape(PrismaRadius.Lg),
+                            ),
+                    ) {
+                        SectionHeader(title = section.title, count = sectionEntries.size)
+                        androidx.compose.foundation.layout.Spacer(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = PrismaSpacing.Sp1)
-                                .clip(RoundedCornerShape(PrismaRadius.Lg))
-                                .background(PrismaSemanticColors.SurfaceRaised.themed())
-                                .border(
-                                    1.dp,
-                                    PrismaSemanticColors.BorderSubtle.themed(),
-                                    RoundedCornerShape(PrismaRadius.Lg),
-                                ),
-                        ) {
-                            SectionHeader(
-                                title = section.title,
-                                count = sectionEntries.size,
-                                expanded = isExpanded,
-                                enabled = !isSearching,
-                                onToggle = {
-                                    onExpandedChange(
-                                        if (section.name in expanded) expanded - section.name
-                                        else expanded + section.name
-                                    )
-                                },
+                                .height(1.dp)
+                                .background(PrismaSemanticColors.BorderSubtle.themed()),
+                        )
+                        sectionEntries.forEachIndexed { rowIdx, entry ->
+                            SidebarRow(
+                                entry = entry,
+                                selected = entry.key == selectedKey,
+                                onSelect = { onSelect(entry) },
                             )
-                            AnimatedVisibility(
-                                visible = isExpanded,
-                                enter = fadeIn() + expandVertically(),
-                                exit = fadeOut() + shrinkVertically(),
-                            ) {
-                                Column {
-                                    androidx.compose.foundation.layout.Spacer(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(1.dp)
-                                            .background(PrismaSemanticColors.BorderSubtle.themed()),
-                                    )
-                                    sectionEntries.forEachIndexed { rowIdx, entry ->
-                                        SidebarRow(
-                                            entry = entry,
-                                            selected = entry.key == selectedKey,
-                                            onSelect = { onSelect(entry) },
-                                        )
-                                        if (rowIdx < sectionEntries.lastIndex) {
-                                            androidx.compose.foundation.layout.Spacer(
-                                                modifier = Modifier
-                                                    .fillMaxWidth()
-                                                    .padding(start = PrismaSpacing.Sp4)
-                                                    .height(0.5.dp)
-                                                    .background(PrismaSemanticColors.BorderSubtle.themed()),
-                                            )
-                                        }
-                                    }
-                                }
+                            if (rowIdx < sectionEntries.lastIndex) {
+                                androidx.compose.foundation.layout.Spacer(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(start = PrismaSpacing.Sp4)
+                                        .height(0.5.dp)
+                                        .background(PrismaSemanticColors.BorderSubtle.themed()),
+                                )
                             }
                         }
+                    }
                 }
             }
         }
@@ -309,31 +285,15 @@ private fun SearchField(
 }
 
 @Composable
-private fun SectionHeader(
-    title: String,
-    count: Int,
-    expanded: Boolean,
-    enabled: Boolean,
-    onToggle: () -> Unit,
-) {
-    // Chevron rotates 90° on toggle — single icon, animated.
-    val rotation by animateFloatAsState(
-        targetValue = if (expanded) 90f else 0f,
-        animationSpec = tween(durationMillis = PrismaMotion.Duration.Default),
-        label = "chevron",
-    )
-    // Min 56dp tap target — taller than M3 default 48dp so the section
-    // header is forgiving to thumb taps near the edge of the chevron.
-    val rowModifier = if (enabled) {
-        Modifier
-            .fillMaxWidth()
-            .heightIn(min = 56.dp)
-            .clickable(role = androidx.compose.ui.semantics.Role.Button, onClick = onToggle)
-    } else {
-        Modifier.fillMaxWidth().heightIn(min = 56.dp)
-    }
+private fun SectionHeader(title: String, count: Int) {
+    // Plain (non-clickable) section label — no toggle, no chevron, no
+    // animated rotation. The previous expand/collapse on tap was
+    // contributing to first-tap sluggishness via gesture conflict with
+    // the row clickable below.
     Row(
-        modifier = rowModifier.padding(horizontal = PrismaSpacing.Sp4, vertical = PrismaSpacing.Sp3),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = PrismaSpacing.Sp4, vertical = PrismaSpacing.Sp3),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(PrismaSpacing.Sp3),
     ) {
@@ -343,15 +303,10 @@ private fun SectionHeader(
             color = PrismaSemanticColors.TextPrimary.themed(),
             modifier = Modifier.weight(1f),
         )
-        // Count chip — uses surface.raised on collapsed sections so it stands out
-        // as the user's "what's hiding here" cue; subtler when expanded.
         Box(
             modifier = Modifier
                 .clip(RoundedCornerShape(PrismaRadius.Full))
-                .background(
-                    if (expanded) PrismaSemanticColors.SurfaceSunken.themed()
-                    else PrismaSemanticColors.SurfaceRaised.themed(),
-                )
+                .background(PrismaSemanticColors.SurfaceSunken.themed())
                 .padding(horizontal = PrismaSpacing.Sp2, vertical = 2.dp),
         ) {
             Text(
@@ -360,14 +315,6 @@ private fun SectionHeader(
                 color = PrismaSemanticColors.TextSecondary.themed(),
             )
         }
-        Icon(
-            painter = painterResource(PrismaIcons.ChevronRight),
-            contentDescription = null,
-            tint = PrismaSemanticColors.TextTertiary.themed(),
-            modifier = Modifier
-                .size(18.dp)
-                .graphicsLayer { rotationZ = rotation },
-        )
     }
 }
 

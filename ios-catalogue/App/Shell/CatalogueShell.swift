@@ -14,52 +14,22 @@ struct CatalogueShell: View {
     /// Sidebar search query — preserved across scene termination.
     @SceneStorage("catalogue.query") private var query: String = ""
 
-    /// Expanded sidebar sections, comma-separated. Default: "Foundations".
-    /// (Comma-separated keeps it `String` for `@SceneStorage` compatibility.)
-    @SceneStorage("catalogue.expanded") private var expandedRaw: String = "Foundations"
-
-    private var expandedSet: Set<String> {
-        Set(expandedRaw.split(separator: ",").map(String.init).filter { !$0.isEmpty })
-    }
-
-    private func toggleExpanded(_ section: CatalogueSection) {
-        var set = expandedSet
-        if set.contains(section.rawValue) {
-            set.remove(section.rawValue)
-        } else {
-            set.insert(section.rawValue)
-        }
-        expandedRaw = set.sorted().joined(separator: ",")
-    }
-
     var body: some View {
-        // NavigationLink(value:) in the sidebar drives this navigationDestination;
-        // updating `selectedKey` in onAppear of each destination keeps the rest
-        // of the app (DetailPane queries, scroll preservation maps) in sync
-        // with what's actually showing. This pairs with the sidebar's switch
-        // away from List(selection:) to NavigationLink-based routing —
-        // resolves the "tap a row, nothing happens" stickiness on iPhone.
+        // NavigationLink(value:) in the sidebar drives this
+        // navigationDestination; updating `selectedKey` in onAppear of
+        // each destination keeps the rest of the app (DetailPane queries,
+        // scroll preservation maps) in sync with what's actually showing.
         NavigationSplitView {
-            Sidebar(
-                selectedKey: $selectedKey,
-                query: $query,
-                expandedSet: expandedSet,
-                onToggleSection: toggleExpanded
-            )
-            .navigationTitle("")
-            .navigationDestination(for: String.self) { key in
-                DetailPane(entry: CatalogueRegistry.byKey(key))
-                    .onAppear { selectedKey = key }
-            }
+            Sidebar(selectedKey: $selectedKey, query: $query)
+                .navigationTitle("")
+                .navigationDestination(for: String.self) { key in
+                    DetailPane(entry: CatalogueRegistry.byKey(key))
+                        .onAppear { selectedKey = key }
+                }
         } detail: {
-            // Initial detail content for tablet width before any selection
-            // — once a row is tapped the navigationDestination above takes
-            // over.
             DetailPane(entry: CatalogueRegistry.byKey(selectedKey))
         }
     }
 }
 
-#Preview {
-    CatalogueShell()
-}
+#Preview { CatalogueShell() }
