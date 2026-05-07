@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "root": {
+    "type": "column",
+    "padding": 32,
+    "spacing": 20,
+    "alignment": "center",
+    "children": [
+      { "type": "spacer", "size": 24 },
+      {
+        "type": "image",
+        "url": "https://images.unsplash.com/photo-1635776062764-e025521e3df3?auto=format&fit=crop&w=900&q=80",
+        "height": 240,
+        "width": 240,
+        "cornerRadius": 32,
+        "contentMode": "cover",
+        "alt": "Welcome illustration"
+      },
+      { "type": "spacer", "size": 8 },
+      { "type": "text", "value": "Welcome to Prisma", "variant": "displayMd", "color": "primary", "align": "center" },
+      {
+        "type": "text",
+        "value": "A native design system for iOS and Android. Tokens flow from a single source of truth — change once, update everywhere.",
+        "variant": "bodyLg",
+        "color": "secondary",
+        "align": "center"
+      },
+      { "type": "spacer", "size": 16 },
+      {
+        "type": "row",
+        "spacing": 8,
+        "alignment": "center",
+        "children": [
+          { "type": "badge", "label": "1. PROFILE",  "tone": "accent" },
+          { "type": "badge", "label": "2. PREFERENCES", "tone": "neutral" },
+          { "type": "badge", "label": "3. DONE", "tone": "neutral" }
+        ]
+      },
+      { "type": "spacer", "size": 24 },
+      {
+        "type": "button",
+        "label": "Get started",
+        "variant": "primary",
+        "size": "lg",
+        "fullWidth": true,
+        "action": { "kind": "log", "id": "onboarding.start" }
+      },
+      {
+        "type": "button",
+        "label": "I already have an account",
+        "variant": "outlined",
+        "size": "md",
+        "fullWidth": true,
+        "action": { "kind": "log", "id": "onboarding.signin" }
+      },
+      { "type": "spacer", "size": 8 },
+      {
+        "type": "button",
+        "label": "Skip for now",
+        "variant": "ghost",
+        "size": "md",
+        "action": { "kind": "log", "id": "onboarding.skip" }
+      }
+    ]
+  }
+}

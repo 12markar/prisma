@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "root": {
+    "type": "column",
+    "padding": 20,
+    "spacing": 16,
+    "children": [
+      { "type": "spacer", "size": 8 },
+      {
+        "type": "column",
+        "alignment": "center",
+        "spacing": 8,
+        "children": [
+          {
+            "type": "image",
+            "url": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80",
+            "height": 96,
+            "width": 96,
+            "cornerRadius": 48,
+            "contentMode": "cover",
+            "alt": "Avatar"
+          },
+          { "type": "text", "value": "Karan Sharma", "variant": "headlineSm", "color": "primary", "align": "center" },
+          { "type": "text", "value": "karansyd4@gmail.com", "variant": "bodyMd", "color": "secondary", "align": "center" },
+          { "type": "row", "spacing": 8, "alignment": "center", "children": [
+            { "type": "badge", "label": "PRO",      "tone": "accent" },
+            { "type": "badge", "label": "VERIFIED", "tone": "success" }
+          ]}
+        ]
+      },
+
+      { "type": "spacer", "size": 8 },
+      { "type": "text", "value": "Account", "variant": "labelLg", "color": "tertiary" },
+      {
+        "type": "card",
+        "padding": 4,
+        "spacing": 0,
+        "children": [
+          { "type": "listItem", "title": "Edit profile",      "subtitle": "Name, photo, handle",        "showChevron": true, "action": { "kind": "log", "id": "settings.profile" } },
+          { "type": "divider" },
+          { "type": "listItem", "title": "Subscription",      "subtitle": "Prisma Pro · renews May 22", "trailingText": "Manage", "showChevron": true, "action": { "kind": "log", "id": "settings.subscription" } },
+          { "type": "divider" },
+          { "type": "listItem", "title": "Connected apps",    "subtitle": "Figma, GitHub",              "showChevron": true, "action": { "kind": "log", "id": "settings.connected" } }
+        ]
+      },
+
+      { "type": "text", "value": "Preferences", "variant": "labelLg", "color": "tertiary" },
+      {
+        "type": "card",
+        "padding": 4,
+        "spacing": 0,
+        "children": [
+          { "type": "listItem", "title": "Notifications",     "subtitle": "Push, email, in-app",  "trailingText": "All",     "showChevron": true, "action": { "kind": "log", "id": "settings.notifications" } },
+          { "type": "divider" },
+          { "type": "listItem", "title": "Appearance",        "subtitle": "Light, dark, system",   "trailingText": "System",  "showChevron": true, "action": { "kind": "log", "id": "settings.appearance" } },
+          { "type": "divider" },
+          { "type": "listItem", "title": "Language",          "subtitle": "Display + content",     "trailingText": "English", "showChevron": true, "action": { "kind": "log", "id": "settings.language" } }
+        ]
+      },
+
+      { "type": "text", "value": "Support", "variant": "labelLg", "color": "tertiary" },
+      {
+        "type": "card",
+        "padding": 4,
+        "spacing": 0,
+        "children": [
+          { "type": "listItem", "title": "Help center",  "subtitle": "Docs, guides, FAQs", "showChevron": true, "action": { "kind": "openUrl", "url": "https://ksharma-xyz.github.io/prisma/" } },
+          { "type": "divider" },
+          { "type": "listItem", "title": "Contact us",   "subtitle": "Reach out to the team", "showChevron": true, "action": { "kind": "log", "id": "settings.contact" } },
+          { "type": "divider" },
+          { "type": "listItem", "title": "Privacy",      "subtitle": "Data, exports, deletion", "showChevron": true, "action": { "kind": "log", "id": "settings.privacy" } }
+        ]
+      },
+
+      { "type": "spacer", "size": 16 },
+      {
+        "type": "button",
+        "label": "Sign out",
+        "variant": "destructive",
+        "size": "md",
+        "fullWidth": true,
+        "action": { "kind": "log", "id": "settings.signout" }
+      },
+      { "type": "text", "value": "v1.0.0 · Build 482", "variant": "labelSm", "color": "tertiary", "align": "center" }
+    ]
+  }
+}

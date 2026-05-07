@@ -1,0 +1,97 @@
+{
+  "version": 1,
+  "root": {
+    "type": "column",
+    "padding": 24,
+    "spacing": 16,
+    "children": [
+      {
+        "type": "card",
+        "padding": 0,
+        "spacing": 0,
+        "children": [
+          {
+            "type": "image",
+            "url": "https://images.unsplash.com/photo-1554034483-04fda0d3507b?auto=format&fit=crop&w=1200&q=80",
+            "height": 220,
+            "cornerRadius": 0,
+            "contentMode": "cover",
+            "alt": "Promo banner"
+          },
+          {
+            "type": "column",
+            "padding": 20,
+            "spacing": 12,
+            "children": [
+              { "type": "row", "spacing": 8, "alignment": "start", "children": [
+                { "type": "badge", "label": "LIMITED TIME", "tone": "warning" },
+                { "type": "badge", "label": "ENDS SUNDAY",  "tone": "danger" }
+              ]},
+              { "type": "text", "value": "Save 30% on Prisma Pro", "variant": "headlineLg", "color": "primary" },
+              { "type": "text", "value": "Upgrade in May and lock in our biggest discount of the year. Full component library, unlimited projects, priority support.", "variant": "bodyMd", "color": "secondary" },
+
+              {
+                "type": "row",
+                "spacing": 16,
+                "alignment": "start",
+                "children": [
+                  {
+                    "type": "column",
+                    "spacing": 0,
+                    "children": [
+                      { "type": "text", "value": "$69.99",     "variant": "headlineMd", "color": "accent" },
+                      { "type": "text", "value": "first year", "variant": "labelSm",   "color": "tertiary" }
+                    ]
+                  },
+                  {
+                    "type": "column",
+                    "spacing": 0,
+                    "children": [
+                      { "type": "text", "value": "$99.99 →",  "variant": "titleMd", "color": "tertiary" },
+                      { "type": "text", "value": "regular",   "variant": "labelSm", "color": "tertiary" }
+                    ]
+                  }
+                ]
+              },
+
+              { "type": "spacer", "size": 4 },
+              {
+                "type": "button",
+                "label": "Claim 30% off",
+                "variant": "primary",
+                "size": "lg",
+                "fullWidth": true,
+                "action": { "kind": "log", "id": "promo.claim" }
+              },
+              {
+                "type": "button",
+                "label": "Maybe later",
+                "variant": "ghost",
+                "size": "md",
+                "fullWidth": true,
+                "action": { "kind": "log", "id": "promo.dismiss" }
+              }
+            ]
+          }
+        ]
+      },
+
+      { "type": "spacer", "size": 8 },
+      { "type": "text", "value": "Trusted by teams at", "variant": "labelMd", "color": "tertiary", "align": "center" },
+      {
+        "type": "row",
+        "spacing": 24,
+        "alignment": "center",
+        "children": [
+          { "type": "text", "value": "Acme",    "variant": "titleMd", "color": "secondary" },
+          { "type": "text", "value": "Globex",  "variant": "titleMd", "color": "secondary" },
+          { "type": "text", "value": "Initech", "variant": "titleMd", "color": "secondary" },
+          { "type": "text", "value": "Hooli",   "variant": "titleMd", "color": "secondary" }
+        ]
+      },
+
+      { "type": "divider" },
+      { "type": "text", "value": "* Discount applies to the first year of an annual Pro subscription. Renews at $99.99 / year unless cancelled.", "variant": "labelSm", "color": "tertiary", "align": "center" }
+    ]
+  }
+}

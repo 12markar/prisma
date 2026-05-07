@@ -6,6 +6,7 @@ public enum CatalogueSection: String, CaseIterable, Identifiable, Hashable {
     case feedback = "Feedback"
     case navigation = "Navigation"
     case dataDisplay = "Data display"
+    case serverDriven = "Server-driven"
 
     public var id: String { rawValue }
 }
@@ -73,6 +74,9 @@ public enum CatalogueRegistry {
         CatalogueEntry(key: "data.avatar", title: "Avatar", section: .dataDisplay, tags: ["user", "image"]),
         CatalogueEntry(key: "data.avatarGroup", title: "Avatar group", section: .dataDisplay, tags: ["user", "stack"]),
         CatalogueEntry(key: "data.divider", title: "Divider", section: .dataDisplay, tags: ["separator", "rule"]),
+
+        // Server-driven UI live demo — connects to ws://localhost:7331/ws
+        CatalogueEntry(key: "sdui.live", title: "SDUI live demo", section: .serverDriven, tags: ["server", "json", "live", "websocket"]),
     ]
 
     public static func bySection(_ section: CatalogueSection) -> [CatalogueEntry] {

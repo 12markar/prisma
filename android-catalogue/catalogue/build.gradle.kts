@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.detekt)
 }
@@ -65,6 +66,11 @@ dependencies {
     // Catalogue browser auto-generation
     implementation(libs.showkase)
     ksp(libs.showkase.processor)
+
+    // Server-driven UI demo — JSON wire format, WebSocket transport, remote images
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.okhttp)
+    implementation(libs.coil.compose)
 
     debugImplementation(libs.compose.ui.tooling)
     // LeakCanary — debug-only memory leak detector. Ships nothing in release.

@@ -1,0 +1,108 @@
+{
+  "version": 1,
+  "root": {
+    "type": "column",
+    "padding": 24,
+    "spacing": 16,
+    "children": [
+      {
+        "type": "image",
+        "url": "https://images.unsplash.com/photo-1604881991720-f91add269bed?auto=format&fit=crop&w=1200&q=80",
+        "height": 200,
+        "cornerRadius": 16,
+        "contentMode": "cover",
+        "alt": "Abstract gradient illustration"
+      },
+      { "type": "spacer", "size": 4 },
+      { "type": "badge", "label": "PRISMA PRO", "tone": "accent" },
+      { "type": "text", "value": "Design without limits", "variant": "displaySm", "color": "primary" },
+      {
+        "type": "text",
+        "value": "Unlock the full Prisma component library, premium illustrations, and priority support.",
+        "variant": "bodyLg",
+        "color": "secondary"
+      },
+      { "type": "spacer", "size": 8 },
+
+      {
+        "type": "card",
+        "padding": 16,
+        "spacing": 12,
+        "children": [
+          { "type": "text", "value": "What you get", "variant": "titleMd", "color": "primary" },
+          { "type": "listItem", "title": "All 41 components", "subtitle": "Buttons, modals, tabs, pickers — everything", "showChevron": false },
+          { "type": "listItem", "title": "Unlimited projects", "subtitle": "Use Prisma in every app you ship", "showChevron": false },
+          { "type": "listItem", "title": "Priority support",   "subtitle": "Slack channel + 24h response", "showChevron": false }
+        ]
+      },
+
+      { "type": "spacer", "size": 8 },
+      {
+        "type": "tabs",
+        "selectedIndex": 1,
+        "items": [
+          {
+            "label": "Monthly",
+            "content": {
+              "type": "column",
+              "spacing": 8,
+              "children": [
+                { "type": "text", "value": "$9.99 / month", "variant": "titleLg", "color": "primary", "align": "center" },
+                { "type": "text", "value": "Billed monthly. Cancel anytime.", "variant": "bodySm", "color": "tertiary", "align": "center" }
+              ]
+            }
+          },
+          {
+            "label": "Annual",
+            "content": {
+              "type": "column",
+              "spacing": 8,
+              "children": [
+                { "type": "text", "value": "$79.99 / year", "variant": "titleLg", "color": "primary", "align": "center" },
+                { "type": "text", "value": "Save 33% — equivalent to $6.66 / month", "variant": "bodySm", "color": "accent", "align": "center" }
+              ]
+            }
+          },
+          {
+            "label": "Lifetime",
+            "content": {
+              "type": "column",
+              "spacing": 8,
+              "children": [
+                { "type": "text", "value": "$199 once", "variant": "titleLg", "color": "primary", "align": "center" },
+                { "type": "text", "value": "One payment. Forever access.", "variant": "bodySm", "color": "tertiary", "align": "center" }
+              ]
+            }
+          }
+        ]
+      },
+
+      { "type": "spacer", "size": 4 },
+      {
+        "type": "button",
+        "label": "Continue",
+        "variant": "primary",
+        "size": "lg",
+        "fullWidth": true,
+        "action": { "kind": "log", "id": "paywall.continue" }
+      },
+      {
+        "type": "button",
+        "label": "Restore purchases",
+        "variant": "ghost",
+        "size": "md",
+        "fullWidth": true,
+        "action": { "kind": "log", "id": "paywall.restore" }
+      },
+
+      { "type": "spacer", "size": 4 },
+      {
+        "type": "text",
+        "value": "By continuing you agree to the Terms of Service and Privacy Policy. Subscription auto-renews until cancelled.",
+        "variant": "bodySm",
+        "color": "tertiary",
+        "align": "center"
+      }
+    ]
+  }
+}

@@ -191,6 +191,8 @@ struct DetailPane: View {
         case "data.avatar":      AvatarShowcase()
         case "data.avatarGroup": AvatarGroupShowcase()
         case "data.divider":     DividerShowcase()
+        // Server-driven
+        case "sdui.live":        SDUIScreen()
         default:
             Text("Phase 0 placeholder — implementation lands per-phase per docs/TODO.md.")
                 .font(PrismaTypography.bodyMd.font)

@@ -1,0 +1,125 @@
+{
+  "version": 1,
+  "root": {
+    "type": "column",
+    "padding": 20,
+    "spacing": 16,
+    "children": [
+      { "type": "text", "value": "For You", "variant": "displaySm", "color": "primary" },
+      { "type": "text", "value": "Wednesday, May 7 · 6 stories", "variant": "labelMd", "color": "tertiary" },
+      { "type": "spacer", "size": 4 },
+
+      {
+        "type": "tabs",
+        "selectedIndex": 0,
+        "items": [
+          { "label": "Top",     "content": { "type": "spacer", "size": 0 } },
+          { "label": "Design",  "content": { "type": "spacer", "size": 0 } },
+          { "label": "Code",    "content": { "type": "spacer", "size": 0 } },
+          { "label": "Saved",   "content": { "type": "spacer", "size": 0 } }
+        ]
+      },
+
+      {
+        "type": "card",
+        "padding": 0,
+        "spacing": 0,
+        "children": [
+          {
+            "type": "image",
+            "url": "https://images.unsplash.com/photo-1517842645767-c639042777db?auto=format&fit=crop&w=1200&q=80",
+            "height": 180,
+            "cornerRadius": 0,
+            "contentMode": "cover",
+            "alt": "Workstation"
+          },
+          {
+            "type": "column",
+            "padding": 16,
+            "spacing": 8,
+            "children": [
+              { "type": "badge", "label": "DESIGN", "tone": "accent" },
+              { "type": "text", "value": "Why design tokens beat hardcoded values", "variant": "titleLg", "color": "primary" },
+              { "type": "text", "value": "Tokens act as a contract between design and code. They turn 'change the brand colour' from a week-long migration into a one-line edit.", "variant": "bodyMd", "color": "secondary" },
+              { "type": "row", "spacing": 12, "alignment": "start", "children": [
+                { "type": "text", "value": "8 min read", "variant": "labelSm", "color": "tertiary" },
+                { "type": "text", "value": "·", "variant": "labelSm", "color": "tertiary" },
+                { "type": "text", "value": "Karan Sharma", "variant": "labelSm", "color": "tertiary" }
+              ]},
+              { "type": "button", "label": "Read article", "variant": "secondary", "size": "sm", "action": { "kind": "log", "id": "feed.read.tokens" } }
+            ]
+          }
+        ]
+      },
+
+      {
+        "type": "card",
+        "padding": 0,
+        "spacing": 0,
+        "children": [
+          {
+            "type": "image",
+            "url": "https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=1200&q=80",
+            "height": 180,
+            "cornerRadius": 0,
+            "contentMode": "cover",
+            "alt": "Code on screen"
+          },
+          {
+            "type": "column",
+            "padding": 16,
+            "spacing": 8,
+            "children": [
+              { "type": "badge", "label": "ENGINEERING", "tone": "success" },
+              { "type": "text", "value": "Server-driven UI without breaking native craft", "variant": "titleLg", "color": "primary" },
+              { "type": "text", "value": "Render JSON to native components — get hot reload + remote control without sacrificing motion, haptics, and platform feel.", "variant": "bodyMd", "color": "secondary" },
+              { "type": "row", "spacing": 12, "alignment": "start", "children": [
+                { "type": "text", "value": "12 min read", "variant": "labelSm", "color": "tertiary" },
+                { "type": "text", "value": "·", "variant": "labelSm", "color": "tertiary" },
+                { "type": "text", "value": "Karan Sharma", "variant": "labelSm", "color": "tertiary" }
+              ]},
+              { "type": "button", "label": "Read article", "variant": "secondary", "size": "sm", "action": { "kind": "log", "id": "feed.read.sdui" } }
+            ]
+          }
+        ]
+      },
+
+      {
+        "type": "card",
+        "padding": 0,
+        "spacing": 0,
+        "children": [
+          {
+            "type": "image",
+            "url": "https://images.unsplash.com/photo-1493612276216-ee3925520721?auto=format&fit=crop&w=1200&q=80",
+            "height": 180,
+            "cornerRadius": 0,
+            "contentMode": "cover",
+            "alt": "Notebook"
+          },
+          {
+            "type": "column",
+            "padding": 16,
+            "spacing": 8,
+            "children": [
+              { "type": "badge", "label": "PROCESS", "tone": "warning" },
+              { "type": "text", "value": "Specs first, code second", "variant": "titleLg", "color": "primary" },
+              { "type": "text", "value": "How writing the contract before the implementation cuts review cycles in half.", "variant": "bodyMd", "color": "secondary" },
+              { "type": "button", "label": "Read article", "variant": "secondary", "size": "sm", "action": { "kind": "log", "id": "feed.read.specs" } }
+            ]
+          }
+        ]
+      },
+
+      { "type": "divider" },
+      {
+        "type": "button",
+        "label": "Load more",
+        "variant": "ghost",
+        "size": "md",
+        "fullWidth": true,
+        "action": { "kind": "log", "id": "feed.loadMore" }
+      }
+    ]
+  }
+}

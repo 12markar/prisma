@@ -1,0 +1,217 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Prisma SDUI Document",
+  "description": "Server-driven UI document broadcast to Prisma catalogue apps. Top-level wrapper carries a version (for future migrations) and a single root node. Renderers walk the tree depth-first.",
+  "type": "object",
+  "required": ["version", "root"],
+  "additionalProperties": false,
+  "properties": {
+    "version": { "const": 1 },
+    "root": { "$ref": "#/$defs/node" }
+  },
+
+  "$defs": {
+    "node": {
+      "oneOf": [
+        { "$ref": "#/$defs/column" },
+        { "$ref": "#/$defs/row" },
+        { "$ref": "#/$defs/text" },
+        { "$ref": "#/$defs/image" },
+        { "$ref": "#/$defs/button" },
+        { "$ref": "#/$defs/card" },
+        { "$ref": "#/$defs/tabs" },
+        { "$ref": "#/$defs/divider" },
+        { "$ref": "#/$defs/spacer" },
+        { "$ref": "#/$defs/badge" },
+        { "$ref": "#/$defs/listItem" }
+      ]
+    },
+
+    "column": {
+      "type": "object",
+      "required": ["type", "children"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "column" },
+        "spacing": { "type": "number", "minimum": 0, "maximum": 64 },
+        "padding": { "type": "number", "minimum": 0, "maximum": 64 },
+        "alignment": { "enum": ["start", "center", "end"] },
+        "children": { "type": "array", "items": { "$ref": "#/$defs/node" } }
+      }
+    },
+
+    "row": {
+      "type": "object",
+      "required": ["type", "children"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "row" },
+        "spacing": { "type": "number", "minimum": 0, "maximum": 64 },
+        "alignment": { "enum": ["start", "center", "end"] },
+        "children": { "type": "array", "items": { "$ref": "#/$defs/node" } }
+      }
+    },
+
+    "text": {
+      "type": "object",
+      "required": ["type", "value"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "text" },
+        "value": { "type": "string" },
+        "variant": {
+          "enum": [
+            "displayLg", "displayMd", "displaySm",
+            "headlineLg", "headlineMd", "headlineSm",
+            "titleLg", "titleMd", "titleSm",
+            "bodyLg", "bodyMd", "bodySm",
+            "labelLg", "labelMd", "labelSm"
+          ]
+        },
+        "color": { "enum": ["primary", "secondary", "tertiary", "accent", "danger"] },
+        "align": { "enum": ["start", "center", "end"] }
+      }
+    },
+
+    "image": {
+      "type": "object",
+      "required": ["type", "url"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "image" },
+        "url": { "type": "string", "format": "uri" },
+        "width": { "type": "number", "minimum": 1, "maximum": 4096 },
+        "height": { "type": "number", "minimum": 1, "maximum": 4096 },
+        "cornerRadius": { "type": "number", "minimum": 0, "maximum": 256 },
+        "contentMode": { "enum": ["fit", "fill", "cover"] },
+        "alt": { "type": "string" }
+      }
+    },
+
+    "button": {
+      "type": "object",
+      "required": ["type", "label"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "button" },
+        "label": { "type": "string" },
+        "variant": { "enum": ["primary", "secondary", "outlined", "ghost", "destructive"] },
+        "size": { "enum": ["sm", "md", "lg"] },
+        "fullWidth": { "type": "boolean" },
+        "disabled": { "type": "boolean" },
+        "action": { "$ref": "#/$defs/action" }
+      }
+    },
+
+    "card": {
+      "type": "object",
+      "required": ["type", "children"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "card" },
+        "padding": { "type": "number", "minimum": 0, "maximum": 64 },
+        "spacing": { "type": "number", "minimum": 0, "maximum": 64 },
+        "children": { "type": "array", "items": { "$ref": "#/$defs/node" } }
+      }
+    },
+
+    "tabs": {
+      "type": "object",
+      "required": ["type", "items"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "tabs" },
+        "selectedIndex": { "type": "integer", "minimum": 0 },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["label", "content"],
+            "additionalProperties": false,
+            "properties": {
+              "label": { "type": "string" },
+              "content": { "$ref": "#/$defs/node" }
+            }
+          }
+        }
+      }
+    },
+
+    "divider": {
+      "type": "object",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "divider" }
+      }
+    },
+
+    "spacer": {
+      "type": "object",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "spacer" },
+        "size": { "type": "number", "minimum": 0, "maximum": 256 }
+      }
+    },
+
+    "badge": {
+      "type": "object",
+      "required": ["type", "label"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "badge" },
+        "label": { "type": "string" },
+        "tone": { "enum": ["neutral", "accent", "success", "warning", "danger"] }
+      }
+    },
+
+    "listItem": {
+      "type": "object",
+      "required": ["type", "title"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "listItem" },
+        "title": { "type": "string" },
+        "subtitle": { "type": "string" },
+        "leadingIconUrl": { "type": "string", "format": "uri" },
+        "trailingText": { "type": "string" },
+        "showChevron": { "type": "boolean" },
+        "action": { "$ref": "#/$defs/action" }
+      }
+    },
+
+    "action": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["kind"],
+          "additionalProperties": false,
+          "properties": {
+            "kind": { "const": "noop" }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["kind", "url"],
+          "additionalProperties": false,
+          "properties": {
+            "kind": { "const": "openUrl" },
+            "url": { "type": "string", "format": "uri" }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["kind", "id"],
+          "additionalProperties": false,
+          "properties": {
+            "kind": { "const": "log" },
+            "id": { "type": "string" }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# Start the Prisma SDUI dev server. First run installs deps; subsequent runs
+# go straight to `npm start`. Stop with Ctrl-C.
+#
+# If port 7331 is already held (orphan from a previous run that didn't clean
+# up — happens when iTerm/SSH gets killed without Ctrl-C reaching node), kill
+# the listener first so the new server can bind. The port is dedicated to
+# this dev server, so claiming it is safe.
+set -euo pipefail
+
+PORT=7331
+cd "$(dirname "$0")/sdui-server"
+
+if pids=$(lsof -ti tcp:$PORT 2>/dev/null) && [ -n "$pids" ]; then
+    echo "[startserver] port $PORT busy — stopping orphan listener (pid $pids)"
+    kill -9 $pids 2>/dev/null || true
+    # tiny grace period so the kernel actually releases the socket before we bind
+    sleep 0.3
+fi
+
+if [ ! -d node_modules ]; then
+    echo "[startserver] installing deps…"
+    npm install --silent
+fi
+
+exec npm start

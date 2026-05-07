@@ -47,6 +47,7 @@ import xyz.ksharma.prisma.catalogue.foundations.MotionShowcase
 import xyz.ksharma.prisma.catalogue.foundations.RadiusShowcase
 import xyz.ksharma.prisma.catalogue.foundations.SpacingShowcase
 import xyz.ksharma.prisma.catalogue.foundations.TypographyShowcase
+import xyz.ksharma.prisma.catalogue.sdui.SduiScreen
 
 public enum class CatalogueSection(public val title: String) {
     Foundations("Foundations"),
@@ -54,6 +55,7 @@ public enum class CatalogueSection(public val title: String) {
     Feedback("Feedback"),
     Navigation("Navigation"),
     DataDisplay("Data display"),
+    ServerDriven("Server-driven"),
 }
 
 public data class CatalogueEntry(
@@ -119,6 +121,9 @@ public object CatalogueRegistry {
         entry("data.avatar",      "Avatar",       CatalogueSection.DataDisplay, listOf("user", "image"))        { AvatarShowcase() },
         entry("data.avatarGroup", "Avatar group", CatalogueSection.DataDisplay, listOf("user", "stack"))        { AvatarGroupShowcase() },
         entry("data.divider",     "Divider",      CatalogueSection.DataDisplay, listOf("separator", "rule"))    { DividerShowcase() },
+
+        // Server-driven UI live demo — connects to ws://10.0.2.2:7331/ws
+        entry("sdui.live", "SDUI live demo", CatalogueSection.ServerDriven, listOf("server", "json", "live", "websocket")) { SduiScreen() },
     )
 
     public val sections: ImmutableList<CatalogueSection> =

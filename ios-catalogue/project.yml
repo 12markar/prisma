@@ -50,6 +50,10 @@ targets:
         UIRequiredDeviceCapabilities:
           - arm64
         UIApplicationSupportsIndirectInputEvents: true
+        # Server-Driven UI demo connects to ws://localhost:7331 — needs ATS
+        # local-networking exception to allow cleartext on the loopback.
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: xyz.ksharma.prisma
