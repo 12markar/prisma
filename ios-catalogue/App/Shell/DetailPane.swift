@@ -105,14 +105,8 @@ struct DetailPane: View {
     }
 
     private func hasShowcase(_ entry: CatalogueEntry) -> Bool {
-        switch entry.key {
-        case "foundation.typography", "foundation.colors", "foundation.spacing",
-             "foundation.radius", "foundation.elevation", "foundation.motion",
-             "foundation.icons", "input.button":
-            return true
-        default:
-            return false
-        }
+        // Every entry in the registry has a real showcase now.
+        return true
     }
 
     @ViewBuilder
@@ -149,6 +143,7 @@ struct DetailPane: View {
     @ViewBuilder
     private func showcase(for entry: CatalogueEntry) -> some View {
         switch entry.key {
+        // Foundations
         case "foundation.typography": TypographyShowcase()
         case "foundation.colors":     ColorShowcase()
         case "foundation.spacing":    SpacingShowcase()
@@ -156,7 +151,46 @@ struct DetailPane: View {
         case "foundation.elevation":  ElevationShowcase()
         case "foundation.motion":     MotionShowcase()
         case "foundation.icons":      IconsShowcase()
-        case "input.button":          ButtonShowcase()
+        // Inputs
+        case "input.button":            ButtonShowcase()
+        case "input.textfield":         TextFieldShowcase()
+        case "input.checkbox":          CheckboxShowcase()
+        case "input.radio":             RadioShowcase()
+        case "input.switch":            SwitchShowcase()
+        case "input.slider":            SliderShowcase()
+        case "input.segmentedControl":  SegmentedControlShowcase()
+        case "input.searchBar":         SearchBarShowcase()
+        case "input.autocomplete":      AutocompleteShowcase()
+        case "input.stepper":           StepperShowcase()
+        case "input.tagInput":          TagInputShowcase()
+        case "input.datePicker":        DatePickerShowcase()
+        case "input.timePicker":        TimePickerShowcase()
+        case "input.colorPicker":       ColorPickerShowcase()
+        // Feedback
+        case "feedback.toast":       ToastShowcase()
+        case "feedback.banner":      BannerShowcase()
+        case "feedback.modal":       ModalShowcase()
+        case "feedback.bottomSheet": BottomSheetShowcase()
+        case "feedback.popover":     PopoverShowcase()
+        case "feedback.tooltip":     TooltipShowcase()
+        case "feedback.loading":     LoadingShowcase()
+        case "feedback.skeleton":    SkeletonShowcase()
+        case "feedback.badge":       BadgeShowcase()
+        case "feedback.emptyState":  EmptyStateShowcase()
+        case "feedback.drawer":      DrawerShowcase()
+        // Navigation
+        case "navigation.tabs":            TabsShowcase()
+        case "navigation.chip":            ChipShowcase()
+        case "navigation.commandPalette":  CommandPaletteShowcase()
+        case "navigation.pagination":      PaginationShowcase()
+        case "navigation.breadcrumb":      BreadcrumbShowcase()
+        case "navigation.wizard":          WizardShowcase()
+        // Data display
+        case "data.card":        CardShowcase()
+        case "data.listItem":    ListItemShowcase()
+        case "data.avatar":      AvatarShowcase()
+        case "data.avatarGroup": AvatarGroupShowcase()
+        case "data.divider":     DividerShowcase()
         default:
             Text("Phase 0 placeholder — implementation lands per-phase per docs/TODO.md.")
                 .font(PrismaTypography.bodyMd.font)

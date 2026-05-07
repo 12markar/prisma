@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Prisma — Tier C Specs</title>
+<link rel="stylesheet" href="../../site/tokens.css"/>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--surface-base);color:var(--text-primary);font-family:var(--font-sans);padding:64px 40px;min-height:100vh}
+  .wrap{max-width:1100px;margin:0 auto}
+  h1{font-size:48px;line-height:1;letter-spacing:-0.025em;font-weight:600;margin-bottom:12px}
+  h1 em{font-style:italic;color:var(--accent-default);font-weight:500}
+  .lede{color:var(--text-secondary);max-width:56ch;font-size:16px;line-height:1.55;margin-bottom:48px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+  .card{display:block;padding:24px;border:1px solid var(--border-subtle);border-radius:12px;background:var(--surface-raised);transition:all 200ms;text-decoration:none;color:inherit}
+  .card:hover{border-color:var(--accent-default);transform:translateY(-2px)}
+  .card .num{font-family:var(--font-mono);font-size:11px;color:var(--accent-default);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px}
+  .card h3{font-size:18px;letter-spacing:-0.01em;font-weight:600;margin-bottom:6px}
+  .card p{font-size:13px;color:var(--text-secondary);line-height:1.5}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Tier C — <em>Component Specs</em></h1>
+  <p class="lede">Twelve additional component specs covering pickers, navigation, input compounds, panels, and search.</p>
+  <div class="grid">
+    <a class="card" href="date-picker.md"><div class="num">C.01</div><h3>Date Picker</h3><p>Calendar surface, range fill, day cell states.</p></a>
+    <a class="card" href="time-picker.md"><div class="num">C.02</div><h3>Time Picker</h3><p>Spinner, wheel, and compact text variants.</p></a>
+    <a class="card" href="color-picker.md"><div class="num">C.03</div><h3>Color Picker</h3><p>SV pad, hue/alpha rails, three fidelity tiers.</p></a>
+    <a class="card" href="autocomplete.md"><div class="num">C.04</div><h3>Autocomplete</h3><p>Typing, async data, free-entry vs strict modes.</p></a>
+    <a class="card" href="pagination.md"><div class="num">C.05</div><h3>Pagination</h3><p>Window logic, jump-to, per-page selector.</p></a>
+    <a class="card" href="breadcrumb.md"><div class="num">C.06</div><h3>Breadcrumb</h3><p>Truncation, editable, mobile collapse.</p></a>
+    <a class="card" href="stepper.md"><div class="num">C.07</div><h3>Stepper</h3><p>Numeric input with hold-to-repeat and validation.</p></a>
+    <a class="card" href="tag-input.md"><div class="num">C.08</div><h3>Tag Input</h3><p>Commit/uncommit, paste splitting, async chips.</p></a>
+    <a class="card" href="drawer.md"><div class="num">C.09</div><h3>Drawer</h3><p>Sizes, modal vs non-modal, drag-to-close.</p></a>
+    <a class="card" href="avatar-group.md"><div class="num">C.10</div><h3>Avatar Group</h3><p>Overlap math, +N chip, initials fallback.</p></a>
+    <a class="card" href="wizard.md"><div class="num">C.11</div><h3>Wizard</h3><p>Step rail, validation, persistence, branching.</p></a>
+    <a class="card" href="search-bar.md"><div class="num">C.12</div><h3>Search Bar</h3><p>Header / hero / launcher / filter variants.</p></a>
+  </div>
+</div>
+</body>
+</html>

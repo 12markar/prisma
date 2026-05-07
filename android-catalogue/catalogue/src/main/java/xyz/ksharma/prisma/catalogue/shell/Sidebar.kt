@@ -1,15 +1,19 @@
 package xyz.ksharma.prisma.catalogue.shell
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInVertically
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,6 +41,7 @@ import androidx.compose.material3.Text
 import androidx.compose.ui.res.painterResource
 import xyz.ksharma.prisma.components.icons.PrismaIcons
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -68,10 +73,22 @@ public fun Sidebar(
     onSelect: (CatalogueEntry) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var query by rememberSaveable { mutableStateOf("") }
-    var expanded by rememberSaveable {
-        mutableStateOf(listOf(CatalogueSection.Foundations.name))
+    // Explicit saveable keys so state survives pane swaps in
+    // NavigableListDetailPaneScaffold (the list pane is destroyed and
+    // recreated on compact widths when navigating to detail and back).
+    var query by rememberSaveable(key = "prisma.sidebar.query") { mutableStateOf("") }
+    var expanded by rememberSaveable(key = "prisma.sidebar.expandedSections") {
+        // All sections expanded by default — easier to discover on first launch
+        // and matches what the user sees after their first toggle session.
+        mutableStateOf(CatalogueRegistry.sections.map { it.name })
     }
+
+    // Subtle staggered entrance: chrome → search → each section header fades
+    // up over ~250ms total. Only fires once per Sidebar composition (i.e. on
+    // first launch and after process death; not on each detail-pane swap
+    // because the saveable keys persist).
+    var entered by rememberSaveable(key = "prisma.sidebar.entered") { mutableStateOf(false) }
+    LaunchedEffect(Unit) { entered = true }
 
     val results by remember(query) { derivedStateOf { CatalogueRegistry.search(query) } }
     val isSearching = query.isNotBlank()
@@ -81,48 +98,57 @@ public fun Sidebar(
             .fillMaxSize()
             .background(PrismaSemanticColors.SurfaceSunken.themed()),
     ) {
-        ChromeRow(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = PrismaSpacing.Sp5, end = PrismaSpacing.Sp4, top = PrismaSpacing.Sp5, bottom = PrismaSpacing.Sp3),
-        )
+        EntranceWrapper(visible = entered, delayMs = 0) {
+            ChromeRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = PrismaSpacing.Sp5, end = PrismaSpacing.Sp4, top = PrismaSpacing.Sp5, bottom = PrismaSpacing.Sp3),
+            )
+        }
 
-        SearchField(
-            query = query,
-            onQueryChange = { query = it },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = PrismaSpacing.Sp4, vertical = PrismaSpacing.Sp1),
-        )
+        EntranceWrapper(visible = entered, delayMs = 60) {
+            SearchField(
+                query = query,
+                onQueryChange = { query = it },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = PrismaSpacing.Sp4, vertical = PrismaSpacing.Sp1),
+            )
+        }
 
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(top = PrismaSpacing.Sp3, bottom = PrismaSpacing.Sp7),
         ) {
-            CatalogueRegistry.sections.forEach { section ->
+            CatalogueRegistry.sections.forEachIndexed { index, section ->
                 val sectionEntries = if (isSearching) {
                     results.filter { it.section == section }
                 } else {
                     CatalogueRegistry.bySection(section)
                 }
-                if (sectionEntries.isEmpty()) return@forEach
+                if (sectionEntries.isEmpty()) return@forEachIndexed
 
                 val isExpanded = isSearching || section.name in expanded
+                // Sections enter ~120ms after search field, then stagger 50ms each
+                // so the eye walks down the list naturally.
+                val sectionDelayMs = 120 + index * 50
 
                 item(key = "header_${section.name}") {
-                    SectionHeader(
-                        title = section.title,
-                        count = sectionEntries.size,
-                        expanded = isExpanded,
-                        enabled = !isSearching,
-                        onToggle = {
-                            expanded = if (section.name in expanded) {
-                                expanded - section.name
-                            } else {
-                                expanded + section.name
-                            }
-                        },
-                    )
+                    EntranceWrapper(visible = entered, delayMs = sectionDelayMs) {
+                        SectionHeader(
+                            title = section.title,
+                            count = sectionEntries.size,
+                            expanded = isExpanded,
+                            enabled = !isSearching,
+                            onToggle = {
+                                expanded = if (section.name in expanded) {
+                                    expanded - section.name
+                                } else {
+                                    expanded + section.name
+                                }
+                            },
+                        )
+                    }
                 }
 
                 if (isExpanded) {
@@ -145,9 +171,37 @@ public fun Sidebar(
     }
 }
 
+/**
+ * Wraps a single sidebar slot with a one-time fade + 8dp slide-up entrance
+ * keyed off [visible]. The combined ~250ms duration with per-slot stagger
+ * gives the sidebar a deliberate-but-quick entrance without feeling slow.
+ */
+@Composable
+private fun EntranceWrapper(
+    visible: Boolean,
+    delayMs: Int,
+    content: @Composable () -> Unit,
+) {
+    AnimatedVisibility(
+        visible = visible,
+        enter = fadeIn(
+            animationSpec = tween(durationMillis = 240, delayMillis = delayMs, easing = FastOutSlowInEasing),
+        ) + slideInVertically(
+            animationSpec = tween(durationMillis = 280, delayMillis = delayMs, easing = FastOutSlowInEasing),
+            initialOffsetY = { offset -> offset / 6 },
+        ),
+        exit = fadeOut(),
+    ) {
+        content()
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ChromeRow(modifier: Modifier = Modifier) {
     val controller = LocalThemeController.current
+    val inspector = LocalInspectorController.current
+    val a11yOverlay = LocalA11yOverlayController.current
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
@@ -181,21 +235,71 @@ private fun ChromeRow(modifier: Modifier = Modifier) {
             )
         }
 
-        Box(
-            modifier = Modifier
-                .size(36.dp)
-                .clip(CircleShape)
-                .background(PrismaSemanticColors.SurfaceRaised.themed())
-                .border(1.dp, PrismaSemanticColors.BorderSubtle.themed(), CircleShape)
-                .clickable(onClick = controller.toggle),
-            contentAlignment = Alignment.Center,
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(PrismaSpacing.Sp2),
         ) {
-            Icon(
-                imageVector = if (controller.isDark) Icons.Default.LightMode else Icons.Default.DarkMode,
-                contentDescription = if (controller.isDark) "Switch to light mode" else "Switch to dark mode",
-                tint = PrismaSemanticColors.TextSecondary.themed(),
-                modifier = Modifier.size(16.dp),
-            )
+            ContrastBadge()
+            Box(
+                modifier = Modifier
+                    .size(36.dp)
+                    .clip(CircleShape)
+                    .background(
+                        if (a11yOverlay.enabled) PrismaSemanticColors.AccentSubtle.themed()
+                        else PrismaSemanticColors.SurfaceRaised.themed(),
+                    )
+                    .border(1.dp, PrismaSemanticColors.BorderSubtle.themed(), CircleShape)
+                    .clickable(role = androidx.compose.ui.semantics.Role.Button, onClick = a11yOverlay.toggle),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    painter = painterResource(PrismaIcons.Grid),
+                    contentDescription = if (a11yOverlay.enabled) "Hide 48dp touch-target grid" else "Show 48dp touch-target grid",
+                    tint = if (a11yOverlay.enabled) PrismaSemanticColors.AccentDefault.themed()
+                           else PrismaSemanticColors.TextSecondary.themed(),
+                    modifier = Modifier.size(16.dp),
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .size(36.dp)
+                    .clip(CircleShape)
+                    .background(
+                        if (inspector.isOpen) PrismaSemanticColors.AccentSubtle.themed()
+                        else PrismaSemanticColors.SurfaceRaised.themed(),
+                    )
+                    .border(1.dp, PrismaSemanticColors.BorderSubtle.themed(), CircleShape)
+                    .clickable(role = androidx.compose.ui.semantics.Role.Button, onClick = inspector.toggle),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    painter = painterResource(PrismaIcons.Layers),
+                    contentDescription = if (inspector.isOpen) "Close inspector" else "Open token inspector",
+                    tint = if (inspector.isOpen) PrismaSemanticColors.AccentDefault.themed()
+                           else PrismaSemanticColors.TextSecondary.themed(),
+                    modifier = Modifier.size(16.dp),
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .size(36.dp)
+                    .clip(CircleShape)
+                    .background(PrismaSemanticColors.SurfaceRaised.themed())
+                    .border(1.dp, PrismaSemanticColors.BorderSubtle.themed(), CircleShape)
+                    .combinedClickable(
+                        onClick = controller.toggle,
+                        onLongClick = controller.followSystem,
+                    ),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    imageVector = if (controller.isDark) Icons.Default.LightMode else Icons.Default.DarkMode,
+                    contentDescription = if (controller.isDark) "Tap: switch to light. Long-press: follow system."
+                                         else "Tap: switch to dark. Long-press: follow system.",
+                    tint = PrismaSemanticColors.TextSecondary.themed(),
+                    modifier = Modifier.size(16.dp),
+                )
+            }
         }
     }
 }

@@ -6,12 +6,18 @@ struct Sidebar: View {
     @Binding var query: String
     let expandedSet: Set<String>
     let onToggleSection: (CatalogueSection) -> Void
+    @Binding var inspectorOpen: Bool
+    @Binding var a11yOverlayEnabled: Bool
 
     @Environment(\.colorScheme) private var scheme
 
     /// Shared with PrismaApp via the same UserDefaults key.
     /// "" = follow system, "light" = forced light, "dark" = forced dark.
     @AppStorage("prisma.isDarkOverride") private var isDarkOverrideRaw: String = ""
+
+    /// One-shot flag flipped on first appearance — drives the staggered
+    /// fade+slide entrance of each section header.
+    @State private var entered: Bool = false
 
     private var isSearching: Bool { !query.trimmingCharacters(in: .whitespaces).isEmpty }
 
@@ -21,14 +27,26 @@ struct Sidebar: View {
 
     var body: some View {
         List(selection: $selectedKey) {
-            ForEach(CatalogueSection.allCases) { section in
+            ForEach(Array(CatalogueSection.allCases.enumerated()), id: \.element.id) { index, section in
                 let entries = entriesFor(section)
                 if !entries.isEmpty {
                     sectionView(section, entries: entries)
+                        .opacity(entered ? 1 : 0)
+                        .offset(y: entered ? 0 : 6)
+                        .animation(
+                            .easeOut(duration: 0.28)
+                                .delay(0.05 * Double(index)),
+                            value: entered
+                        )
                 }
             }
         }
         .listStyle(.sidebar)
+        .onAppear {
+            // Tiny delay so the first frame paints with sections invisible,
+            // then the staggered animation runs visibly.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.02) { entered = true }
+        }
         .scrollContentBackground(.hidden)
         .background(PrismaSemanticColors.surfaceSunken.themed(scheme))
         .searchable(
@@ -62,10 +80,37 @@ struct Sidebar: View {
                 }
             }
             ToolbarItem(placement: .topBarTrailing) {
-                Button(action: cycleTheme) {
-                    Image(systemName: themeIconName)
+                HStack(spacing: PrismaSpacing.sp2) {
+                    ContrastBadge()
+                    Button(action: { a11yOverlayEnabled.toggle() }) {
+                        Image(prisma: .grid)
+                            .renderingMode(.template)
+                            .resizable()
+                            .frame(width: 16, height: 16)
+                            .foregroundStyle(
+                                a11yOverlayEnabled
+                                    ? PrismaSemanticColors.accentDefault.themed(scheme)
+                                    : PrismaSemanticColors.textSecondary.themed(scheme)
+                            )
+                    }
+                    .accessibilityLabel(a11yOverlayEnabled ? "Hide 44pt touch-target grid" : "Show 44pt touch-target grid")
+                    Button(action: { inspectorOpen.toggle() }) {
+                        Image(prisma: .layers)
+                            .renderingMode(.template)
+                            .resizable()
+                            .frame(width: 16, height: 16)
+                            .foregroundStyle(
+                                inspectorOpen
+                                    ? PrismaSemanticColors.accentDefault.themed(scheme)
+                                    : PrismaSemanticColors.textSecondary.themed(scheme)
+                            )
+                    }
+                    .accessibilityLabel(inspectorOpen ? "Close inspector" : "Open token inspector")
+                    Button(action: cycleTheme) {
+                        Image(systemName: themeIconName)
+                    }
+                    .accessibilityLabel(themeAccessibilityLabel)
                 }
-                .accessibilityLabel(themeAccessibilityLabel)
             }
         }
         .toolbarTitleDisplayMode(.inline)
@@ -107,30 +152,24 @@ struct Sidebar: View {
 
     @ViewBuilder
     private func sectionView(_ section: CatalogueSection, entries: [CatalogueEntry]) -> some View {
-        // When searching, all sections are expanded; otherwise honour user state.
+        // When searching, all sections are forced-expanded; otherwise honour user state.
         let isExpanded = isSearching || expandedSet.contains(section.rawValue)
 
-        if isSearching {
-            Section {
+        // Use Section + Button-as-header so taps on the header *only* toggle
+        // expansion. Previously DisclosureGroup inside List(selection:)
+        // could fire a row-selection on label tap, mis-feeling like nav.
+        Section {
+            if isExpanded {
                 ForEach(entries) { entry in
                     rowView(entry)
                 }
-            } header: {
-                sectionLabel(section: section, count: entries.count, expanded: true)
             }
-        } else {
-            DisclosureGroup(
-                isExpanded: Binding(
-                    get: { isExpanded },
-                    set: { _ in onToggleSection(section) }
-                )
-            ) {
-                ForEach(entries) { entry in
-                    rowView(entry)
-                }
-            } label: {
+        } header: {
+            Button(action: { if !isSearching { onToggleSection(section) } }) {
                 sectionLabel(section: section, count: entries.count, expanded: isExpanded)
             }
+            .buttonStyle(.plain)
+            .disabled(isSearching)
         }
     }
 
@@ -155,8 +194,12 @@ struct Sidebar: View {
                         : PrismaSemanticColors.surfaceRaised.themed(scheme)
                 )
                 .clipShape(Capsule())
+            Image(systemName: expanded ? "chevron.down" : "chevron.right")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(PrismaSemanticColors.textTertiary.themed(scheme))
         }
-        .textCase(nil)              // Override List's default uppercase header treatment
+        .contentShape(Rectangle())   // Whole row is the hit target.
+        .textCase(nil)
         .padding(.vertical, 4)
     }
 

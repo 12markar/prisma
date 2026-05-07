@@ -18,6 +18,16 @@ android {
     buildFeatures { compose = true }
 }
 
+// Mirror the catalogue module: emit Compose Compiler stability reports
+// for every component when `-PcomposeCompilerReports=true` is passed.
+val composeCompilerReports = providers.gradleProperty("composeCompilerReports").orNull?.toBoolean() ?: false
+if (composeCompilerReports) {
+    composeCompiler {
+        reportsDestination = layout.buildDirectory.dir("compose_compiler")
+        metricsDestination = layout.buildDirectory.dir("compose_compiler")
+    }
+}
+
 dependencies {
     api(project(":core-ui"))
     implementation(platform(libs.compose.bom))

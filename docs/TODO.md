@@ -9,242 +9,119 @@ The actionable, step-by-step build list. For architectural rationale and tradeof
 ## 0. Pre-build housekeeping ✅
 
 - [x] Project + folder + repo all renamed to `Prisma`
-- [x] Duplicate `docs/prisma/design-system-output/` removed
 - [x] Site moved to `design-system/site/`
-- [x] Detekt config decision: sensible defaults (Slack-style + compose-lints) until krail config shared
-- [x] GitHub repo created at https://github.com/ksharma-xyz/prisma (public)
-- [x] Reference repos cloned to `references/` (gitignored): cvs-health iOS a11y, kiwicom orbit-compose
+- [x] Detekt config: sensible defaults (Slack-style + compose-lints)
+- [x] GitHub repo created: https://github.com/ksharma-xyz/prisma
+- [x] Reference repos cloned to `references/` (gitignored)
 
 ---
 
-## Phase 0 — Scaffold (the foundation the rest hangs on)
+## Phase 0 — Scaffold ✅
 
-Goal: token pipeline working end-to-end on both platforms; both apps build and render a placeholder showcase using real Prisma tokens; adaptive shell visible on phone (single-pane) and tablet (two-pane).
+- [x] **0.1 Component specs** — all 38 specs in `design-system/component-specs/`
+- [x] **0.2 Style Dictionary token pipeline** — Compose + SwiftUI emitters, contrast checker, lint, font copy script
+- [x] **0.3 Android scaffold** — `:core-ui`, `:components`, `:catalogue` modules; AGP 8.7.2 / compileSdk 36 / Kotlin 2; Material3 adaptive `NavigableListDetailPaneScaffold`; `PrismaTheme` + `LocalPrismaIsDark`
+- [x] **0.4 iOS scaffold** — Swift Package + xcodegen-generated Xcode project; `NavigationSplitView` adaptive shell
+- [x] **0.5 CI/CD** — `tokens-check`, `lint`, `android-ci`, `ios-ci`, `deploy-site` workflows in place
+- [x] **0.6 Acceptance** — both apps build, theme toggle works, adaptive shell on phone (single) and tablet (two-pane)
 
-### 0.1 Fill in the missing component specs (I write these in matching Prisma format)
+### Outstanding (cosmetic, not blocking)
 
-- [ ] `skeleton.md` — content-shaped placeholders, shimmer animation, reduce-motion handling
-- [ ] `divider.md` — horizontal/vertical, inset/full, weight variants
-- [ ] `list-item.md` — leading icon, primary + secondary text, trailing element, dividers, selectable state
-- [ ] `avatar.md` — sizes, image/initials/icon fallback, status indicator dot
-- [ ] `slider.md` — single-thumb, range, tick marks, continuous mode (design-sensitive — would have benefited from a Claude Design pass; I'll write best-effort + flag for review)
-- [ ] `tooltip.md` — desktop hover / touch long-press / keyboard focus, auto-flip positioning
-- [ ] `popover.md` — richer content variant of tooltip
-- [ ] `segmented-control.md` — 2–5 options, single selection, distinct from Tabs
-- [ ] `banner.md` — persistent inline message (info/success/warning/danger), distinct from Toast
-- [ ] `empty-state.md` — illustration slot + title + description + optional action button
-- [ ] `command-palette.md` — modal ⌘K interface, fuzzy search, sectioned results, keyboard nav
-
-### 0.2 Style Dictionary token pipeline ✅
-
-- [x] `cd design-system && npm install` (Style Dictionary v4 installed)
-- [x] Custom Compose format `prisma/compose` — emits `Color(0xFFxxxxxx)`, `Dp`, `sp`, `PrismaSemanticColor` data class with `@Composable resolve()`, multi-layer `PrismaShadow` + `PrismaElevation`, `TextStyle` referencing `PrismaFonts`, `FloatArray` cubic-bezier easing
-- [x] Custom SwiftUI format `prisma/swiftui` — emits `Color(.sRGB, red:green:blue:opacity:)`, `CGFloat`, `PrismaSemanticColor` struct with `resolve(_ scheme:)`, multi-layer `PrismaShadow` + `PrismaElevation`, `Font.custom` via `PrismaFonts.sans/mono(size:weight:)`, cubic-bezier tuples
-- [x] `npm run build-tokens` runs end-to-end:
-  - `PrismaTokens.kt` → `android-catalogue/core-ui/src/main/java/xyz/ksharma/prisma/tokens/` (453 lines)
-  - `PrismaTokens.swift` → `ios-catalogue/CoreUI/Sources/CoreUI/Tokens/` (420 lines)
-  - `tokens.css` → `design-system/build/css/` (sanity check — gitignored)
-- [x] `scripts/check-contrast.mjs` — real WCAG AA check, 24 semantic text/surface pairs verified, all pass
-- [x] `scripts/lint.mjs` — DTCG schema + reference resolution, 6 token files all valid
-- [x] `scripts/copy-fonts.mjs` — copies any `.ttf`/`.otf` from `design-system/fonts/` to both apps' resource folders
-- [ ] **Pending: drop actual `.ttf` files for Instrument Sans + JetBrains Mono into `design-system/fonts/`** (not blocking — apps fall back to system fonts until provided)
-- [ ] **Pending: update iOS `Info.plist` UIAppFonts after fonts dropped in
-
-### 0.3 Android scaffold
-
-- [ ] Create Gradle multi-module project at `android-catalogue/`
-  - [ ] Root `build.gradle.kts`, `settings.gradle.kts`, `gradle.properties`, wrapper
-  - [ ] AGP 8.6+, Kotlin 2.0+, Compose Compiler plugin, KSP
-  - [ ] `compileSdk 36`, `minSdk 26`, target Java 17
-- [ ] `:core-ui` module
-  - [ ] `PrismaTheme` composable wrapping `MaterialTheme` (or fully custom CompositionLocal)
-  - [ ] `LocalPrismaColors`, `LocalPrismaTypography`, `LocalPrismaSpacing` providers
-  - [ ] Light/dark token resolution
-  - [ ] Font registration (Instrument Sans + JetBrains Mono)
-- [ ] `:components` module (empty initially, placeholder package)
-- [ ] `:catalogue` app module
-  - [ ] `MainActivity` with `setContent { PrismaTheme { CatalogueApp() } }`
-  - [ ] Navigation 3 (`androidx.navigation3`) — `NavDisplay` with back-stack-as-state
-  - [ ] `NavigableListDetailPaneScaffold` from `material3.adaptive`
-  - [ ] Sidebar: `LazyColumn` with sticky headers, collapsible sections via `AnimatedVisibility`
-  - [ ] Search field at top (`derivedStateOf` filter)
-  - [ ] Detail pane shows placeholder text initially
-- [ ] Wire `npm run build-tokens` as Gradle task `:core-ui:generateTokens`, depended on by `compileKotlin`
-- [ ] Configure Detekt + slack/compose-lints + ktlint
-  - [ ] `detekt.yml` (mirror krail or sensible default)
-  - [ ] `kotlinx-collections-immutable` dependency added
-- [ ] Verify `./gradlew assembleDebug` succeeds, app launches in emulator showing styled "Prisma" label + adaptive shell
-
-### 0.4 iOS scaffold
-
-- [ ] Create Swift Package at `ios-catalogue/`
-  - [ ] `Package.swift` with `CoreUI` and `Components` library targets
-  - [ ] `swift-tools-version:5.10`, `iOS(.v17)`
-- [ ] `CoreUI` target
-  - [ ] `PrismaTheme` `EnvironmentValue`
-  - [ ] `Color(light:dark:)` extension reading `colorScheme`
-  - [ ] Font registration (Instrument Sans + JetBrains Mono via `Resources/Fonts/`)
-  - [ ] `Font.prisma(.body, weight: .regular)` extension
-- [ ] `Components` target (empty initially)
-- [ ] Create Xcode app project `CatalogueApp/CatalogueApp.xcodeproj`
-  - [ ] Depends on local Swift Package via `.package(path: "..")`
-  - [ ] `App.swift` with `@main` and `WindowGroup { CatalogueRoot() }`
-  - [ ] `CatalogueRoot` uses `NavigationSplitView`
-  - [ ] Sidebar: `List` with `DisclosureGroup` for sections, `.searchable(text:)`
-  - [ ] Detail view shows placeholder initially
-- [ ] Wire `npm run build-tokens` as Run Script Build Phase before "Compile Sources"
-- [ ] Configure SwiftLint + SwiftFormat
-  - [ ] `.swiftlint.yml` with strict rules + custom SwiftUI rules
-  - [ ] `.swiftformat` config
-  - [ ] Pre-commit hook
-- [ ] Verify `xcodebuild` succeeds, app launches in simulator showing styled "Prisma" label + adaptive shell on iPhone (compact) and iPad (split)
-
-### 0.5 CI/CD
-
-- [ ] `.github/workflows/tokens-check.yml` — runs `npm run build-tokens`, fails on uncommitted diff + WCAG contrast check
-- [ ] `.github/workflows/lint.yml` — Detekt + compose-lints (Android) and SwiftLint + SwiftFormat (iOS)
-- [ ] `.github/workflows/android-ci.yml` — `./gradlew assembleDebug` (snapshot tests added in Phase 1 once components exist)
-- [ ] `.github/workflows/ios-ci.yml` — `xcodebuild build` (snapshot tests added in Phase 1)
-- [ ] `.github/workflows/deploy-site.yml` — GitHub Pages deploy from `docs/prisma/site/` on push to main
-- [ ] First commit + push, verify all workflows green
-- [ ] GitHub Pages enabled and site live
-
-### 0.6 Phase 0 acceptance criteria
-
-- [ ] Both apps build cleanly
-- [ ] Both apps render a styled label using Prisma typography + color tokens
-- [ ] Theme toggle works (light/dark) on both
-- [ ] Adaptive shell visible: phone single-pane, tablet two-pane
-- [ ] All CI workflows green
-- [ ] Site deployed to GitHub Pages
+- [ ] Drop `Instrument Sans` + `JetBrains Mono` `.ttf` files into `design-system/fonts/` (apps fall back to system fonts)
+- [ ] Update iOS `Info.plist` `UIAppFonts` after fonts dropped
+- [ ] Extend `android-ci.yml` and `ios-ci.yml` with snapshot test invocations once snapshot suites land
 
 ---
 
-## Phase 1 — Foundation showcase + Button (the first real component)
+## Phase 1 — Foundation showcase + Button ✅
 
-### 1.1 Foundation showcase pages — bespoke designs (not generic detail layout)
+- [x] All 7 foundation showcases live (Typography, Color, Icon, Spacing, Elevation, Motion, Radius) on both platforms
+- [x] Button shipped on both platforms — 6 variants × 3 sizes × all states (default / pressed / disabled / loading), haptic feedback wired
+- [x] Catalogue detail page (live preview, variants, states, interactive playground)
 
-Each foundation gets its own visually-distinctive showcase page on both platforms.
+### Outstanding
 
-- [ ] **Typography specimen** — every type token rendered at full size, label + family + weight + size + line height + letter spacing alongside each
-- [ ] **Color grid** — primitive scale on left, semantic tokens on right, light/dark side-by-side, contrast ratio badge per swatch, tap to copy token name
-- [ ] **Icon grid** — searchable, all icons at uniform size, tap to copy import code
-- [ ] **Spacing visualizer** — stacked horizontal bars showing actual width per token
-- [ ] **Elevation showcase** — cards demonstrating each elevation token, light + dark side-by-side
-- [ ] **Motion demo** — interactive — tap to trigger an animation using each duration/easing token
-- [ ] **Radius showcase** — squares with each radius applied
-
-### 1.2 Button component (the canonical example — every other component follows this template)
-
-- [ ] **Android implementation**
-  - [ ] All variants: primary, secondary, outlined, ghost, icon, destructive
-  - [ ] All sizes: small, default, large
-  - [ ] All states: default, pressed, focused, disabled, loading
-  - [ ] Haptic feedback on press
-  - [ ] `@ShowkaseComposable` annotations for every variant × size combination
-  - [ ] Paparazzi snapshot tests (states × theme × font scale matrix)
-  - [ ] A11y tests (`Role.Button`, `contentDescription`, min 48dp touch target)
-- [ ] **iOS implementation**
-  - [ ] Same variants, sizes, states
-  - [ ] `UIImpactFeedbackGenerator` on press
-  - [ ] `swift-snapshot-testing` snapshots
-  - [ ] XCUITest a11y assertions (`accessibilityLabel`, `accessibilityTraits = .isButton`, min 44pt touch target)
-- [ ] **Catalogue detail page** (both platforms)
-  - [ ] Live demo at top
-  - [ ] Variants showcase (all rendered side-by-side)
-  - [ ] States showcase (interactive — tap to see pressed, etc.)
-  - [ ] "Tokens used" — read from spec
-  - [ ] "Accessibility" — read from spec
-  - [ ] Code snippet (live, token-aware)
-  - [ ] Interactive prop playground (toggle disabled, switch variant, edit label, swap icon)
-
-### 1.3 Phase 1 acceptance criteria
-
-- [ ] All 7 foundation showcase pages live in catalogue (Android + iOS)
-- [ ] Button shipped on both platforms, all variants × sizes × states
-- [ ] Snapshot test suite green for Button (≥ 8 PNGs per platform per variant)
-- [ ] A11y tests green
-- [ ] Theme toggle propagates correctly through everything
-- [ ] CI green on both platforms
+- [ ] Paparazzi snapshot tests for Button (Android)
+- [ ] `swift-snapshot-testing` snapshots for Button (iOS)
+- [ ] A11y XCUITest assertions (touch target, traits)
 
 ---
 
-## Phase 2 — Inputs
+## Phase 2 — Inputs ✅
 
-- [ ] TextField (default, focused, error, disabled, with helper text — all states)
-- [ ] Checkbox (unchecked, checked, indeterminate, disabled)
-- [ ] Radio (selectable group semantics)
-- [ ] Switch / Toggle
-- [ ] Slider (single-thumb + range)
-- [ ] Segmented Control
+All shipped on both platforms with playgrounds. TextField, Checkbox, Radio, Switch, Slider, SegmentedControl, SearchBar, Autocomplete, Stepper, TagInput, DatePicker, TimePicker, ColorPicker.
 
-Each: Android + iOS implementation, snapshot tests, a11y tests, catalogue detail page with playground.
+### Outstanding
+
+- [ ] Snapshot tests per input component
+- [ ] A11y assertions per input component
 
 ---
 
-## Phase 3 — Feedback & Overlay
+## Phase 3 — Feedback & Overlay ✅
 
-- [ ] Loading (circular, linear)
-- [ ] Skeleton
-- [ ] Toast / Snackbar
-- [ ] Banner / Inline Alert
-- [ ] Modal / Alert Dialog
-- [ ] Bottom Sheet (with detents)
-- [ ] Tooltip
-- [ ] Popover
-- [ ] Badge (count, dot)
-- [ ] Empty State
+All shipped on both platforms with playgrounds. Toast, Banner, Modal, BottomSheet, Popover, Tooltip, Loading, Skeleton, Badge, EmptyState, Drawer.
+
+### Outstanding
+
+- [ ] Snapshot tests per feedback component
 
 ---
 
-## Phase 4 — Navigation & Data Display
+## Phase 4 — Navigation & Data Display ✅
 
-- [ ] Tabs (top + scrollable variants)
-- [ ] Chip (filter, input, suggestion)
-- [ ] Card (elevated, outlined, filled)
-- [ ] List Item / Row
-- [ ] Avatar
-- [ ] Divider
+All shipped on both platforms with playgrounds. Tabs, Chip, CommandPalette, Pagination, Breadcrumb, Wizard, Card, ListItem, Avatar, AvatarGroup, Divider.
+
+### Outstanding
+
+- [ ] Snapshot tests per nav/display component
 
 ---
 
 ## Phase 5 — Catalogue polish (the world-class layer)
 
-- [ ] Showkase browser polished inside adaptive shell (Android)
-- [ ] `NavigationSplitView` browser polished (iOS)
-- [ ] Code snippet viewer per component (syntax-highlighted, copy button)
-- [ ] **Interactive prop playground** for every component (Storybook-style controls)
-- [ ] **Command Palette (⌘K)** — fuzzy-search any component instantly
-- [ ] **A11y overlay toggle** — visualises every component's a11y tree
-- [ ] **Inspector panel** — view hierarchy + applied tokens + computed contrast ratios
-- [ ] Adaptive layout snapshot variants in CI (compact + expanded widths)
-- [ ] Polished empty states everywhere
-- [ ] First-launch onboarding screen
-- [ ] Smooth theme transition (animated, no flash)
-- [ ] Choreographed entrance animations on sidebar
-- [ ] Haptics audit across every interaction
-- [ ] Performance audit — cold start < 1.5 s, zero memory leaks, stable composables verified
+### Done
+
+- [x] Material3 adaptive list-detail shell (Android) + NavigationSplitView (iOS)
+- [x] Theme toggle wired everywhere — system-following + user override; Material3 ColorScheme derived from Prisma tokens so M3 internals follow in-app theme
+- [x] State preserved across pane transitions (`rememberSaveable` keys)
+- [x] **Interactive prop playground** for every component — Storybook-style controls, live preview, states gallery
+- [x] Command Palette (⌘K) component implemented; sidebar search field
+- [x] Component-level a11y semantics: live regions on Toast/Banner, progress semantics on Loading, `invisibleToUser` on Skeleton, `heading()` on titles, `selectableGroup` on Tabs, merged descendants on Avatar/ListItem
+- [x] Polished empty detail-pane state (with stats strip)
+- [x] **Code snippet viewer per component** — copy button, live (reflects current knob values), wired into all 36 showcases on both platforms
+- [x] **First-launch onboarding** screen — both platforms; `rememberSaveable` (Android) / `@AppStorage` (iOS) so it appears once
+- [x] **Smooth animated theme transition** — root surface `animateColorAsState` (Android) + `.animation(value: scheme)` (iOS), 300ms ease
+- [x] **Haptics audit** — selection feedback added to Switch, Tabs, Chip on both platforms (Button already had haptics)
+- [x] Heart / pill / chip / list-item state-gallery cells are now stateful (tap to toggle), not frozen
+- [x] **Per-component A11y panel** — `A11yPanel` reusable view rendering role / min-touch-target / behaviour bullets. Wired into all 36 playgrounds on both platforms.
+- [x] **Live theme contrast indicator in chrome** — `ContrastBadge` computes WCAG ratio between `TextPrimary` and `SurfaceBase` for the active theme; AAA / AA / AA- / FAIL chip with live ratio.
+- [x] **`ImmutableList<T>` migration** — 8 component public APIs converted; all 47 component composables now skip on structural equality (zero unstable params).
+- [x] **Sidebar entrance animations** — staggered fade + 8dp slide-up on first appearance, ~280ms total. Both platforms.
+- [x] **Inspector panel** — toggleable right-side overlay listing the active theme's resolved tokens (Surface / Text / Border / Accent / Status colours with hex, plus Spacing and Radius scales). Chrome button (`Layers` icon).
+- [x] **A11y touch-target overlay** — toggleable 48dp/44pt magenta grid drawn over the catalogue so devs can eyeball touch-target compliance. Chrome button (`Grid` icon).
+
+### Outstanding
+
+- [ ] **Snapshot test suites** — Paparazzi (Android) + swift-snapshot-testing (iOS); golden images committed; CI fails on diff
+- [ ] **Adaptive layout snapshot variants** — compact + medium + expanded widths
+- [x] **Performance audit baseline** — Compose Compiler stability reports wired (`-PcomposeCompilerReports=true`); LeakCanary on debug; cold-start procedure documented; baseline written to [`docs/PERFORMANCE.md`](./PERFORMANCE.md). All 142 composables across `:components` + `:catalogue` are `restartable skippable`. Zero unstable parameters after `ImmutableList<T>` migration.
 
 ---
 
 ## Future upgrades (not blocking)
 
-- [ ] **Migrate to AGP 9** when stable — currently using AGP 8.7.2. AGP 9 is in alpha as of 2025-05; revisit once it ships stable.
-- [ ] Migrate to **Jetpack Navigation 3** (`androidx.navigation3`) when stable — Phase 0 uses `NavigableListDetailPaneScaffold`'s built-in back stack, which is sufficient for a list-detail catalogue. Nav 3 becomes valuable for deeper navigation graphs.
-- [ ] **Replace Material icons in catalogue chrome with design-system-supplied icon set.** Currently `Icons.Default.Search`, `Icons.Default.KeyboardArrowDown`, `Icons.AutoMirrored.Filled.KeyboardArrowRight` (Sidebar.kt). The Foundations / Icons showcase page (Phase 1) will define the canonical icon set; once it lands, the catalogue chrome should consume from there too. iOS equivalent: replace SF Symbols defaults with the same canonical set bridged via SFSafeSymbols.
+- [ ] Migrate to AGP 9 when stable (currently 8.7.2)
+- [ ] Migrate to Jetpack Navigation 3 when stable
+- [x] ~~Replace Material icons in catalogue chrome with Prisma icon set~~ — done; `PrismaIcons` registry on both platforms (64 icons)
 
 ---
 
 ## Open questions / decisions queued
 
-These don't block Phase 0 but should be resolved before they become blockers:
-
-- [ ] **Krail Detekt config** — share URL?
-- [ ] **GitHub username/org** for Option C migration (not blocking)
-- [ ] **App Store / Play Store distribution intent** — affects metadata, signing setup
-- [ ] **Custom illustrations** for empty states / onboarding — bespoke art or geometric/typographic?
-- [ ] **Icon set** — SF Symbols on iOS is decided; on Android, do we use `Icons.Default.*` from M3, Lucide, or a bespoke set?
-- [ ] **Whether to spec Command Palette as a reusable component** vs build into catalogue chrome only
+- [ ] Krail Detekt config — share URL?
+- [ ] App Store / Play Store distribution intent — affects metadata, signing setup
+- [ ] Custom illustrations for empty states / onboarding — bespoke art or geometric/typographic?
 
 ---
 

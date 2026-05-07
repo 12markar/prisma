@@ -31,6 +31,17 @@ android {
     buildFeatures { compose = true }
 }
 
+// Compose Compiler stability + recomposition reports.
+// Run: `./gradlew :catalogue:assembleDebug -PcomposeCompilerReports=true`
+// Output: catalogue/build/compose_compiler/ — inspect *-classes.txt for stability.
+val composeCompilerReports = providers.gradleProperty("composeCompilerReports").orNull?.toBoolean() ?: false
+if (composeCompilerReports) {
+    composeCompiler {
+        reportsDestination = layout.buildDirectory.dir("compose_compiler")
+        metricsDestination = layout.buildDirectory.dir("compose_compiler")
+    }
+}
+
 dependencies {
     implementation(project(":core-ui"))
     implementation(project(":components"))
@@ -56,6 +67,8 @@ dependencies {
     ksp(libs.showkase.processor)
 
     debugImplementation(libs.compose.ui.tooling)
+    // LeakCanary — debug-only memory leak detector. Ships nothing in release.
+    debugImplementation(libs.leakcanary)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.compose.ui.test.junit4)

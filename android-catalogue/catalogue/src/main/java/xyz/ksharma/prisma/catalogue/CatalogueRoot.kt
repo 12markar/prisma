@@ -1,6 +1,8 @@
 package xyz.ksharma.prisma.catalogue
 
 import android.app.Activity
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -20,7 +22,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import xyz.ksharma.prisma.catalogue.shell.A11yOverlayController
+import xyz.ksharma.prisma.catalogue.shell.A11yOverlayLayer
 import xyz.ksharma.prisma.catalogue.shell.CatalogueShell
+import xyz.ksharma.prisma.catalogue.shell.InspectorController
+import xyz.ksharma.prisma.catalogue.shell.InspectorOverlay
+import xyz.ksharma.prisma.catalogue.shell.LocalA11yOverlayController
+import xyz.ksharma.prisma.catalogue.shell.LocalInspectorController
+import xyz.ksharma.prisma.catalogue.shell.OnboardingOverlay
 import xyz.ksharma.prisma.coreui.PrismaTheme
 import xyz.ksharma.prisma.coreui.themed
 import xyz.ksharma.prisma.tokens.PrismaSemanticColors
@@ -35,7 +44,10 @@ public val LocalThemeController = compositionLocalOf<ThemeController> {
 
 public class ThemeController(
     public val isDark: Boolean,
+    /** True when the user explicitly overrode system; false → following system. */
+    public val isUserOverride: Boolean,
     public val toggle: () -> Unit,
+    public val followSystem: () -> Unit,
 )
 
 /**
@@ -50,11 +62,39 @@ public class ThemeController(
  */
 @Composable
 public fun CatalogueRoot() {
+    // Read system on every composition so the app follows system theme dynamically
+    // when there is no user override.
     val systemDark = isSystemInDarkTheme()
-    var isDark by rememberSaveable { mutableStateOf(systemDark) }
+    // null = follow system; non-null = user-forced light (false) or dark (true).
+    var userOverride by rememberSaveable { mutableStateOf<Boolean?>(null) }
+    var showOnboarding by rememberSaveable { mutableStateOf(true) }
+    // Inspector visibility is intentionally NOT saveable — it's a transient
+    // debug aid; coming back from background should land cleanly closed.
+    var inspectorOpen by remember { mutableStateOf(false) }
+    val inspectorController = remember(inspectorOpen) {
+        InspectorController(
+            isOpen = inspectorOpen,
+            toggle = { inspectorOpen = !inspectorOpen },
+            close = { inspectorOpen = false },
+        )
+    }
+    var a11yOverlayEnabled by remember { mutableStateOf(false) }
+    val a11yOverlayController = remember(a11yOverlayEnabled) {
+        A11yOverlayController(
+            enabled = a11yOverlayEnabled,
+            toggle = { a11yOverlayEnabled = !a11yOverlayEnabled },
+        )
+    }
+    val isDark = userOverride ?: systemDark
+    val isUserOverride = userOverride != null
 
-    val controller = remember(isDark) {
-        ThemeController(isDark = isDark, toggle = { isDark = !isDark })
+    val controller = remember(isDark, isUserOverride) {
+        ThemeController(
+            isDark = isDark,
+            isUserOverride = isUserOverride,
+            toggle = { userOverride = !isDark },
+            followSystem = { userOverride = null },
+        )
     }
 
     // System-bar appearance follows the active Prisma theme (light bg → dark icons,
@@ -71,24 +111,39 @@ public fun CatalogueRoot() {
     }
 
     PrismaTheme(isDark = isDark) {
-        CompositionLocalProvider(LocalThemeController provides controller) {
-            // Outer Box: paints the full window (incl. safe-area regions) with
-            // surface.base. Inner Box applies system-bar padding so the actual
-            // shell content avoids the status / navigation bar — but the bar
-            // regions still render the themed background instead of the legacy
-            // window colour.
+        CompositionLocalProvider(
+            LocalThemeController provides controller,
+            LocalInspectorController provides inspectorController,
+            LocalA11yOverlayController provides a11yOverlayController,
+        ) {
+            // Smoothly cross-fade the root surface colour during theme swaps so
+            // the change feels deliberate instead of an abrupt snap. Leaf-level
+            // colours still resolve discretely; the eye reads the root fade as
+            // the whole surface easing.
+            val animatedSurface by animateColorAsState(
+                targetValue = PrismaSemanticColors.SurfaceBase.themed(),
+                animationSpec = tween(durationMillis = 300),
+                label = "rootSurface",
+            )
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(PrismaSemanticColors.SurfaceBase.themed()),
+                    .background(animatedSurface),
             ) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .windowInsetsPadding(WindowInsets.systemBars),
                 ) {
-                    CatalogueShell()
+                    A11yOverlayLayer(enabled = a11yOverlayEnabled) {
+                        CatalogueShell()
+                    }
                 }
+                InspectorOverlay(controller = inspectorController)
+                OnboardingOverlay(
+                    visible = showOnboarding,
+                    onDismiss = { showOnboarding = false },
+                )
             }
         }
     }
