@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -80,21 +81,24 @@ public fun PrismaTriStateCheckbox(
     val isDark = LocalPrismaIsDark.current
     val palette = paletteFor(state, enabled, isError)
 
+    // Whole row is the touch target — clickable across the full width
+    // so a long label doesn't shrink the hit area to just the box, and
+    // tapping anywhere on the row toggles state.
     val rowModifier = if (onClick != null) {
-        modifier.triStateToggleable(
+        modifier.fillMaxWidth().triStateToggleable(
             state = state,
             onClick = onClick,
             enabled = enabled,
             role = Role.Checkbox,
         )
     } else {
-        modifier
+        modifier.fillMaxWidth()
     }
 
     Row(
         modifier = rowModifier
-            .defaultMinSize(minHeight = 44.dp)
-            .padding(vertical = PrismaSpacing.Sp1),
+            .defaultMinSize(minHeight = 48.dp)
+            .padding(vertical = PrismaSpacing.Sp2, horizontal = PrismaSpacing.Sp1),
         verticalAlignment = Alignment.Top,
         horizontalArrangement = Arrangement.spacedBy(PrismaSpacing.Sp3),
     ) {
