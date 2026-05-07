@@ -31,19 +31,24 @@ public fun CatalogueShell() {
     val navigator = rememberListDetailPaneScaffoldNavigator<Any>()
     var selectedKey by rememberSaveable { mutableStateOf<String?>(null) }
 
-    // Both sidebar and detail-pane scroll states are hoisted here —
-    // outside the AnimatedPane that destroys on pane swap.
-    // NavigableListDetailPaneScaffold's SaveableStateHolder doesn't
-    // reliably restore LazyListState / ScrollState on back-nav (a known
-    // material3-adaptive quirk on compact widths), so we own them at the
-    // always-existing parent. Detail-pane scroll positions are kept per
-    // entry.key in a remembered map so revisiting a component restores
-    // exactly where you left off.
+    // ALL state that must survive AnimatedPane destruction is hoisted here.
+    // NavigableListDetailPaneScaffold's internal SaveableStateHolder doesn't
+    // reliably restore state when a pane is destroyed on compact widths
+    // (known material3-adaptive quirk). Owning it at the always-existing
+    // parent removes that variable: scroll position, entrance flag,
+    // expanded sections, and search query all live here so the sidebar
+    // re-mount is just a re-bind, not a fresh start.
     val sidebarScrollState = rememberSaveable(
         saver = LazyListState.Saver,
         key = "prisma.sidebar.scroll",
     ) { LazyListState() }
     val detailScrollOffsets = remember { mutableStateMapOf<String, Int>() }
+
+    var sidebarEntered by rememberSaveable(key = "prisma.sidebar.entered") { mutableStateOf(false) }
+    var sidebarQuery by rememberSaveable(key = "prisma.sidebar.query") { mutableStateOf("") }
+    var sidebarExpanded by rememberSaveable(key = "prisma.sidebar.expanded") {
+        mutableStateOf(CatalogueRegistry.sections.map { it.name })
+    }
 
     NavigableListDetailPaneScaffold(
         navigator = navigator,
@@ -56,6 +61,12 @@ public fun CatalogueShell() {
                         navigator.navigateTo(ListDetailPaneScaffoldRole.Detail)
                     },
                     listScrollState = sidebarScrollState,
+                    entered = sidebarEntered,
+                    onEnteredChange = { sidebarEntered = it },
+                    query = sidebarQuery,
+                    onQueryChange = { sidebarQuery = it },
+                    expanded = sidebarExpanded,
+                    onExpandedChange = { sidebarExpanded = it },
                 )
             }
         },

@@ -75,26 +75,19 @@ public fun Sidebar(
     selectedKey: String?,
     onSelect: (CatalogueEntry) -> Unit,
     listScrollState: androidx.compose.foundation.lazy.LazyListState,
+    entered: Boolean,
+    onEnteredChange: (Boolean) -> Unit,
+    query: String,
+    onQueryChange: (String) -> Unit,
+    expanded: List<String>,
+    onExpandedChange: (List<String>) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    // Explicit saveable keys so state survives pane swaps in
-    // NavigableListDetailPaneScaffold (the list pane is destroyed and
-    // recreated on compact widths when navigating to detail and back).
-    var query by rememberSaveable(key = "prisma.sidebar.query") { mutableStateOf("") }
-    var expanded by rememberSaveable(key = "prisma.sidebar.expandedSections") {
-        // All sections expanded by default — easier to discover on first launch
-        // and matches what the user sees after their first toggle session.
-        mutableStateOf(CatalogueRegistry.sections.map { it.name })
-    }
-
-    // Subtle staggered entrance — only the *very first* time the sidebar
-    // mounts in this process. The saveable flag persists across
-    // configuration changes and (critically) across detail-pane swaps in
-    // NavigableListDetailPaneScaffold, which would otherwise re-run the
-    // animation on every back nav and feel like a jerk.
-    var entered by rememberSaveable(key = "prisma.sidebar.entered") { mutableStateOf(false) }
+    // All state hoisted to CatalogueShell — Sidebar is now a pure
+    // presentation layer. Pane destruction during list/detail swaps no
+    // longer wipes state, because nothing here is owned by the pane.
     if (!entered) {
-        LaunchedEffect(Unit) { entered = true }
+        LaunchedEffect(Unit) { onEnteredChange(true) }
     }
 
     val results by remember(query) { derivedStateOf { CatalogueRegistry.search(query) } }
@@ -116,7 +109,7 @@ public fun Sidebar(
         EntranceWrapper(visible = entered, delayMs = 60) {
             SearchField(
                 query = query,
-                onQueryChange = { query = it },
+                onQueryChange = onQueryChange,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = PrismaSpacing.Sp4, vertical = PrismaSpacing.Sp1),
@@ -176,11 +169,10 @@ public fun Sidebar(
                                 expanded = isExpanded,
                                 enabled = !isSearching,
                                 onToggle = {
-                                    expanded = if (section.name in expanded) {
-                                        expanded - section.name
-                                    } else {
-                                        expanded + section.name
-                                    }
+                                    onExpandedChange(
+                                        if (section.name in expanded) expanded - section.name
+                                        else expanded + section.name
+                                    )
                                 },
                             )
                             AnimatedVisibility(
