@@ -14,13 +14,18 @@ Open the SDUI screen in either catalogue app — it connects on launch.
 
 ## Switch between sample layouts
 
+Each layout has multiple variants — same screen identity, different content
+or ordering — so a live demo can flip between A and B and watch both apps
+re-render simultaneously.
+
 ```bash
-npm run list              # see available samples
-npm run set paywall       # copy samples/paywall.json → layout.json (server hot-reloads)
-npm run set onboarding
-npm run set feed
-npm run set profile
-npm run set promo
+npm run list              # show all samples + arrow on the active one
+npm run set 1a            # paywall variant A          (1b → variant B)
+npm run set 1             # shorthand for 1a
+npm run set 3b            # feed variant B
+npm run set paywall-a     # by name still works
+npm run next              # cycle to the next variant (1a → 1b → 2a → …)
+npm run demo              # interactive: pick layout, edit text fields by number
 ```
 
 Or just edit `layout.json` by hand — chokidar watches it and broadcasts on save.
@@ -57,15 +62,20 @@ layout.json ──(chokidar 100ms debounce)──▶ Ajv validate ──▶ wss.
 
 Unknown node types render as a small "Unsupported: X" placeholder — they don't crash the app.
 
-## The 5 demo layouts
+## The 5 demo layouts (each with A/B variants)
 
-| Sample | Style |
-|---|---|
-| `paywall` | Subscription paywall: hero, feature list, plan tabs, CTA stack |
-| `onboarding` | Centered welcome step: illustration, title, step badges, CTA stack |
-| `feed` | Article feed: tabs + image-headed cards with read CTAs |
-| `profile` | Account / settings: avatar, badges, three list-item cards, destructive sign-out |
-| `promo` | Limited-time promo: hero card with badges, price comparison, CTAs, social proof |
+| ID | Name | Style |
+|---|---|---|
+| 1a | `paywall-a`    | Subscription paywall: hero, feature list, plan tabs, CTA stack |
+| 1b | `paywall-b`    | Same screen, free-trial flavour: features moved up, social-proof badges below CTA |
+| 2a | `onboarding-a` | Centered welcome step: illustration, title, step badges, CTA stack |
+| 2b | `onboarding-b` | Stack-picker step: list of platforms, single primary CTA |
+| 3a | `feed-a`       | Article feed: tabs + image-headed cards |
+| 3b | `feed-b`       | Trending list: numbered badges, no images, denser layout |
+| 4a | `profile-a`    | Settings: centered avatar, three list-item cards, destructive sign-out |
+| 4b | `profile-b`    | Settings: row-style header, quick-actions row, billing + privacy cards |
+| 5a | `promo-a`      | Limited-time promo: 30% off, price comparison, social proof |
+| 5b | `promo-b`      | Flash sale: 50% off, premium tier, feature list card |
 
 ## Caveats
 

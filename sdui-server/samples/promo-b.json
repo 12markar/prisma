@@ -1,0 +1,97 @@
+{
+  "version": 1,
+  "root": {
+    "type": "column",
+    "padding": 24,
+    "spacing": 16,
+    "children": [
+      {
+        "type": "card",
+        "padding": 0,
+        "spacing": 0,
+        "children": [
+          {
+            "type": "image",
+            "url": "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=1200&q=80",
+            "height": 220,
+            "cornerRadius": 0,
+            "contentMode": "cover",
+            "alt": "Premium upgrade"
+          },
+          {
+            "type": "column",
+            "padding": 20,
+            "spacing": 12,
+            "children": [
+              { "type": "row", "spacing": 8, "alignment": "start", "children": [
+                { "type": "badge", "label": "FLASH SALE",  "tone": "danger" },
+                { "type": "badge", "label": "48 HOURS",    "tone": "warning" }
+              ]},
+              { "type": "text", "value": "Save 50% on Premium",  "variant": "headlineLg", "color": "primary" },
+              { "type": "text", "value": "Our deepest discount of the year. Premium gets you everything in Pro plus enterprise SSO, audit logs, and a dedicated success engineer.", "variant": "bodyMd", "color": "secondary" },
+
+              {
+                "type": "row",
+                "spacing": 16,
+                "alignment": "start",
+                "children": [
+                  {
+                    "type": "column",
+                    "spacing": 0,
+                    "children": [
+                      { "type": "text", "value": "$149",         "variant": "displaySm", "color": "accent" },
+                      { "type": "text", "value": "first year",   "variant": "labelSm",   "color": "tertiary" }
+                    ]
+                  },
+                  {
+                    "type": "column",
+                    "spacing": 0,
+                    "children": [
+                      { "type": "text", "value": "$299 →",       "variant": "titleMd", "color": "tertiary" },
+                      { "type": "text", "value": "regular",      "variant": "labelSm", "color": "tertiary" }
+                    ]
+                  }
+                ]
+              },
+
+              { "type": "spacer", "size": 4 },
+              {
+                "type": "button",
+                "label": "Upgrade for $149",
+                "variant": "primary",
+                "size": "lg",
+                "fullWidth": true,
+                "action": { "kind": "log", "id": "promo.b.upgrade" }
+              },
+              {
+                "type": "button",
+                "label": "Compare plans",
+                "variant": "outlined",
+                "size": "md",
+                "fullWidth": true,
+                "action": { "kind": "log", "id": "promo.b.compare" }
+              }
+            ]
+          }
+        ]
+      },
+
+      { "type": "spacer", "size": 4 },
+      {
+        "type": "card",
+        "padding": 16,
+        "spacing": 12,
+        "children": [
+          { "type": "text", "value": "What's in Premium", "variant": "titleMd", "color": "primary" },
+          { "type": "listItem", "title": "SAML / OIDC SSO",      "subtitle": "Okta, Azure AD, Google", "showChevron": false },
+          { "type": "listItem", "title": "Audit logs",            "subtitle": "90 days, exportable",   "showChevron": false },
+          { "type": "listItem", "title": "Dedicated CSM",         "subtitle": "Quarterly reviews",     "showChevron": false },
+          { "type": "listItem", "title": "99.95% uptime SLA",     "subtitle": "Financial-backed",       "showChevron": false }
+        ]
+      },
+
+      { "type": "divider" },
+      { "type": "text", "value": "* Discount applies to the first year of an annual Premium subscription. Renews at $299 / year unless cancelled.", "variant": "labelSm", "color": "tertiary", "align": "center" }
+    ]
+  }
+}

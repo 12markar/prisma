@@ -1,0 +1,99 @@
+{
+  "version": 1,
+  "root": {
+    "type": "column",
+    "padding": 20,
+    "spacing": 16,
+    "children": [
+      {
+        "type": "card",
+        "padding": 16,
+        "spacing": 12,
+        "children": [
+          {
+            "type": "row",
+            "spacing": 16,
+            "alignment": "start",
+            "children": [
+              {
+                "type": "image",
+                "url": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80",
+                "height": 64,
+                "width": 64,
+                "cornerRadius": 32,
+                "contentMode": "cover",
+                "alt": "Avatar"
+              },
+              {
+                "type": "column",
+                "spacing": 2,
+                "children": [
+                  { "type": "text", "value": "Karan Sharma",       "variant": "titleLg", "color": "primary" },
+                  { "type": "text", "value": "Pro · since Mar 2024", "variant": "bodySm",  "color": "secondary" }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "row",
+            "spacing": 8,
+            "alignment": "start",
+            "children": [
+              { "type": "badge", "label": "PRO",      "tone": "accent" },
+              { "type": "badge", "label": "VERIFIED", "tone": "success" },
+              { "type": "badge", "label": "ADMIN",    "tone": "warning" }
+            ]
+          }
+        ]
+      },
+
+      { "type": "text", "value": "Quick actions", "variant": "labelLg", "color": "tertiary" },
+      {
+        "type": "row",
+        "spacing": 12,
+        "alignment": "start",
+        "children": [
+          { "type": "button", "label": "Edit profile",  "variant": "secondary", "size": "sm", "action": { "kind": "log", "id": "profile.b.edit" } },
+          { "type": "button", "label": "Share",         "variant": "outlined",  "size": "sm", "action": { "kind": "log", "id": "profile.b.share" } },
+          { "type": "button", "label": "Help",          "variant": "ghost",     "size": "sm", "action": { "kind": "log", "id": "profile.b.help" } }
+        ]
+      },
+
+      { "type": "text", "value": "Billing", "variant": "labelLg", "color": "tertiary" },
+      {
+        "type": "card",
+        "padding": 4,
+        "spacing": 0,
+        "children": [
+          { "type": "listItem", "title": "Subscription",   "subtitle": "Pro · renews May 22", "trailingText": "$79.99/yr", "showChevron": true, "action": { "kind": "log", "id": "profile.b.subscription" } },
+          { "type": "divider" },
+          { "type": "listItem", "title": "Payment method", "subtitle": "Visa ending 4242",      "trailingText": "Default",   "showChevron": true, "action": { "kind": "log", "id": "profile.b.payment" } },
+          { "type": "divider" },
+          { "type": "listItem", "title": "Invoice history", "subtitle": "12 invoices",          "showChevron": true,         "action": { "kind": "log", "id": "profile.b.invoices" } }
+        ]
+      },
+
+      { "type": "text", "value": "Privacy & data", "variant": "labelLg", "color": "tertiary" },
+      {
+        "type": "card",
+        "padding": 4,
+        "spacing": 0,
+        "children": [
+          { "type": "listItem", "title": "Export my data", "subtitle": "JSON · last 12 months",   "showChevron": true, "action": { "kind": "log", "id": "profile.b.export" } },
+          { "type": "divider" },
+          { "type": "listItem", "title": "Delete account", "subtitle": "Permanent. Cannot undo.", "showChevron": true, "action": { "kind": "log", "id": "profile.b.delete" } }
+        ]
+      },
+
+      { "type": "spacer", "size": 16 },
+      {
+        "type": "button",
+        "label": "Manage subscription",
+        "variant": "primary",
+        "size": "md",
+        "fullWidth": true,
+        "action": { "kind": "log", "id": "profile.b.manage" }
+      }
+    ]
+  }
+}

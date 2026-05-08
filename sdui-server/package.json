@@ -9,7 +9,9 @@
     "start": "node server.js",
     "dev":   "node server.js",
     "set":   "node scripts/set-layout.mjs",
-    "list":  "node scripts/set-layout.mjs --list"
+    "next":  "node scripts/set-layout.mjs next",
+    "list":  "node scripts/set-layout.mjs --list",
+    "demo":  "node scripts/demo.mjs"
   },
   "engines": {
     "node": ">=20"

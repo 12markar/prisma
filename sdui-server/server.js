@@ -15,10 +15,10 @@ const LAYOUT     = resolve(__dirname, 'layout.json');
 const SAMPLES    = resolve(__dirname, 'samples');
 const SCHEMA     = resolve(__dirname, 'schema', 'sdui.schema.json');
 
-// Seed layout.json from the paywall sample on first boot so the server
+// Seed layout.json from the first sample on first boot so the server
 // always has something to broadcast.
 if (!existsSync(LAYOUT)) {
-    const seed = resolve(SAMPLES, 'paywall.json');
+    const seed = resolve(SAMPLES, 'paywall-a.json');
     copyFileSync(seed, LAYOUT);
     console.log(`[sdui] seeded layout.json from ${basename(seed)}`);
 }

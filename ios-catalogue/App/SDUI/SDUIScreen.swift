@@ -52,17 +52,34 @@ struct SDUIScreen: View {
     }
 
     private var waitingState: some View {
-        VStack(spacing: PrismaSpacing.sp2) {
-            Text("No layout yet")
+        let (headline, body): (String, String) = {
+            switch client.state {
+            case .connecting:          return ("Connecting…", "Reaching \(SDUI_WS_URL)")
+            case .disconnected(let r): return ("Can't reach the dev server", r)
+            default:                   return ("No layout yet", "")
+            }
+        }()
+        return VStack(alignment: .leading, spacing: PrismaSpacing.sp1) {
+            Text(headline)
                 .font(PrismaTypography.titleLg.font)
                 .foregroundStyle(PrismaSemanticColors.textPrimary.themed(scheme))
-            Text("Start the dev server: cd sdui-server && npm start")
-                .font(PrismaTypography.bodyMd.font)
-                .foregroundStyle(PrismaSemanticColors.textSecondary.themed(scheme))
-                .multilineTextAlignment(.center)
+            if !body.isEmpty {
+                Text(body)
+                    .font(PrismaTypography.bodyMd.font)
+                    .foregroundStyle(PrismaSemanticColors.textSecondary.themed(scheme))
+            }
+            Spacer().frame(height: PrismaSpacing.sp3)
+            Group {
+                Text("1. Run ./startserver from the repo root.")
+                Text("2. Confirm http://localhost:7331 opens in a browser on the host.")
+                Text("3. WS URL on iOS Simulator is \(SDUI_WS_URL) — change SDUIScreen.swift for a real device.")
+                Text("Logs: filter the Xcode console for [SDUI]")
+            }
+            .font(PrismaTypography.bodySm.font)
+            .foregroundStyle(PrismaSemanticColors.textTertiary.themed(scheme))
         }
-        .padding(PrismaSpacing.sp7)
-        .frame(maxWidth: .infinity)
+        .padding(PrismaSpacing.sp5)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .background(PrismaSemanticColors.surfaceSunken.themed(scheme))
         .clipShape(RoundedRectangle(cornerRadius: PrismaRadius.lg))
     }

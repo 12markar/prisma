@@ -97,35 +97,54 @@ private fun ConnectionBanner(state: SduiState) {
 
 @Composable
 private fun WaitingState(state: SduiState) {
-    Box(
+    val (headline, body) = when (state) {
+        SduiState.Connecting        -> "Connecting…" to "Reaching $SDUI_WS_URL"
+        SduiState.Connected         -> "Connected" to "Waiting for the first frame from the server"
+        is SduiState.Disconnected   -> "Can't reach the dev server" to state.reason
+        is SduiState.Loaded,
+        is SduiState.InvalidPayload -> "No layout yet" to "" // unreachable in this composable
+    }
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(PrismaRadius.Lg))
             .background(PrismaSemanticColors.SurfaceSunken.themed())
-            .padding(PrismaSpacing.Sp7),
-        contentAlignment = Alignment.Center,
+            .padding(PrismaSpacing.Sp5),
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(
+            text = headline,
+            style = PrismaTypography.TitleLg,
+            color = PrismaSemanticColors.TextPrimary.themed(),
+        )
+        if (body.isNotBlank()) {
+            Spacer(Modifier.height(PrismaSpacing.Sp1))
             Text(
-                text = "No layout yet",
-                style = PrismaTypography.TitleLg,
-                color = PrismaSemanticColors.TextPrimary.themed(),
-            )
-            Spacer(Modifier.height(PrismaSpacing.Sp2))
-            Text(
-                text = "Start the dev server with: cd sdui-server && npm start",
+                text = body,
                 style = PrismaTypography.BodyMd,
                 color = PrismaSemanticColors.TextSecondary.themed(),
             )
-            if (state is SduiState.Disconnected) {
-                Spacer(Modifier.height(PrismaSpacing.Sp1))
-                Text(
-                    text = state.reason,
-                    style = PrismaTypography.BodySm,
-                    color = PrismaSemanticColors.TextTertiary.themed(),
-                )
-            }
         }
+        Spacer(Modifier.height(PrismaSpacing.Sp4))
+        Text(
+            text = "1. Run ./startserver from the repo root.",
+            style = PrismaTypography.BodySm,
+            color = PrismaSemanticColors.TextTertiary.themed(),
+        )
+        Text(
+            text = "2. Confirm http://localhost:7331 opens in a browser on the host.",
+            style = PrismaTypography.BodySm,
+            color = PrismaSemanticColors.TextTertiary.themed(),
+        )
+        Text(
+            text = "3. WS URL on Android emulator is $SDUI_WS_URL — change SduiScreen.kt for a real device.",
+            style = PrismaTypography.BodySm,
+            color = PrismaSemanticColors.TextTertiary.themed(),
+        )
+        Text(
+            text = "Logs: adb logcat -s SDUI:*",
+            style = PrismaTypography.BodySm,
+            color = PrismaSemanticColors.TextTertiary.themed(),
+        )
     }
 }
 

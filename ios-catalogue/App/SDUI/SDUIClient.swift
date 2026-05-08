@@ -44,6 +44,8 @@ final class SDUIClient: ObservableObject {
     }
 
     private func connect() {
+        // Filter Xcode console with: [SDUI]
+        print("[SDUI] connect → \(url) (attempt \(attempt + 1))")
         if attempt == 0 { state = .connecting }
         let t = session.webSocketTask(with: url)
         task = t
@@ -57,15 +59,19 @@ final class SDUIClient: ObservableObject {
                 let msg = try await t.receive()
                 attempt = 0
                 switch msg {
-                case .string(let s): handle(s)
+                case .string(let s):
+                    print("[SDUI] frame \(s.count)B head=\(s.prefix(80).replacingOccurrences(of: "\n", with: " "))")
+                    handle(s)
                 case .data(let d):
+                    print("[SDUI] frame \(d.count)B (binary)")
                     if let s = String(data: d, encoding: .utf8) { handle(s) }
                 @unknown default: break
                 }
             }
         } catch {
             guard !stopped else { return }
-            state = .disconnected(error.localizedDescription)
+            print("[SDUI] fail \(type(of: error)): \(error.localizedDescription)")
+            state = .disconnected("\(type(of: error)): \(error.localizedDescription)")
             scheduleReconnect()
         }
     }

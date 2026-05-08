@@ -1,5 +1,6 @@
 package xyz.ksharma.prisma.catalogue.sdui
 
+import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -21,6 +22,9 @@ import okhttp3.WebSocketListener
 import java.util.concurrent.TimeUnit
 import kotlin.math.min
 import kotlin.math.pow
+
+// Filter logcat with: `adb logcat -s SDUI:*` to see connection lifecycle.
+private const val TAG = "SDUI"
 
 /**
  * Connection state for the SDUI screen. Renderer maps each state to a
@@ -82,23 +86,28 @@ public class SduiClient(private val url: String) {
     }
 
     private fun connect() {
+        Log.d(TAG, "connect → $url (attempt ${attempt + 1})")
         _state.value = if (attempt == 0) SduiState.Connecting else SduiState.Disconnected("Reconnecting (attempt ${attempt + 1})…")
         socket = http.newWebSocket(
             Request.Builder().url(url).build(),
             object : WebSocketListener() {
                 override fun onOpen(webSocket: WebSocket, response: Response) {
+                    Log.d(TAG, "open ← $url")
                     attempt = 0
                     _state.value = SduiState.Connected
                 }
                 override fun onMessage(webSocket: WebSocket, text: String) {
+                    Log.d(TAG, "frame ${text.length}B head=${text.take(80).replace('\n', ' ')}")
                     handleFrame(text)
                 }
                 override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
+                    Log.d(TAG, "closed code=$code reason=$reason")
                     _state.value = SduiState.Disconnected(if (reason.isBlank()) "Connection closed" else reason)
                     scheduleReconnect()
                 }
                 override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-                    _state.value = SduiState.Disconnected(t.message ?: "Connection failed")
+                    Log.e(TAG, "fail ${t.javaClass.simpleName}: ${t.message}", t)
+                    _state.value = SduiState.Disconnected("${t.javaClass.simpleName}: ${t.message ?: "Connection failed"}")
                     scheduleReconnect()
                 }
             },

@@ -134,6 +134,23 @@ private fun EntryDetail(
     // transparent system bars.
     val statusBarTop = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
     val navBarBottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+
+    // The SDUI demo is meant to look like a real product screen — no
+    // breadcrumb, no entry-title chrome, no catalogue horizontal padding.
+    // The JSON document owns its own padding via the root column's `padding`
+    // property, so we render edge-to-edge here and let JSON dictate inset.
+    if (entry.key == "sdui.live") {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(scrollState)
+                .padding(top = statusBarTop, bottom = navBarBottom),
+        ) {
+            entry.content?.invoke()
+        }
+        return
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()

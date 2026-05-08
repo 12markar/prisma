@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Thin wrapper so `./sdui set 1a`, `./sdui next`, `./sdui demo`, `./sdui list`
+# all work from the repo root without `cd sdui-server` first. Forwards the
+# subcommand and any args straight to `npm run` inside sdui-server.
+#
+# Use ./startserver to start the dev server itself.
+set -euo pipefail
+
+cd "$(dirname "$0")/sdui-server"
+
+if [ $# -eq 0 ]; then
+    exec npm run list
+fi
+
+exec npm run "$@"

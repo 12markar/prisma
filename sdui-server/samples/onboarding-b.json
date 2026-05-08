@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "root": {
+    "type": "column",
+    "padding": 24,
+    "spacing": 20,
+    "alignment": "center",
+    "children": [
+      { "type": "spacer", "size": 16 },
+      {
+        "type": "image",
+        "url": "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?auto=format&fit=crop&w=900&q=80",
+        "height": 280,
+        "width": 280,
+        "cornerRadius": 140,
+        "contentMode": "cover",
+        "alt": "Onboarding step"
+      },
+      { "type": "badge", "label": "STEP 2 of 3", "tone": "accent" },
+      { "type": "text", "value": "Pick your stack", "variant": "displayMd", "color": "primary", "align": "center" },
+      {
+        "type": "text",
+        "value": "We'll tailor examples and starter templates to the platforms you ship on.",
+        "variant": "bodyLg",
+        "color": "secondary",
+        "align": "center"
+      },
+      { "type": "spacer", "size": 8 },
+
+      {
+        "type": "card",
+        "padding": 4,
+        "spacing": 0,
+        "children": [
+          { "type": "listItem", "title": "iOS",     "subtitle": "SwiftUI, iOS 17+",                  "trailingText": "Selected", "showChevron": true, "action": { "kind": "log", "id": "onboarding.b.ios" } },
+          { "type": "divider" },
+          { "type": "listItem", "title": "Android", "subtitle": "Jetpack Compose, compileSdk 34+",   "trailingText": "Selected", "showChevron": true, "action": { "kind": "log", "id": "onboarding.b.android" } },
+          { "type": "divider" },
+          { "type": "listItem", "title": "Web",     "subtitle": "Tailwind tokens (coming soon)",     "showChevron": true,        "action": { "kind": "log", "id": "onboarding.b.web" } }
+        ]
+      },
+
+      { "type": "spacer", "size": 16 },
+      {
+        "type": "button",
+        "label": "Continue",
+        "variant": "primary",
+        "size": "lg",
+        "fullWidth": true,
+        "action": { "kind": "log", "id": "onboarding.b.continue" }
+      },
+      {
+        "type": "button",
+        "label": "Back",
+        "variant": "ghost",
+        "size": "md",
+        "fullWidth": true,
+        "action": { "kind": "log", "id": "onboarding.b.back" }
+      }
+    ]
+  }
+}

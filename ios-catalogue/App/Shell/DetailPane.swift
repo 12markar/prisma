@@ -63,7 +63,20 @@ struct DetailPane: View {
     }
 
     private func entryContent(_ entry: CatalogueEntry) -> some View {
-        ScrollView {
+        // The SDUI demo is meant to look like a real product screen — no
+        // breadcrumb, no entry-title chrome, no catalogue horizontal padding.
+        // The JSON document owns its own padding via the root column's
+        // `padding` property, so we render edge-to-edge and let the JSON
+        // dictate inset.
+        if entry.key == "sdui.live" {
+            return AnyView(
+                ScrollView {
+                    showcase(for: entry)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+            )
+        }
+        return AnyView(ScrollView {
             VStack(alignment: .leading, spacing: PrismaSpacing.sp4) {
                 // Section breadcrumb pill.
                 Text(entry.section.rawValue)
@@ -101,7 +114,7 @@ struct DetailPane: View {
             .padding(.horizontal, PrismaSpacing.sp8)
             .padding(.vertical, PrismaSpacing.sp7)
             .frame(maxWidth: .infinity, alignment: .leading)
-        }
+        })
     }
 
     private func hasShowcase(_ entry: CatalogueEntry) -> Bool {

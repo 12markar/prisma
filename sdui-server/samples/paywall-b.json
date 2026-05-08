@@ -1,0 +1,112 @@
+{
+  "version": 1,
+  "root": {
+    "type": "column",
+    "padding": 24,
+    "spacing": 16,
+    "children": [
+      {
+        "type": "image",
+        "url": "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&w=1200&q=80",
+        "height": 200,
+        "cornerRadius": 16,
+        "contentMode": "cover",
+        "alt": "Premium hero"
+      },
+      { "type": "spacer", "size": 4 },
+      {
+        "type": "row",
+        "spacing": 8,
+        "alignment": "start",
+        "children": [
+          { "type": "badge", "label": "PRISMA PRO", "tone": "accent" },
+          { "type": "badge", "label": "7-DAY TRIAL", "tone": "success" }
+        ]
+      },
+      { "type": "text", "value": "Go Pro, ship faster", "variant": "displaySm", "color": "primary" },
+
+      { "type": "spacer", "size": 4 },
+      {
+        "type": "tabs",
+        "selectedIndex": 0,
+        "items": [
+          {
+            "label": "Free trial",
+            "content": {
+              "type": "column",
+              "spacing": 8,
+              "children": [
+                { "type": "text", "value": "$0 for 7 days", "variant": "titleLg", "color": "primary", "align": "center" },
+                { "type": "text", "value": "Then $79.99 / year. Cancel anytime.", "variant": "bodySm", "color": "tertiary", "align": "center" }
+              ]
+            }
+          },
+          {
+            "label": "Annual",
+            "content": {
+              "type": "column",
+              "spacing": 8,
+              "children": [
+                { "type": "text", "value": "$79.99 / year", "variant": "titleLg", "color": "primary", "align": "center" },
+                { "type": "text", "value": "Save 33% — equivalent to $6.66 / month", "variant": "bodySm", "color": "accent", "align": "center" }
+              ]
+            }
+          },
+          {
+            "label": "Lifetime",
+            "content": {
+              "type": "column",
+              "spacing": 8,
+              "children": [
+                { "type": "text", "value": "$199 once", "variant": "titleLg", "color": "primary", "align": "center" },
+                { "type": "text", "value": "One payment. Forever access.", "variant": "bodySm", "color": "tertiary", "align": "center" }
+              ]
+            }
+          }
+        ]
+      },
+
+      { "type": "spacer", "size": 4 },
+      {
+        "type": "card",
+        "padding": 16,
+        "spacing": 12,
+        "children": [
+          { "type": "text", "value": "Everything in Pro", "variant": "titleMd", "color": "primary" },
+          { "type": "listItem", "title": "Unlimited components",  "subtitle": "All 41 — and any future ones",      "showChevron": false },
+          { "type": "listItem", "title": "Team workspaces",        "subtitle": "Share Prisma across your org",      "showChevron": false },
+          { "type": "listItem", "title": "Priority Slack support", "subtitle": "Direct line to the maintainers",    "showChevron": false },
+          { "type": "listItem", "title": "Early access",           "subtitle": "Beta features two weeks early",     "showChevron": false }
+        ]
+      },
+
+      { "type": "spacer", "size": 4 },
+      {
+        "type": "button",
+        "label": "Start free trial",
+        "variant": "primary",
+        "size": "lg",
+        "fullWidth": true,
+        "action": { "kind": "log", "id": "paywall.b.trial" }
+      },
+      {
+        "type": "row",
+        "spacing": 16,
+        "alignment": "center",
+        "children": [
+          { "type": "badge", "label": "★ 4.9",           "tone": "neutral" },
+          { "type": "badge", "label": "12K+ TEAMS",     "tone": "neutral" },
+          { "type": "badge", "label": "SOC 2 TYPE II",  "tone": "neutral" }
+        ]
+      },
+      { "type": "spacer", "size": 4 },
+      {
+        "type": "text",
+        "value": "No charge until day 7. Cancel from settings any time.",
+        "variant": "bodySm",
+        "color": "tertiary",
+        "align": "center"
+      }
+    ]
+  }
+}
