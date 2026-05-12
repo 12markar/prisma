@@ -31,6 +31,9 @@ ios-catalogue/Pods/
 ios-catalogue/Prisma.xcodeproj/
 ios-catalogue/App/Generated/
 
+# Release artifacts (published via GitHub Actions, not stored in repo)
+releases/
+
 # macOS
 .DS_Store
 
